@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#656464",
+              "inverse-primary": "#9fcaff",
+              "background": "#fcf9f8",
+              "error-container": "#ffdad6",
+              "surface-variant": "#e4e2e1",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "inverse-on-surface": "#f3f0f0",
+              "primary-fixed-dim": "#9fcaff",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed": "#111c2c",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "secondary-fixed": "#e4e2e1",
+              "surface-container-highest": "#e4e2e1",
+              "primary-fixed": "#d2e4ff",
+              "primary-container": "#0d99ff",
+              "on-primary-fixed": "#001c37",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#c8c6c5",
+              "tertiary-container": "#8b96ab",
+              "surface": "#fcf9f8",
+              "surface-bright": "#fcf9f8",
+              "surface-tint": "#0061a5",
+              "surface-container": "#f0eded",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1b1c1c",
+              "error": "#ba1a1a",
+              "on-secondary-fixed-variant": "#474747",
+              "on-surface-variant": "#3f4753",
+              "on-primary-fixed-variant": "#00497e",
+              "surface-container-high": "#eae7e7",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "outline-variant": "#bfc7d5",
+              "outline": "#707884",
+              "on-tertiary-container": "#242f40",
+              "on-primary-container": "#002f55",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#303030",
+              "primary": "#0061a5",
+              "tertiary": "#545f72",
+              "tertiary-fixed": "#d8e3fa",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-surface": "#1b1c1c",
+              "surface-container-low": "#f6f3f2",
+              "surface-dim": "#dcd9d9",
+              "on-secondary": "#ffffff",
+              "secondary": "#5f5e5e"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+        }
+    </style>
+</head>
+<body class="text-on-background antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-[0_12px_40px_rgba(27,28,28,0.06)] font-['Inter'] antialiased">
+<div class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black tracking-tighter text-blue-800 dark:text-blue-200">SENTINEL</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Shopping</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Diet</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">Recruitment</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-2 mr-4">
+<span class="material-symbols-outlined text-slate-600" data-icon="shopping_cart">shopping_cart</span>
+<span class="material-symbols-outlined text-slate-600" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-slate-600" data-icon="account_circle">account_circle</span>
+</div>
+<button class="px-6 py-2 bg-primary text-on-primary rounded-full font-bold text-sm hover:opacity-90 transition-opacity">Login</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 max-w-7xl mx-auto px-8">
+<!-- Header Section -->
+<header class="mb-16">
+<h1 class="text-[3.5rem] font-bold tracking-tighter text-on-background mb-4 leading-tight">예비군 정보 서비스</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                거주지 주변 예비군 훈련장 위치 확인 및 훈련 신청을 간편하게 진행할 수 있습니다. 
+                최신 훈련 일정과 상세 위치 정보를 확인하세요.
+            </p>
+</header>
+<!-- Main Content Area: Map and List Asymmetric Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Map Section (Large Area) -->
+<section class="lg:col-span-8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(27,28,28,0.06)] bg-surface-container-lowest h-[600px] relative">
+<div class="absolute inset-0 bg-surface-container-low flex items-center justify-center">
+<img alt="Interactive map showing reserve training centers in Seoul" class="w-full h-full object-cover" data-location="Seoul, South Korea" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC37Xj0ON_2guiDtreDJw_GfwReMzuc4H3Bs8-eVLuVOgKGQ66huAWWkws2ClnTtgiyxcqgSe-JV3uRvwjeI-Qo1qVzD-wG7mKGe-PbQKKqQzGV-nvFGPlWwCPjOmBHE9vUr8KJSV21ab-xFxB06u-swfIcQ98ayKkfIFH9E_zmanwuWbf1zbQnVrMCk4zmFa4dWuoTt304Fp5rYpBiva5Ws7aEE8-imXHxHqW-8dv4vJOF1ZEuOpo_lBKX7nCnoSZHigx5xTyrXrWy"/>
+</div>
+<!-- Map Overlay UI -->
+<div class="absolute top-6 left-6 flex flex-col gap-2">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md p-3 rounded-lg shadow-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="my_location">my_location</span>
+<span class="text-sm font-medium">현재 위치: 서울특별시 관악구</span>
+</div>
+</div>
+</section>
+<!-- Training Center List -->
+<section class="lg:col-span-4 space-y-6">
+<div class="flex items-center justify-between mb-2">
+<h2 class="text-xl font-bold tracking-tight text-on-background">주변 훈련장 목록</h2>
+<span class="text-sm text-on-surface-variant">총 4개 발견</span>
+</div>
+<!-- Training Center Card 1 -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(27,28,28,0.03)] group transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-bold text-on-background mb-1">관악구 예비군 훈련소</h3>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                서울특별시 관악구 남부순환로
+                            </p>
+</div>
+<span class="text-sm font-bold text-primary">1.2km</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold text-sm hover:opacity-90 transition-opacity">신청하기</button>
+<button class="p-3 bg-surface-container-high text-on-surface-variant rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+<!-- Training Center Card 2 -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(27,28,28,0.03)] group transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-bold text-on-background mb-1">서초동 과학화 훈련장</h3>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                서울특별시 서초구 반포대로
+                            </p>
+</div>
+<span class="text-sm font-bold text-primary">3.8km</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold text-sm hover:opacity-90 transition-opacity">신청하기</button>
+<button class="p-3 bg-surface-container-high text-on-surface-variant rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+<!-- Training Center Card 3 -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(27,28,28,0.03)] group transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-bold text-on-background mb-1">강남구 통합 훈련센터</h3>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                서울특별시 강남구 도곡로
+                            </p>
+</div>
+<span class="text-sm font-bold text-primary">5.2km</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold text-sm hover:opacity-90 transition-opacity">신청하기</button>
+<button class="p-3 bg-surface-container-high text-on-surface-variant rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+<!-- Training Center Card 4 -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(27,28,28,0.03)] group transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-bold text-on-background mb-1">동작구 지역 예비군 교장</h3>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                서울특별시 동작구 현충로
+                            </p>
+</div>
+<span class="text-sm font-bold text-primary">7.5km</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-bold text-sm hover:opacity-90 transition-opacity">신청하기</button>
+<button class="p-3 bg-surface-container-high text-on-surface-variant rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full py-12 border-t border-slate-200/15 font-['Inter'] text-sm tracking-wide">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-12 max-w-7xl mx-auto">
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 mb-4 text-lg">SENTINEL</div>
+<p class="text-slate-500 dark:text-slate-400 max-w-md">
+                    대한민국 국방부 지정 예비군 공식 정보 포털입니다. 예비군의 권익 보호와 효율적인 훈련 관리를 위해 최선을 다합니다.
+                </p>
+<p class="mt-8 text-slate-500 dark:text-slate-400">© 2024 SENTINEL Military Services Portal. All rights reserved.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Contact Support</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Unit Directory</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

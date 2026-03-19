@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#111c2c",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "error-container": "#ffdad6",
+              "surface-variant": "#e4e2e1",
+              "on-secondary-container": "#656464",
+              "inverse-primary": "#9fcaff",
+              "background": "#fcf9f8",
+              "primary-fixed-dim": "#9fcaff",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "inverse-on-surface": "#f3f0f0",
+              "surface-bright": "#fcf9f8",
+              "tertiary-container": "#8b96ab",
+              "surface": "#fcf9f8",
+              "surface-tint": "#0061a5",
+              "surface-container": "#f0eded",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1b1c1c",
+              "error": "#ba1a1a",
+              "surface-container-highest": "#e4e2e1",
+              "primary-fixed": "#d2e4ff",
+              "secondary-fixed": "#e4e2e1",
+              "primary-container": "#0d99ff",
+              "on-primary-fixed": "#001c37",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#c8c6c5",
+              "outline": "#707884",
+              "on-tertiary-container": "#242f40",
+              "on-primary-container": "#002f55",
+              "outline-variant": "#bfc7d5",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#303030",
+              "on-surface-variant": "#3f4753",
+              "on-primary-fixed-variant": "#00497e",
+              "surface-container-high": "#eae7e7",
+              "on-secondary-fixed-variant": "#474747",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "surface-container-low": "#f6f3f2",
+              "surface-dim": "#dcd9d9",
+              "on-secondary": "#ffffff",
+              "tertiary-fixed": "#d8e3fa",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-surface": "#1b1c1c",
+              "secondary": "#5f5e5e",
+              "primary": "#0061a5",
+              "tertiary": "#545f72"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg no-border shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<nav class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto font-['Inter'] tracking-tight">
+<div class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-200">SENTINEL</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Shopping</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Diet</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Recruitment</a>
+<a class="text-blue-700 dark:text-blue-400 font-semibold border-b-2 border-blue-600" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">notifications</button>
+<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">shopping_cart</button>
+<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">account_circle</button>
+</div>
+</nav>
+</header>
+<main class="pt-32 pb-20 px-8 max-w-screen-xl mx-auto">
+<!-- Editorial Header Section -->
+<section class="mb-20">
+<h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter mb-4 text-on-surface">커뮤니티</h1>
+<p class="text-on-surface-variant text-lg max-w-2xl leading-relaxed">장병들과 소통하고 정보를 나누는 자유로운 공간입니다.</p>
+</section>
+<!-- Community Post List -->
+<!-- Following the "No-Line" Rule: separation via background shifts and spacing -->
+<div class="bg-surface-container-low rounded-xl p-8 md:p-12">
+<div class="grid grid-cols-1 gap-4">
+<!-- Post Item 1 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">오늘 급식 메뉴 추천합니다</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2시간 전</span>
+</div>
+<!-- Post Item 2 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">휴가 복귀할 때 꼭 챙겨야 할 것</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">3시간 전</span>
+</div>
+<!-- Post Item 3 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">자기계발 비용 신청 방법 질문입니다</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">5시간 전</span>
+</div>
+<!-- Post Item 4 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">신병 교육대 생활 꿀팁 대방출</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">8시간 전</span>
+</div>
+<!-- Post Item 5 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">군인 할인 혜택 정리해봤습니다</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">12시간 전</span>
+</div>
+<!-- Post Item 6 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">전역 후 진로 고민이 많네요</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">어제</span>
+</div>
+<!-- Post Item 7 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">운동 루틴 공유합니다 (복근 위주)</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">어제</span>
+</div>
+<!-- Post Item 8 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">BX 신상 간식 후기</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2일 전</span>
+</div>
+<!-- Post Item 9 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">부대 근처 맛집 추천 부탁드려요</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2일 전</span>
+</div>
+<!-- Post Item 10 -->
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">군 e-러닝 수강신청 기간 공지</span>
+<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">3일 전</span>
+</div>
+</div>
+<!-- Pagination/Load More -->
+<div class="mt-12 flex justify-center">
+<button class="bg-surface-container-high text-on-surface px-8 py-3 rounded-full font-medium hover:bg-surface-dim transition-all">더 보기</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full pt-16 pb-8 bg-slate-50 dark:bg-slate-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-screen-2xl mx-auto space-y-6 md:space-y-0">
+<div class="font-bold text-blue-900 dark:text-blue-100">SENTINEL</div>
+<div class="flex flex-wrap justify-center gap-8 text-sm font-['Inter'] leading-relaxed">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Contact Support</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Accessibility</a>
+</div>
+<div class="text-slate-500 dark:text-slate-400 text-sm">
+                © 2024 Modern Sentinel Military Services. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>
