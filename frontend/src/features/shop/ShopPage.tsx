@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useProducts } from './hooks/useProducts';
 import { ProductCard } from './components/ProductCard';
+import { SearchBar } from '../../components/common/SearchBar';
 
 export const ShopPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 8;
   const { products, loading, error, totalCount } = useProducts(page, pageSize);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -19,6 +21,16 @@ export const ShopPage: React.FC = () => {
 
   return (
     <>
+      {/* Search Section */}
+      <section className="max-w-2xl mx-auto mb-16 px-4">
+        <SearchBar 
+          searchType="food" 
+          placeholder="찾으시는 식량이나 상품을 입력하세요" 
+          onSearchSelect={(item) => setSelectedProduct(item)} 
+        />
+      </section>
+
+      {/* Hero Section */}
       <section className="mb-12 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-extrabold tracking-tighter mb-4 text-on-surface dark:text-white">
@@ -32,7 +44,9 @@ export const ShopPage: React.FC = () => {
 
       {/* Product Grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-        {loading ? (
+        {selectedProduct ? (
+          <ProductCard key={selectedProduct.id} product={selectedProduct} />
+        ) : loading ? (
           <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center py-20">
             <span className="text-on-surface-variant dark:text-slate-400">Loading products...</span>
           </div>
@@ -51,8 +65,8 @@ export const ShopPage: React.FC = () => {
         )}
       </section>
 
-      {/* Pagination */}
-      {totalPages > 0 && (
+      {/* Pagination - Hide when searching */}
+      {!selectedProduct && totalPages > 0 && (
         <section className="flex justify-center items-center gap-6 mt-8">
           <button 
             onClick={handlePrevPage}

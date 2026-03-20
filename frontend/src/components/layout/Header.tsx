@@ -74,7 +74,7 @@ export const Header: React.FC = () => {
             Community
           </a>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           <button
             onClick={toggleDarkMode}
             className="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
