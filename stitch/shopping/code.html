@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-container-high": "#eae7e7",
+                        "on-tertiary-container": "#242f40",
+                        "on-primary-container": "#002f55",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "secondary-container": "#e4e2e1",
+                        "outline": "#707884",
+                        "surface-container-low": "#f6f3f2",
+                        "inverse-primary": "#9fcaff",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-secondary-container": "#656464",
+                        "surface-tint": "#0061a5",
+                        "outline-variant": "#bfc7d5",
+                        "secondary-fixed": "#e4e2e1",
+                        "error": "#ba1a1a",
+                        "tertiary": "#545f72",
+                        "surface": "#fcf9f8",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "on-primary-fixed": "#001c37",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "on-background": "#1b1c1c",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#fcf9f8",
+                        "inverse-surface": "#303030",
+                        "surface-dim": "#dcd9d9",
+                        "tertiary-fixed": "#d8e3fa",
+                        "on-primary-fixed-variant": "#00497e",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-fixed-variant": "#474747",
+                        "background": "#fcf9f8",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#9fcaff",
+                        "on-tertiary-fixed": "#111c2c",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "primary-container": "#0d99ff",
+                        "primary": "#0061a5",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary": "#5f5e5e",
+                        "on-surface-variant": "#3f4753",
+                        "tertiary-fixed-dim": "#bcc7dd",
+                        "primary-fixed": "#d2e4ff",
+                        "tertiary-container": "#8b96ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #0061A5 0%, #0D99FF 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<nav class="flex justify-between items-center px-8 h-16 max-w-full">
+<div class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">Modern Sentinel</div>
+<div class="hidden md:flex space-x-8">
+<a class="text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-['Inter'] text-sm tracking-tight" href="#">Shopping</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Armed Reserve</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Recruitment</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-all">dark_mode</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-all">confirmation_number</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-all">shopping_cart</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-primary transition-all">account_circle</span>
+</div>
+</nav>
+</header>
+<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto">
+<!-- Search Section -->
+<section class="max-w-2xl mx-auto mb-16 px-4">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-14 pr-16 py-4 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-full text-sm font-medium placeholder:text-outline transition-all shadow-sm" placeholder="찾으시는 상품이나 정보를 입력하세요" type="text"/>
+<button class="absolute inset-y-2 right-2 px-4 flex items-center justify-center bg-primary text-on-primary rounded-full hover:bg-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Hero Section -->
+<section class="mb-12 text-center">
+<div class="max-w-3xl mx-auto">
+<h1 class="text-5xl font-extrabold tracking-tighter mb-4 text-on-surface">프리미엄 전투식량 &amp; 군용 식품</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed">엄격한 기준을 통과한 고품질 군용 식품을 만나보세요. 현역 장병부터 일반인까지 누구나 즐길 수 있는 최고의 영양 설계를 제공합니다.</p>
+</div>
+</section>
+<!-- Product Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+<!-- Item 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Premium military meal kit pack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxjtIYQgISZLH-dUsJIMmxZkdmm3XbwtJP4FmT4sLuZx-lQmytSzNKGWsg0zqs5KDQcb4K1dq8V4S-qKAZtAW4_iVYFvqyLmEY1WoiDmTKp8LVtbaHh7Q5j9s7y26NSuf22eadWmIw65am18ePA1BziMB9VZ_D67VfAE9qo772B5NdxURr_3B-5xaOrX1wW76YEtMDSd9RzUmlWAQlk-fs-J1ZRtFw3W_QKBTDSwbyTgqdrBMjfzpmNP8UGhzr-IWR5851h1n7Il3A"/>
+<div class="absolute top-3 left-3 px-3 py-1 bg-primary text-on-primary text-[10px] font-bold rounded-full">BEST</div>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">프리미엄 1형 식단 세트</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">고열량 영양 설계로 완성된 한국형 전투식량 패키지입니다.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 12,500</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="High protein energy bar box" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTH1rc5_ZMvFihRIjq__cFFf_rqhmGto9AP2S8bxMzB8m2MIukcyxI4_caBeGLequZpTVq-3ALjn-HF6VKsgE4NiNvHRqALspzJfgNOPqsgWpUHSoN7Cfnu11Crs0tWYlFGO0awHZNSLNxudRYQwzYZYeC8vL8owMXqBb9dWXVYerdHCWZHQb6uZ4X2DV_VH8lNyKGhxSfbf7avaMOQG5PA5ThgVsYpAU8MdyhhlVqU0JY6G3uwqmXFKxUwGMADnArkyqJRS3e0Mt0"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">아머 프로틴 바 12입</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">훈련 중 빠른 에너지 보충을 위한 고함량 단백질 바 세트.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 18,900</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Military grade dehydrated food kit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKKyaZiJk_q8BCShwCK_J4RCm6jHoHjcEEDDW_JadtkCXNiDBzOuH_1nPDbxxc8HQEgHQZdAnqyaRKESBQXPwkmNv9HZgut4UxRJFR2__-B2NCsqy8KfOZ2XkKh3i0ZJ9oLbLfIGpFxa_Y4-9BUJGAzVgYZcvQfpJezflf7LLMoyNtShnD56VMCAxtCnJPo8-OScF0MkhqeHAbFXcaxPoN96chlL7NRCxoJcjLuI4M-QLKSoR1GN9NrhAog42fi29FiH6U6DuZH3Et"/>
+<div class="absolute top-3 left-3 px-3 py-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold rounded-full">SPECIAL</div>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">72시간 생존 비상식량 키트</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">재난 및 비상 상황을 대비한 최적의 영양 구성. 장기 보관 파우치 포장.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 45,000</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Tactical beverage and water pack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuj51UCdL0xzToJOzqaGgFV5z5rKMUFuuXWkyuTVZzt1Wb0EJEZRpAxlc-pbJB9MMDU3BFYaQLm2LsY8TTssBwIxHP82ujB2RjLOnwEJVvkZJz-ULBFKIWdQRQ_25LXw1kCNyVTuKxHbDL_Yh5HeGXB-FQFIQedTQ8hTzMfxZtMUMXe0u-my6gKQc964JYST1oOVbMdJ6SZNT090OUXZWnYIpFwUEokY9skAAhgjLsZg9upder23vVc1_a1NmJ0D7fNnv2ydLUEoSC"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">전술용 수분 보충 파우더</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">땀으로 소실되는 전해질을 빠르게 공급하는 텍티컬 드링크.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 8,400</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Military canned food variety" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiFdhQBxkTWranbHlO7_cn_9K8Q9sjm_yRvDSbyS7hkay-ih8HABuxBkkNZZQTJyimZ47LEdQ98wBnIMFCapcnnCBaVmd0JZls3u2LBKnooEJHF-CadvX_hzieNcBqOhGIbhxo-ViOwgeaKUoZK4pY2tsZv55AhVGP0jale47Ho4SVDTxfMFswKfHWMKsEqmwg2HEAXhch4ZXOkIVkOjRXHYaiO65We5cHlMXy0CG1F_IfmMCUdzgAjLXn9o0m5ZI0iu_7VUieQXHg"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">특제 군대 양념 쇠고기 캔</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">진한 양념으로 밥반찬에 최적화된 군 보급형 캔 장조림.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 4,200</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 6 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Military freeze dried rice" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn-I_zWbWd_pE7R58S8W-S3e-K2Y3z1R-vN2iL1pZ9e8d7c6b5a4"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">동결건조 비빔밥 5종 세트</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">뜨거운 물만 부으면 완성되는 간편하고 든든한 한 끼 식사.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 15,500</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 7 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Tactical supplement multi vitamin" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAm_I8y-xWd_pE7R58S8W-S3e-K2Y3z1R-vN2iL1pZ9e8d7c6b5a4"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">밀리터리 멀티비타민 포르테</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">강도 높은 훈련 후 빠른 회복을 돕는 고농축 종합 비타민.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 24,000</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 8 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all duration-300">
+<div class="aspect-square bg-surface-dim relative overflow-hidden">
+<img alt="Military hard biscuit pack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl_I8y-xWd_pE7R58S8W-S3e-K2Y3z1R-vN2iL1pZ9e8d7c6b5a4"/>
+</div>
+<div class="p-5">
+<h3 class="text-lg font-bold text-on-surface mb-2 tracking-tight">추억의 건빵 대용량 팩</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">별사탕이 포함된 오리지널 군용 건빵. 바삭하고 고소한 맛.</p>
+<div class="flex items-center justify-between"><span class="text-lg font-extrabold text-primary">₩ 6,500</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pagination -->
+<section class="flex justify-center items-center gap-6 mt-8">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="text-sm font-medium tracking-widest text-on-surface-variant">
+                1 <span class="mx-2 text-outline-variant">/</span> 3
+            </div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 max-w-7xl mx-auto">
+<div class="mb-8 md:mb-0 text-center md:text-left">
+<div class="text-lg font-bold text-primary mb-2">Modern Sentinel Military Services</div>
+<p class="font-['Inter'] text-xs text-slate-500 dark:text-slate-400">© 2024 Modern Sentinel Military Services. All rights reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

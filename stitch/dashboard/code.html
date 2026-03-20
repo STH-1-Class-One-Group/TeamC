@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modern Sentinel - 메인 대시보드</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#f3f0f0",
+              "surface-container-high": "#eae7e7",
+              "on-tertiary-container": "#242f40",
+              "on-primary-container": "#002f55",
+              "surface-container": "#f0eded",
+              "secondary-fixed-dim": "#c8c6c5",
+              "secondary-container": "#e4e2e1",
+              "outline": "#707884",
+              "surface-container-low": "#f6f3f2",
+              "inverse-primary": "#9fcaff",
+              "surface-container-highest": "#e4e2e1",
+              "on-secondary-container": "#656464",
+              "surface-tint": "#0061a5",
+              "outline-variant": "#bfc7d5",
+              "secondary-fixed": "#e4e2e1",
+              "error": "#ba1a1a",
+              "tertiary": "#545f72",
+              "surface": "#fcf9f8",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "on-primary-fixed": "#001c37",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#1b1c1c",
+              "on-background": "#1b1c1c",
+              "error-container": "#ffdad6",
+              "surface-bright": "#fcf9f8",
+              "inverse-surface": "#303030",
+              "surface-dim": "#dcd9d9",
+              "tertiary-fixed": "#d8e3fa",
+              "on-primary-fixed-variant": "#00497e",
+              "on-error": "#ffffff",
+              "surface-variant": "#e4e2e1",
+              "on-secondary-fixed-variant": "#474747",
+              "background": "#fcf9f8",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#9fcaff",
+              "on-tertiary-fixed": "#111c2c",
+              "on-secondary-fixed": "#1b1c1c",
+              "primary-container": "#0d99ff",
+              "primary": "#0061a5",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "secondary": "#5f5e5e",
+              "on-surface-variant": "#3f4753",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "primary-fixed": "#d2e4ff",
+              "tertiary-container": "#8b96ab"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #0061A5 0%, #0D99FF 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex justify-between items-center px-8 h-16 max-w-full">
+<div class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">Modern Sentinel</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Shopping</a>
+<a class="text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-['Inter'] text-sm tracking-tight" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Armed Reserve</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Recruitment</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-blue-600 transition-all" data-icon="dark_mode">dark_mode</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-blue-600 transition-all" data-icon="confirmation_number">confirmation_number</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-blue-600 transition-all" data-icon="shopping_cart">shopping_cart</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-blue-600 transition-all" data-icon="account_circle">account_circle</span>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 max-w-7xl mx-auto space-y-16">
+<!-- Hero Section -->
+<section class="relative">
+<div class="max-w-3xl">
+<h1 class="text-[3.5rem] font-extrabold tracking-tighter leading-tight text-on-surface mb-6">
+                당신의 군 생활을 위한<br/>
+<span class="text-primary">통합 지휘 본부.</span>
+</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-xl">
+                효율적인 일정 관리와 최신 국방 정보, 맞춤형 서비스를 한곳에서 제어하십시오. 현대적이고 직관적인 센티넬 대시보드입니다.
+            </p>
+</div>
+<!-- Decorative Element (Asymmetry) -->
+<div class="absolute -top-10 -right-20 w-96 h-96 signature-gradient opacity-10 rounded-full blur-[100px] -z-10"></div>
+</section>
+<!-- Main Dashboard Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Discharge Calculator (Priority Card) -->
+<div class="md:col-span-8 bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex flex-col justify-between space-y-8">
+<div class="flex justify-between items-start">
+<div>
+<span class="text-xs font-bold text-primary tracking-widest uppercase mb-2 block">Personnel Status</span>
+<h2 class="text-2xl font-bold text-on-surface">군대전역일 계산기</h2>
+</div>
+<div class="bg-surface-container-low px-4 py-2 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="timer">timer</span>
+<span class="text-sm font-semibold text-on-surface">D-184</span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex flex-col md:flex-row gap-4">
+<div class="flex-1 space-y-2">
+<label class="text-xs font-medium text-on-surface-variant ml-1">입대일</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface text-sm" type="text" value="2023. 05. 08"/>
+</div>
+<div class="flex-1 space-y-2">
+<label class="text-xs font-medium text-on-surface-variant ml-1">전역일</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface text-sm" type="text" value="2024. 11. 07"/>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-on-surface-variant">복무율</span>
+<span class="text-4xl font-extrabold text-primary tracking-tighter">68.4<span class="text-xl">%</span></span>
+</div>
+<div class="w-full h-3 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full signature-gradient rounded-full" style="width: 68.4%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Reservist Status (Side Card) -->
+<div class="md:col-span-4 bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-lg" data-icon="military_tech">military_tech</span>
+<h2 class="text-xl font-bold text-on-surface">예비군 훈련 현황</h2>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-xs text-on-surface-variant mb-1">현재 연차</p>
+<p class="text-xl font-bold">전역 1년차 (희망배정)</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm font-bold">동원훈련 (2박 3일)</p>
+<p class="text-xs text-on-surface-variant">2024. 09. 12 ~ 09. 14</p>
+</div>
+<span class="bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded text-[10px] font-bold">대기중</span>
+</div>
+<div class="border-t border-outline-variant/15 pt-3">
+<p class="text-xs text-on-surface-variant">장소: 경기도 파주시 예비군 훈련장</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Meal Plan (Small Bento) -->
+<div class="md:col-span-4 bg-surface-container-low p-8 rounded-xl flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-bold text-on-surface">오늘 무엇을 먹나요?</h2>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-primary w-8">조식</span>
+<p class="text-sm text-on-surface">쌀밥, 미역국, 제육볶음, 김치</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center justify-between py-3 border-y border-outline-variant/15">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-primary w-8">중식</span>
+<p class="text-sm text-on-surface">잡곡밥, 육개장, 돈까스, 샐러드</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-primary w-8">석식</span>
+<p class="text-sm text-on-surface">비빔밥, 된장찌개, 계란말이</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<button class="mt-auto pt-6 text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">
+                전체 식단표 보기 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Defense News Section (Editorial List) -->
+<div class="md:col-span-8 bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-bold text-on-surface">국방 뉴스 섹션</h2>
+<button class="text-xs font-bold text-on-surface-variant hover:text-primary">전체보기</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<!-- News Item 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-lg bg-surface-dim mb-4 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Military base landscape with sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCRa5qOGIkDJyWP3IL_0CcIcZbSZgBJCbS4xrLN5lsySdUc5V2HkIYLCsL5A42G1afKfh__mr43K2BJ6OQjQr-EhmUwV1NuQlhKc-l4-DETcGEgcYp8QRRNOFkFZ0s9k7MlYsN8laG9BeJjgJFrKQCZ7NbCgJPvUXz7iRqnxvd2WhxsUMVASDy0bnwZxlMjpNJbaSc4G2xdmxRkPRd4prujeom3kppvVLa532fTc9nxCc2xhwYj-ccihKtMrSqoUwIY3-rnvMq8A0l"/>
+</div>
+<h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
+                        차세대 주력 전차 K-3 개발 착수, 국방부 공식 발표
+                    </h3>
+</div>
+<!-- News Item 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-lg bg-surface-dim mb-4 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Futuristic military technology digital interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjGNVtsQaHAlpv-j4_AciKjVdKqMEgE-UlO4QmbCZQo37bJUHttkXn8G6hDQSjpsdYKP4pVLBebEl27Vc4V79h2ipb0shxMdOzcSo1HV8vwaQ7VTN3khF6QqtVwVZ_QA2Ej84HcbRY-PTItre462C2Y94GQNw3dbxrSz1CCUf6ecB-enxIZTvcrpcg-UxX9DNW_b6My4110tsM2tMZ9bRBs4latlpSZNSSEDcvYfOfEz36qfgS-JUcMWyEDxsy3ptr7yLtb-H0JpaX"/>
+</div>
+<h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
+                        군 장병 복지 향상을 위한 '스마트 병영 2.0' 로드맵 공개
+                    </h3>
+</div>
+<!-- News Item 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-lg bg-surface-dim mb-4 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Army helicopters flying in formation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUDHS7JbJvZ_2dIbzc8nuvElFWP_9oPsmK_A_3KYAA0HARntSYtTrs_TP2lYilULRaB6USJHdcc7Riif6wO1P_1iGOuyzYu3L97x5KNMiUa-P4w9bb6SmWwx3v1PAmRMtzkTzXnFkTYXVKhXk-burP5qcPWqFbteerJIbQT6PfZua3g1RoKPYYmq9byTdBw6dTh1c1kJEtPcWA6h7CxaqmPTqbZOcVjMJB5SpnM2-0IsiN66x4kHGCiiequJt-JGth_h5DLvF0MAOf"/>
+</div>
+<h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
+                        한미 합동 공중 기동 훈련 실시, 최고 수준 경계 태세 유지
+                    </h3>
+</div>
+<!-- News Item 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-lg bg-surface-dim mb-4 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Modern military uniform detail with patch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9cTB-vpNV_i6PHm-Xwqymu9BvIHjB5iTp4035_sJ5_tl36M10FbFWgpq65o21h2hgrcMA311TkjMkBTkEFh-424_hDDR9pfcQ8lAI-mhH8CDgnu3-N8ReBtmo1BXcfHVTWIz3btEhkCCb-2W8ITi_GnMONSuZ2Nkh4RwIs3hHjfmvrfFlAUzL7qgOuyLJmoihmvHU9DFXG-zxEcJswdJocPXK0cOLxqzijbL9iKC6Lr45GRz7D-78zRgyf6AYYPjfJH1XQm4_XrqI"/>
+</div>
+<h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
+                        내년부터 병 봉급 인상... 상병 기준 월 150만원 시대
+                    </h3>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 max-w-7xl mx-auto">
+<div class="text-xs text-slate-500 dark:text-slate-400 font-['Inter'] mb-4 md:mb-0">
+            © 2024 Modern Sentinel Military Services. All rights reserved.
+        </div>
+<div class="flex gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs" href="#">Terms of Service</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>

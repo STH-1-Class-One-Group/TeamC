@@ -9,22 +9,102 @@
       name="description"
       content="Web site created using create-react-app"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#f3f0f0",
+              "surface-container-high": "#eae7e7",
+              "on-tertiary-container": "#242f40",
+              "on-primary-container": "#002f55",
+              "surface-container": "#f0eded",
+              "secondary-fixed-dim": "#c8c6c5",
+              "secondary-container": "#e4e2e1",
+              outline: "#707884",
+              "surface-container-low": "#f6f3f2",
+              "inverse-primary": "#9fcaff",
+              "surface-container-highest": "#e4e2e1",
+              "on-secondary-container": "#656464",
+              "surface-tint": "#0061a5",
+              "outline-variant": "#bfc7d5",
+              "secondary-fixed": "#e4e2e1",
+              error: "#ba1a1a",
+              tertiary: "#545f72",
+              surface: "#fcf9f8",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "on-primary-fixed": "#001c37",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#1b1c1c",
+              "on-background": "#1b1c1c",
+              "error-container": "#ffdad6",
+              "surface-bright": "#fcf9f8",
+              "inverse-surface": "#303030",
+              "surface-dim": "#dcd9d9",
+              "tertiary-fixed": "#d8e3fa",
+              "on-primary-fixed-variant": "#00497e",
+              "on-error": "#ffffff",
+              "surface-variant": "#e4e2e1",
+              "on-secondary-fixed-variant": "#474747",
+              background: "#fcf9f8",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#9fcaff",
+              "on-tertiary-fixed": "#111c2c",
+              "on-secondary-fixed": "#1b1c1c",
+              "primary-container": "#0d99ff",
+              primary: "#0061a5",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              secondary: "#5f5e5e",
+              "on-surface-variant": "#3f4753",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "primary-fixed": "#d2e4ff",
+              "tertiary-container": "#8b96ab",
+            },
+            fontFamily: {
+              headline: ["Inter", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              label: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .signature-gradient {
+        background: linear-gradient(135deg, #0061a5 0%, #0d99ff 100%);
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #fcf9f8;
+      }
+    </style>
+    <title>Modern Sentinel</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#1b1c1c",
+              "primary-fixed-dim": "#9fcaff",
+              "on-error": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "background": "#fcf9f8",
+              "surface-dim": "#dcd9d9",
+              "primary": "#0061a5",
+              "inverse-surface": "#303030",
+              "surface-container-highest": "#e4e2e1",
+              "on-tertiary-container": "#242f40",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#002f55",
+              "outline": "#707884",
+              "error": "#ba1a1a",
+              "inverse-on-surface": "#f3f0f0",
+              "error-container": "#ffdad6",
+              "on-background": "#1b1c1c",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed-variant": "#474747",
+              "surface-container-low": "#f6f3f2",
+              "surface-variant": "#e4e2e1",
+              "secondary-fixed": "#e4e2e1",
+              "primary-fixed": "#d2e4ff",
+              "primary-container": "#0d99ff",
+              "surface-bright": "#fcf9f8",
+              "surface": "#fcf9f8",
+              "on-secondary": "#ffffff",
+              "surface-tint": "#0061a5",
+              "on-secondary-container": "#656464",
+              "on-primary-fixed-variant": "#00497e",
+              "inverse-primary": "#9fcaff",
+              "secondary-fixed-dim": "#c8c6c5",
+              "on-tertiary-fixed": "#111c2c",
+              "on-surface-variant": "#3f4753",
+              "on-error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "surface-container": "#f0eded",
+              "secondary": "#5f5e5e",
+              "outline-variant": "#bfc7d5",
+              "tertiary-container": "#8b96ab",
+              "on-tertiary": "#ffffff",
+              "tertiary-fixed": "#d8e3fa",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-primary-fixed": "#001c37",
+              "tertiary": "#545f72",
+              "surface-container-high": "#eae7e7"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+            color: #1b1c1c;
+        }
+        .editorial-gradient {
+            background: linear-gradient(135deg, #0061A5 0%, #0D99FF 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed">
+<!-- TopNavBar -->
+<nav class="sticky top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Modern Sentinel</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-medium" href="#">Community</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-opacity" href="#">Services</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-opacity" href="#">News</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+<!-- Editorial Header -->
+<header class="mb-12">
+<span class="text-primary font-semibold tracking-wider text-sm mb-3 block">NEW POST</span>
+<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-on-surface leading-tight">
+                새로운 소식을 <br/>
+<span class="text-primary-container text-opacity-90">커뮤니티</span>에 공유하세요.
+            </h1>
+</header>
+<!-- Form Container using Surface Layering -->
+<div class="bg-surface-container-low rounded-xl p-1 md:p-8 space-y-8">
+<section class="bg-surface-container-lowest rounded-xl p-8 shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<form class="space-y-8">
+<!-- Title Input -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1" for="title">제목</label>
+<input class="w-full bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-lg transition-all outline-none placeholder:text-outline-variant" id="title" placeholder="주제를 명확하게 나타내는 제목을 입력하세요" type="text"/>
+</div>
+<!-- Editor Mockup -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">본문 내용</label>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<!-- Editor Toolbar -->
+<div class="flex items-center gap-2 px-4 py-3 bg-surface-container-high/50 border-b border-outline-variant/10">
+<button class="p-2 hover:bg-surface-container-lowest rounded-lg transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="format_bold">format_bold</span>
+</button>
+<button class="p-2 hover:bg-surface-container-lowest rounded-lg transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="format_italic">format_italic</span>
+</button>
+<button class="p-2 hover:bg-surface-container-lowest rounded-lg transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="format_list_bulleted">format_list_bulleted</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/20 mx-1"></div>
+<button class="p-2 hover:bg-surface-container-lowest rounded-lg transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="image">image</span>
+</button>
+<button class="p-2 hover:bg-surface-container-lowest rounded-lg transition-colors text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="link">link</span>
+</button>
+</div>
+<textarea class="w-full bg-transparent border-none focus:ring-0 px-6 py-6 text-body-lg leading-relaxed resize-none placeholder:text-outline-variant" id="content" placeholder="전하고자 하는 내용을 자유롭게 작성해주세요." rows="12"></textarea>
+</div>
+</div>
+<!-- Tag Feature -->
+<div class="space-y-3">
+<label class="text-sm font-semibold text-on-surface-variant ml-1">태그</label>
+<div class="flex flex-wrap gap-2 mb-3">
+<span class="inline-flex items-center gap-1 px-3 py-1.5 bg-tertiary-container text-on-tertiary-container text-sm font-medium rounded-full">
+                                #병영생활 <button class="hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 px-3 py-1.5 bg-tertiary-container text-on-tertiary-container text-sm font-medium rounded-full">
+                                #정보공유 <button class="hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</span>
+</div>
+<div class="relative max-w-xs">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">#</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-full pl-8 pr-4 py-2.5 text-sm outline-none transition-all" placeholder="태그 입력 후 Enter" type="text"/>
+</div>
+</div>
+</form>
+</section>
+<!-- Action Buttons -->
+<div class="flex flex-col md:flex-row items-center justify-end gap-4 px-4 pb-4">
+<button class="w-full md:w-auto px-10 py-4 bg-surface-container-high text-on-surface font-semibold rounded-full hover:bg-surface-dim transition-all active:scale-95" type="button">
+                    취소
+                </button>
+<button class="w-full md:w-auto editorial-gradient text-on-primary px-16 py-4 font-bold rounded-full shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-95" type="submit">
+                    등록하기
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low mt-20 py-16 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="space-y-4">
+<div class="text-xl font-extrabold tracking-tight text-on-surface">Modern Sentinel</div>
+<p class="text-on-surface-variant text-sm max-w-md leading-relaxed">
+                    국방 서비스의 현대화와 효율적인 커뮤니티 환경을 제공합니다. <br/>
+                    모든 정보는 보안 지침에 따라 관리됩니다.
+                </p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-12">
+<div class="space-y-4">
+<h4 class="font-bold text-sm">서비스</h4>
+<ul class="text-sm text-on-surface-variant space-y-2">
+<li><a class="hover:text-primary transition-colors" href="#">공지사항</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">복지몰</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">지원문의</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-sm">법적고지</h4>
+<ul class="text-sm text-on-surface-variant space-y-2">
+<li><a class="hover:text-primary transition-colors" href="#">이용약관</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">개인정보처리방침</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-outline-variant/20 text-xs text-outline text-center md:text-left">
+            © 2024 Modern Sentinel. All rights reserved.
+        </div>
+</footer>
+<!-- Mobile BottomNavBar -->
+<div class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center p-3 pb-safe bg-white dark:bg-slate-900 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-xl px-4 py-1 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[11px] font-medium font-['Inter']">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="text-[11px] font-medium font-['Inter']">Units</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="text-[11px] font-medium font-['Inter']">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[11px] font-medium font-['Inter']">Profile</span>
+</a>
+</div>
+</body></html>

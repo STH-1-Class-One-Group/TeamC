@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#111c2c",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "error-container": "#ffdad6",
+              "surface-variant": "#e4e2e1",
+              "on-secondary-container": "#656464",
+              "inverse-primary": "#9fcaff",
+              "background": "#fcf9f8",
+              "primary-fixed-dim": "#9fcaff",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "inverse-on-surface": "#f3f0f0",
+              "surface-bright": "#fcf9f8",
+              "tertiary-container": "#8b96ab",
+              "surface": "#fcf9f8",
+              "surface-tint": "#0061a5",
+              "surface-container": "#f0eded",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1b1c1c",
+              "error": "#ba1a1a",
+              "surface-container-highest": "#e4e2e1",
+              "primary-fixed": "#d2e4ff",
+              "secondary-fixed": "#e4e2e1",
+              "primary-container": "#0d99ff",
+              "on-primary-fixed": "#001c37",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#c8c6c5",
+              "outline": "#707884",
+              "on-tertiary-container": "#242f40",
+              "on-primary-container": "#002f55",
+              "outline-variant": "#bfc7d5",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#303030",
+              "on-surface-variant": "#3f4753",
+              "on-primary-fixed-variant": "#00497e",
+              "surface-container-high": "#eae7e7",
+              "on-secondary-fixed-variant": "#474747",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "surface-container-low": "#f6f3f2",
+              "surface-dim": "#dcd9d9",
+              "on-secondary": "#ffffff",
+              "tertiary-fixed": "#d8e3fa",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-surface": "#1b1c1c",
+              "secondary": "#5f5e5e",
+              "primary": "#0061a5",
+              "tertiary": "#545f72"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fcf9f8;
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #0061A5 0%, #0D99FF 100%);
+      }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- TopNavBar Implementation -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-800">SENTINEL</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-600 hover:text-blue-600 transition-colors font-['Inter'] tracking-tight" href="#">Shopping</a>
+<a class="text-slate-600 hover:text-blue-600 transition-colors font-['Inter'] tracking-tight" href="#">Dashboard</a>
+<a class="text-slate-600 hover:text-blue-600 transition-colors font-['Inter'] tracking-tight" href="#">Armed Reserve</a>
+<a class="text-blue-700 font-semibold border-b-2 border-blue-600 font-['Inter'] tracking-tight" href="#">Recruitment</a>
+<a class="text-slate-600 hover:text-blue-600 transition-colors font-['Inter'] tracking-tight" href="#">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-5 text-blue-700">
+<span class="material-symbols-outlined cursor-pointer hover:text-blue-600 transition-all" data-icon="dark_mode">dark_mode</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-blue-600 transition-all" data-icon="confirmation_number">confirmation_number</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-blue-600 transition-all" data-icon="shopping_cart">shopping_cart</span>
+<button class="bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors">Login</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-8 max-w-screen-2xl mx-auto">
+<!-- Simplified Header Section -->
+<header class="mb-12">
+<div class="max-w-2xl">
+<h1 class="text-5xl font-extrabold tracking-tighter text-on-surface mb-4">인재 채용</h1>
+<p class="text-xl text-on-surface-variant leading-relaxed">미래를 수호하는 현대적 감각과 전문성을 갖춘 요원을 모집합니다. SENTINEL과 함께 새로운 국방의 기준을 세우십시오.</p>
+</div>
+</header>
+<!-- Simplified Recruitment Grid -->
+<section>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(27,28,28,0.06)] group border border-transparent hover:border-outline-variant/15 transition-all flex flex-col">
+<div class="aspect-video overflow-hidden rounded-lg mb-6 bg-surface-dim">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="High-tech military command center operations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSC-5PUB9F7Q1uETj8DA-8wwWR7RJ4tONk5YE75rr_9z7kLt3D6_imYbBAQsrZBw1BuY6w3kPLOhULdoyGBl1E-LbZw6ANZuuUgEBi0XHCDXpYgZvIgN18vYMkwR-csKordbaIMr8wBPf92_K8W_ydETgVQKwDGO00VTSgTkgqg9SxvvO-4y5tRTl_EskjSWhXOJ5PxSqhqF8EQr8d90tviCeT2OcRgnAIwxVT5xg9oH6DEBPaQuy1GN6ECHA1wHZ5GH2rZ6Zs7pMs"/>
+</div>
+<div class="flex-1">
+<h4 class="text-xl font-bold mb-3">제 105기 기술 전문 요원 채용</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">사이버 보안, 네트워크 엔지니어링 및 전략 데이터 분석 분야의 숙련된 전문가를 모집합니다.</p>
+</div>
+<button class="w-full border-2 border-primary/20 text-primary px-6 py-3 rounded-full font-bold hover:bg-primary/5 transition-colors">자세히 보기</button>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(27,28,28,0.06)] group border border-transparent hover:border-outline-variant/15 transition-all flex flex-col">
+<div class="aspect-video overflow-hidden rounded-lg mb-6 bg-surface-dim">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Military office administration professional setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjR0CmRynOrutthnO3JVI82RA1xwG58UJPDPUTvV8YbhzDTC6lw5QyQP9nPWkG05GLLH_hBmfJBNSeyuFHA19nYT1rtb-HWEcAXdbeNDXUmncwXR8MoHX25RFu6l30sH3zAkX2Eg7RDW5g5QmFTNmGSQpwcjdou1--AJqmKVIKSRfHZuKzLqAoEFbRbAvkNdJe5cdUlLN8Gx0TPzPBOjy3s7ljcCvoruhMC3BZpfMhSEkIW5AucZ3VZJ6eu0iPOs1WHVh4K36REt69"/>
+</div>
+<div class="flex-1">
+<h4 class="text-xl font-bold mb-3">전략 기획실 행정 요원</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">군수 지원 및 인사 관리 시스템의 효율적 운영을 담당할 인재를 찾습니다.</p>
+</div>
+<button class="w-full border-2 border-primary/20 text-primary px-6 py-3 rounded-full font-bold hover:bg-primary/5 transition-colors">자세히 보기</button>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(27,28,28,0.06)] group border border-transparent hover:border-outline-variant/15 transition-all flex flex-col">
+<div class="aspect-video overflow-hidden rounded-lg mb-6 bg-surface-dim">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Medical field military professional at work" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUMBKAFJvOhCL-QTmjTS1h2IhPpJLKzj2zq-KdJJ0ofm_LtuCl1JY4pIn8SOujC13b3nJbK5gf35aIol1e-og7GyQjKnMiDNfvWsurOQNFGGNP54viz-qSOsuH210jOmeP3_Ea2JoyM9UlP8S0Y9rHuXYULkkpwVnvSXC3aImdOlTtRm_3hLeL4naxy4eGKx9mUtdezyw_9VkU17RjJKmJ2qRY8Dz3IybesB4MU18V7F_Uymse-dp_ySyI-jZT1sKZ1hHXydF_Plj1"/>
+</div>
+<div class="flex-1">
+<h4 class="text-xl font-bold mb-3">야전 의료 서비스 전문관</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">긴급 상황 대응 및 군 장병들의 보건 관리를 책임질 전문 의료인을 모집합니다.</p>
+</div>
+<button class="w-full border-2 border-primary/20 text-primary px-6 py-3 rounded-full font-bold hover:bg-primary/5 transition-colors">자세히 보기</button>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(27,28,28,0.06)] group border border-transparent hover:border-outline-variant/15 transition-all flex flex-col">
+<div class="aspect-video overflow-hidden rounded-lg mb-6 bg-surface-dim">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Mechanical engineering military hardware maintenance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSoTxQNjV9WAjR5VyBQe5_CuAf1p2l3NznSetIiEh_qLhzYgzBfG5pSsvMzE22pyC48Pj5lKVeWu1F7lUXVgpEXV5lxxGndnENz9Cu_dctfvqzEc549DwzRadJPdNnKUTTirhrzMVo1dHHZPk_Q0vA2liy2-cH713WPuaLwirx8dc8TFoW7Ms6ILHPiFyx9tE2vXmNfYz9X1M_iRWhqgFRJhXncK0V5WV0N13eLafNWNgvbajI1D2bOZOwSY6rcex1iDHjtWjawqj0"/>
+</div>
+<div class="flex-1">
+<h4 class="text-xl font-bold mb-3">항공 정비 부문 기술 장교</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">최신예 기종 유지보수 및 기체 정비를 위한 기술적 역량을 보유한 인재를 모집합니다.</p>
+</div>
+<button class="w-full border-2 border-primary/20 text-primary px-6 py-3 rounded-full font-bold hover:bg-primary/5 transition-colors">자세히 보기</button>
+</div>
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(27,28,28,0.06)] group border border-transparent hover:border-outline-variant/15 transition-all flex flex-col">
+<div class="aspect-video overflow-hidden rounded-lg mb-6 bg-surface-dim">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Data code and security screen abstract" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_uVSKb6zy_NwywU-akCDbrZH9r9dIfMK9mgXQ96xVJPlE3XWFtXJhq9FgHvjUaobI92eNzieexzIlk7curE1n1KYpOBRkuSadTtpt2fXkhsdbTBOqo39kGDlvLOVard4sMMzYOvSdCR5lPk5rpZrB2R_d72EGMThrp6EdovAEZVA0ZqoB0J8hPdWY7qq3VJ33UJeQqRyXKzUmmas-agpTobyaXPB8Mxg5Y40H0BlMkVwd8egmhS0H08XEPDtS1lP4Md-0x9hk1cf2"/>
+</div>
+<div class="flex-1">
+<h4 class="text-xl font-bold mb-3">상시 채용: 화이트해커</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">국가 안보를 위한 사이버 대응팀의 인재 풀 등록을 상시 진행하고 있습니다.</p>
+</div>
+<button class="w-full border-2 border-primary/20 text-primary px-6 py-3 rounded-full font-bold hover:bg-primary/5 transition-colors">자세히 보기</button>
+</div>
+</div>
+<!-- Pagination Implementation -->
+<div class="mt-16 flex justify-center items-center gap-6">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">chevron_left</span>
+</button>
+<div class="flex items-center gap-2 font-medium text-on-surface">
+<span class="text-primary font-bold">1</span>
+<span class="text-on-surface-variant">/</span>
+<span class="text-on-surface-variant">3</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Process Section -->
+<section class="mt-32">
+<div class="bg-surface-container-low rounded-3xl p-12">
+<h3 class="text-2xl font-bold mb-12 text-center">선발 절차 안내</h3>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="text-center">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+</div>
+<h5 class="font-bold mb-2">서류 접수</h5>
+<p class="text-sm text-on-surface-variant">온라인을 통한 지원서 및 포트폴리오 제출</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="psychology">psychology</span>
+</div>
+<h5 class="font-bold mb-2">직무 적성 검사</h5>
+<p class="text-sm text-on-surface-variant">기초 인적성 및 직무 지식 평가</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="groups">groups</span>
+</div>
+<h5 class="font-bold mb-2">실무 면접</h5>
+<p class="text-sm text-on-surface-variant">관련 부서 리더 및 전문가 기술 면접</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+</div>
+<h5 class="font-bold mb-2">신체 검사 및 임용</h5>
+<p class="text-sm text-on-surface-variant">최종 건강 검진 및 보안 적합성 검토</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Implementation -->
+<footer class="w-full pt-16 pb-8 bg-slate-50 border-t border-slate-200">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-screen-2xl mx-auto mb-8">
+<div class="mb-6 md:mb-0">
+<span class="font-bold text-blue-900">SENTINEL</span>
+<p class="text-sm text-slate-500 mt-2 font-['Inter'] leading-relaxed">Modern Sentinel Military Services Portal</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-sm font-['Inter'] leading-relaxed text-slate-500 hover:text-blue-600 transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm font-['Inter'] leading-relaxed text-slate-500 hover:text-blue-600 transition-colors" href="#">Terms of Service</a>
+<a class="text-sm font-['Inter'] leading-relaxed text-slate-500 hover:text-blue-600 transition-colors" href="#">Contact Support</a>
+<a class="text-sm font-['Inter'] leading-relaxed text-slate-500 hover:text-blue-600 transition-colors" href="#">Accessibility</a>
+</div>
+</div>
+<div class="px-8 max-w-screen-2xl mx-auto text-center border-t border-slate-100 pt-8">
+<p class="text-sm font-['Inter'] leading-relaxed text-slate-500">© 2024 Modern Sentinel Military Services. All rights reserved.</p>
+</div>
+</footer>
+</body></html>

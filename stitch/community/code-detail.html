@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e4e2e1",
+              "primary": "#0061a5",
+              "inverse-surface": "#303030",
+              "inverse-primary": "#9fcaff",
+              "surface-bright": "#fcf9f8",
+              "on-primary-fixed": "#001c37",
+              "tertiary-container": "#8b96ab",
+              "outline-variant": "#bfc7d5",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "primary-fixed": "#d2e4ff",
+              "inverse-on-surface": "#f3f0f0",
+              "background": "#fcf9f8",
+              "surface-tint": "#0061a5",
+              "on-secondary-fixed-variant": "#474747",
+              "surface-container-low": "#f6f3f2",
+              "tertiary": "#545f72",
+              "secondary-fixed": "#e4e2e1",
+              "surface-container": "#f0eded",
+              "on-tertiary-container": "#242f40",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1b1c1c",
+              "on-primary": "#ffffff",
+              "on-surface-variant": "#3f4753",
+              "outline": "#707884",
+              "surface-dim": "#dcd9d9",
+              "primary-container": "#0d99ff",
+              "error": "#ba1a1a",
+              "surface-container-highest": "#e4e2e1",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-secondary-container": "#656464",
+              "on-primary-fixed-variant": "#00497e",
+              "tertiary-fixed": "#d8e3fa",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "on-error": "#ffffff",
+              "surface": "#fcf9f8",
+              "on-error-container": "#93000a",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "surface-container-high": "#eae7e7",
+              "secondary-fixed-dim": "#c8c6c5",
+              "on-tertiary-fixed": "#111c2c",
+              "on-surface": "#1b1c1c",
+              "secondary": "#5f5e5e",
+              "on-primary-container": "#002f55",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#9fcaff"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+            color: #1b1c1c;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black tracking-tighter text-blue-800 dark:text-blue-300">SENTINEL</div>
+<div class="hidden md:flex items-center space-x-8 font-['Inter'] tracking-tight font-medium text-sm">
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Shopping</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Armed Reserve</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Recruitment</a>
+<a class="text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">Community</a>
+</div>
+<div class="flex items-center space-x-5">
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50/50 p-2 rounded-full transition-all">dark_mode</button>
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50/50 p-2 rounded-full transition-all">confirmation_number</button>
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50/50 p-2 rounded-full transition-all">shopping_cart</button>
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50/50 p-2 rounded-full transition-all">login</button>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto">
+<!-- Editorial Post Header -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<header class="p-8 md:p-12 border-b border-outline-variant/15">
+<div class="flex items-center gap-3 mb-6">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-xs font-semibold tracking-wider">REVIEWS</span>
+<span class="text-on-surface-variant text-sm font-medium">May 24, 2024</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-8 leading-tight">PX 신상 간식 후기</h1>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Profile picture of a military officer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-9m-tdFtzjeJkIlKT6W8aYo6oEpfEWVEmG1eBK9Va39wd_u_dZywZ1amlJ0jd5wigQVDYAKbgoVcq5sn3IBBYqwPrZbeemGnCrfZxoGC5v6yUNmIOiF_PRkOTI6mb8GlJAH7yn5J9AwwG2XfUhDuOOwpjqCvlbXPkXfLJShFWybe9OdtNEIIAZ9xv3Tn2z8T_wdmAvTKiJBmDJc8y7bhOikKWbLg2SSoeaU05agk5pwe7lIGwaBbKW4OgAGB_WsDxjBHpz5LT_N05"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">김병장 (Kim Sentinel)</p>
+<p class="text-sm text-on-surface-variant">Armed Reserve Unit 12</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+<span class="text-sm font-medium">Share</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="p-8 md:p-12">
+<div class="relative w-full aspect-video rounded-xl overflow-hidden mb-12 bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="Assorted Korean snacks on a wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGAjBPeywWlFljCEU6F-A5CyrYSllCTQManWS8EiTJOKNVDCdNVhrkFPJYSOF33-wTTXTjlQPqk8MVPYxncvMBmywdOu9d55p21hA81kiit9rs88vqBANWtvfewWmQEqgCByH9izJk522G5d8_bDr1HC0V9fd0340hfN_oxuZo_-2PM_NOOEOiH03cpO_4Rn82XsFMyp3UFdWTn92jpt0yHbveLiu4-c1fz0BpSYaaeHvWHT81D8ZgogTM9hbYEtzWmw57qpo3ceZE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-6">
+<p class="text-white text-sm italic font-light">Featured: The latest snack rotation at the Garrison PX.</p>
+</div>
+</div>
+<div class="prose prose-lg max-w-none text-on-surface leading-relaxed space-y-6">
+<p class="body-lg">오늘 PX에 새로 들어온 스낵 라인업을 확인하고 왔습니다. 이번 신상은 특히 예비군들 사이에서도 화제가 되고 있는 고단백 크런치 바입니다. 이전 제품들에 비해 단맛이 덜하고 고소한 맛이 강화되어 훈련 후 간식으로 제격인 것 같습니다.</p>
+<h3 class="text-2xl font-bold mt-12 mb-4">1. 리얼 카카오 프로틴 칩</h3>
+<p>가격 대비 용량이 아주 훌륭합니다. 식감은 시중의 일반 감자칩보다 훨씬 단단하며, 씹을수록 진한 카카오 향이 올라옵니다. 영양 성분표를 보니 단백질 함량이 12g으로 꽤 높아서 운동 전후에 먹기 좋습니다.</p>
+<div class="bg-surface-container-low p-8 rounded-xl my-10 border-l-4 border-primary">
+<p class="italic text-on-surface-variant">"이번 신상 중에서 가장 추천하는 품목입니다. 보급 건빵에 질린 분들에게 새로운 활력소가 될 것 같네요."</p>
+</div>
+<h3 class="text-2xl font-bold mt-12 mb-4">2. 냉동 짬뽕 만두 (Premium Edition)</h3>
+<p>기존 냉동 코너의 스테디셀러인 짬뽕 만두가 업그레이드되었습니다. 피가 훨씬 얇아졌고 속 재료의 식감이 살아있습니다. 전자레인지 3분이면 충분하지만, 에어프라이어가 있는 생활관이라면 180도에서 10분 돌려보시길 적극 권장합니다.</p>
+</div>
+<div class="mt-16 pt-12 border-t border-outline-variant/15 flex flex-wrap gap-2">
+<span class="px-4 py-1.5 bg-surface-container-high text-on-surface-variant rounded-full text-sm font-medium hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">#PX신상</span>
+<span class="px-4 py-1.5 bg-surface-container-high text-on-surface-variant rounded-full text-sm font-medium hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">#군대간식</span>
+<span class="px-4 py-1.5 bg-surface-container-high text-on-surface-variant rounded-full text-sm font-medium hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">#맛스타</span>
+<span class="px-4 py-1.5 bg-surface-container-high text-on-surface-variant rounded-full text-sm font-medium hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">#리뷰</span>
+</div>
+</div>
+</article>
+<!-- Comments Section -->
+<section class="mt-12 bg-surface-container-lowest rounded-xl p-8 md:p-12">
+<div class="flex items-center justify-between mb-10">
+<h2 class="text-2xl font-bold flex items-center gap-2">
+                    Comments <span class="text-primary text-lg font-medium opacity-60">12</span>
+</h2>
+<div class="flex gap-4">
+<button class="text-sm font-semibold text-primary">Newest</button>
+<button class="text-sm font-semibold text-on-surface-variant">Popular</button>
+</div>
+</div>
+<!-- Write Comment -->
+<div class="mb-12">
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div class="flex-grow group">
+<textarea class="w-full bg-surface-container-low border-none rounded-xl p-4 focus:ring-1 focus:ring-primary focus:bg-white transition-all text-sm" placeholder="Write a comment..." rows="3"></textarea>
+<div class="flex justify-end mt-3">
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-semibold text-sm shadow-md hover:shadow-lg transition-all active:scale-95">Post Comment</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment List -->
+<div class="space-y-10">
+<!-- Comment 1 -->
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Avatar of a male user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANJJGFwQNGiyFlEzqx3LmcrzqurSId1GeoU2N2B-QrZM8g5YtoSQ5CHEX0brMPBQ4s3TqvuD_P83bgLISOrp3XzygTIl5kQvaWqnHr3WrfJ9bVmGiXBwZNzL_qK-aAokRK1yPcQQZGko0Ys3lLPjViBLPaa5Shs0iZOQXSCBDY2iJRYTHAV9RC6S3d6dvjEJknJGuVttC8J_gWv-NmWrB8MOPwHEuuwnZ5oLTlS8JZOlLQiB9ro6ZrS-TxA6FlxXMloGHuQXesw3x0"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">이일병</span>
+<span class="text-xs text-on-surface-variant">2 hours ago</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface-variant">와, 짬뽕 만두 진짜 궁금했는데 오늘 일과 끝나고 달려가야겠네요. 좋은 정보 감사합니다!</p>
+<div class="flex items-center gap-4 mt-3">
+<button class="flex items-center gap-1 text-xs font-semibold text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span> 14
+                            </button>
+<button class="text-xs font-semibold text-on-surface-variant hover:text-primary">Reply</button>
+</div>
+</div>
+</div>
+<!-- Comment 2 -->
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Avatar of a female user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6Of9YePAjl8Izx6MLGnGcmroFPWe9wkKNWAP1dF3hA_I7_Nv2hJMLcDdfzr5HKh3TsUNm8ux3vtWRrzneWQkQ0Silmlw3bfXti9JK76UeKGiRijNAXFz40BXyZucS3DX3O2H5O34LHKPj8Kbh4SryzLuCyzHbVQrzonDJ8FOEhBiHsJIc73S8zjnMAnegBsJGTV-G3jLnnuOUUcFa1CZtzTyy71s7y0yX-2JdhnMcAGnR8ErfOcPuZuZafaKkYxCYrI7WGUxszOpU"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">박상사</span>
+<span class="text-xs text-on-surface-variant">5 hours ago</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface-variant">프로틴 칩은 성분이 괜찮아서 간부님들도 많이 드시더군요. 다이어트 중인데 대안으로 아주 좋습니다.</p>
+<div class="flex items-center gap-4 mt-3">
+<button class="flex items-center gap-1 text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">thumb_up</span> 8
+                            </button>
+<button class="text-xs font-semibold text-on-surface-variant hover:text-primary">Reply</button>
+</div>
+</div>
+</div>
+<!-- Nested Comment -->
+<div class="ml-14 flex gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Avatar of author" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp6ZZsYGewuEWEFLg-PE-_mMfsw2z7rJh0cpYz0q6NeTQwOfL22LS6BiKS1lK5J55yD_1VjcocvN_NS_-2922U3YT-hNSL4ZFmE50UXntj9jJTg8Ac9ie4qZnLYozMsW1v70qZE58EMdJWuFqdGJTYT8ruQuXO0wkIB938tb64JaCKNWCJ-JBRY3qf0BMmSKvGcUXHsOKa8LdbRUFts06fp5Rrt0tDTamDpzdgiC5upRH3qqRCDv7PBFIhFxGz3yYOpV_tPtnXRv_e"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">김병장 (Author)</span>
+<span class="text-xs text-on-surface-variant">3 hours ago</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface-variant">맞습니다 상사님. 특히 커피랑 같이 먹으면 초코 풍미가 더 잘 느껴집니다!</p>
+<div class="flex items-center gap-4 mt-3">
+<button class="flex items-center gap-1 text-xs font-semibold text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span> 2
+                            </button>
+<button class="text-xs font-semibold text-on-surface-variant hover:text-primary">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full py-16 px-8 mt-20">
+<div class="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 font-['Inter'] text-sm leading-relaxed">
+<div>
+<div class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">SENTINEL</div>
+<p class="text-slate-500 dark:text-slate-400">© 2024 SENTINEL Military Services. All rights reserved.</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Support</h4>
+<a class="block text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Privacy Policy</a>
+<a class="block text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="space-y-4">
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Connect</h4>
+<a class="block text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Contact Support</a>
+<a class="block text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Institutional Oversight</a>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Language</h4>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-white border border-outline-variant/30 rounded-lg text-primary font-semibold">KOR</button>
+<button class="px-3 py-1 hover:bg-white/50 rounded-lg transition-colors">ENG</button>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

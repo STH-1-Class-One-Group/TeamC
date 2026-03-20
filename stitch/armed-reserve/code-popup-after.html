@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-tint": "#0061a5",
+              "surface-container": "#f0eded",
+              "tertiary": "#545f72",
+              "surface-dim": "#dcd9d9",
+              "on-tertiary-container": "#242f40",
+              "on-error-container": "#93000a",
+              "background": "#fcf9f8",
+              "on-primary-fixed-variant": "#00497e",
+              "on-primary-fixed": "#001c37",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#fcf9f8",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#656464",
+              "error-container": "#ffdad6",
+              "primary-container": "#0d99ff",
+              "secondary-container": "#e4e2e1",
+              "secondary-fixed": "#e4e2e1",
+              "on-secondary-fixed-variant": "#474747",
+              "outline-variant": "#bfc7d5",
+              "error": "#ba1a1a",
+              "secondary": "#5f5e5e",
+              "surface-container-highest": "#e4e2e1",
+              "primary": "#0061a5",
+              "on-surface-variant": "#3f4753",
+              "on-tertiary-fixed": "#111c2c",
+              "tertiary-fixed": "#d8e3fa",
+              "surface-container-low": "#f6f3f2",
+              "primary-fixed": "#d2e4ff",
+              "on-background": "#1b1c1c",
+              "surface-container-high": "#eae7e7",
+              "primary-fixed-dim": "#9fcaff",
+              "on-surface": "#1b1c1c",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "on-error": "#ffffff",
+              "inverse-primary": "#9fcaff",
+              "on-primary-container": "#002f55",
+              "inverse-surface": "#303030",
+              "surface-variant": "#e4e2e1",
+              "secondary-fixed-dim": "#c8c6c5",
+              "outline": "#707884",
+              "on-tertiary": "#ffffff",
+              "surface-bright": "#fcf9f8",
+              "tertiary-container": "#8b96ab",
+              "inverse-on-surface": "#f3f0f0"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased">
+<!-- TopNavBar -->
+<header class="sticky top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#0061A5] dark:text-[#0D99FF]">The Modern Sentinel</span>
+<nav class="hidden md:flex items-center gap-6 font-['Inter'] antialiased text-sm font-medium tracking-tight">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] dark:hover:text-[#0D99FF] transition-colors" href="#">Shopping</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] dark:hover:text-[#0D99FF] transition-colors" href="#">Dashboard</a>
+<a class="text-[#0061A5] dark:text-[#0D99FF] border-b-2 border-[#0061A5] dark:border-[#0D99FF] pb-1" href="#">Armed Reserve</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] dark:hover:text-[#0D99FF] transition-colors" href="#">Recruitment</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] dark:hover:text-[#0D99FF] transition-colors" href="#">Community</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<button class="p-2 hover:opacity-80 transition-all duration-300 text-slate-600">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 hover:opacity-80 transition-all duration-300 text-slate-600">
+<span class="material-symbols-outlined">confirmation_number</span>
+</button>
+<button class="p-2 hover:opacity-80 transition-all duration-300 text-slate-600">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 rounded-full font-semibold text-sm hover:opacity-90 active:scale-95 transition-all">
+                    Login
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-8 py-12 relative">
+<!-- Title & Bookmark Section -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<h1 class="text-[3.5rem] font-extrabold tracking-tighter leading-tight text-on-surface">예비군 정보 서비스</h1>
+<p class="text-on-surface-variant mt-2 text-lg">내 주변 훈련소 정보와 예약을 한눈에 관리하세요.</p>
+</div>
+<button class="flex items-center gap-3 bg-surface-container-lowest shadow-[0_12px_40px_rgba(27,28,28,0.06)] px-8 py-4 rounded-xl border border-outline-variant/15 hover:bg-surface-bright transition-all group">
+<span class="material-symbols-outlined text-primary scale-125" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+<span class="font-bold text-lg text-primary">북마크한 훈련소</span>
+</button>
+</div>
+<!-- Main Content Layout -->
+<div class="grid grid-cols-12 gap-8 items-start">
+<!-- Map Section -->
+<div class="col-span-12 lg:col-span-8">
+<div class="relative rounded-xl overflow-hidden bg-surface-container-low shadow-sm aspect-[16/9] border border-outline-variant/10">
+<img class="w-full h-full object-cover opacity-90 mix-blend-multiply grayscale-[20%]" data-alt="Modern clean map showing military training centers in Seoul" data-location="Seoul, South Korea" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB72VqgtKKukUndICg-n5Y4qM7kZWaDh0CDCZmG7HaU8DAT0lfjERg4F2C4Wb3NArf3hItZ_Tufe7tfyn8LnWF7rtB3UobTWS1q9x995LxcM4x4x60IYQRYKkrbIrYjCynCx_ECjYzRTrtdEYvxnIhzvt3dz4uT0xRGte9N50CZAW5adDe_yM29lB89zd9yxR3IQSTWigigLZpKJteZjeOKs9wFnxtxC1SDUZltp_kNhlwTwVV__J_ytFuFZo_7cD_90YjkUAsSyng1"/>
+<!-- Map Overlays -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Marker 1 -->
+<div class="absolute top-1/4 left-1/3 pointer-events-auto">
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-bold shadow-lg mb-1 group-hover:scale-110 transition-transform">서초 훈련장</div>
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+<!-- Marker 2 -->
+<div class="absolute top-1/2 left-2/3 pointer-events-auto">
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="bg-surface-container-lowest text-on-surface px-3 py-1 rounded-full text-xs font-bold shadow-lg mb-1 group-hover:scale-110 transition-transform">강남 훈련소</div>
+<span class="material-symbols-outlined text-tertiary text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute bottom-6 right-6 flex flex-col gap-2">
+<button class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-on-surface">add</span>
+</button>
+<button class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-on-surface">remove</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Side List Section -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="flex justify-between items-center">
+<h3 class="text-xl font-bold tracking-tight text-on-surface">주변 훈련장 목록</h3>
+<span class="text-sm font-medium text-on-surface-variant">총 12개 결과</span>
+</div>
+<div class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+<!-- Training Center Item 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors">서초 과학화 훈련장</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-tertiary-container/30 text-on-tertiary-fixed-variant text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Active</span>
+<span class="text-xs text-on-surface-variant font-medium">1.2km 거리</span>
+</div>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bookmark</span>
+</button>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 line-clamp-1">서울특별시 서초구 신원동 산 45-1</p>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface-container-high py-2.5 rounded-full text-sm font-bold hover:bg-surface-dim transition-colors">상세보기</button>
+<button class="flex-1 bg-primary text-on-primary py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-opacity">신청하기</button>
+</div>
+</div>
+<!-- Training Center Item 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors">강남 예비군 훈련소</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-tertiary-container/30 text-on-tertiary-fixed-variant text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Reserved</span>
+<span class="text-xs text-on-surface-variant font-medium">3.5km 거리</span>
+</div>
+</div>
+<button class="text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 line-clamp-1">서울특별시 강남구 내곡동 산 12-3</p>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface-container-high py-2.5 rounded-full text-sm font-bold hover:bg-surface-dim transition-colors">상세보기</button>
+<button class="flex-1 bg-primary text-on-primary py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-opacity">신청하기</button>
+</div>
+</div>
+<!-- Training Center Item 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-bold text-lg group-hover:text-primary transition-colors">송파 과학화 교육관</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-tertiary-container/30 text-on-tertiary-fixed-variant text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Closed</span>
+<span class="text-xs text-on-surface-variant font-medium">5.8km 거리</span>
+</div>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bookmark</span>
+</button>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 line-clamp-1">서울특별시 송파구 장지동 102-4</p>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface-container-high py-2.5 rounded-full text-sm font-bold hover:bg-surface-dim transition-colors">상세보기</button>
+<button class="flex-1 bg-primary text-on-primary py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-opacity">신청하기</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bookmark Modal (Visual Overlay Representation) -->
+<div class="absolute top-[120px] right-8 w-[400px] bg-surface-container-lowest rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.15)] border border-outline-variant/15 z-40 overflow-hidden transform transition-all">
+<div class="bg-surface-container-low px-6 py-4 flex justify-between items-center border-b border-outline-variant/10">
+<h3 class="font-bold text-on-surface">북마크한 훈련소 목록</h3>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex items-center gap-4 p-3 hover:bg-surface-container-low rounded-xl transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">강남 예비군 훈련소</div>
+<div class="text-[11px] text-on-surface-variant">강남구 내곡동 • 최근 조회 2일 전</div>
+</div>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex items-center gap-4 p-3 hover:bg-surface-container-low rounded-xl transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">관악 과학화 훈련장</div>
+<div class="text-[11px] text-on-surface-variant">관악구 봉천동 • 최근 조회 5일 전</div>
+</div>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant/10">
+<button class="w-full bg-surface-container-high text-on-surface py-2 rounded-lg text-xs font-bold hover:bg-surface-dim transition-colors">전체 북마크 관리</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200/15 dark:border-slate-800/15 bg-[#f6f3f2] dark:bg-slate-950 mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-10 gap-6 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-6">
+<span class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500">© 2024 Modern Sentinel Military Services. All rights reserved.</span>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 hover:text-[#0061A5] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 hover:text-[#0061A5] transition-colors" href="#">Terms</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 hover:text-[#0061A5] transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</body></html>
