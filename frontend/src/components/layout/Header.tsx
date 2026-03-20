@@ -35,6 +35,13 @@ export const Header: React.FC = () => {
         </div>
         <div className="hidden md:flex items-center space-x-8">
           <a
+            className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
+            href="#"
+          >
+            Shopping
+            
+          </a>
+          <a
             className="text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-['Inter'] text-sm tracking-tight"
             href="#"
           >
@@ -44,13 +51,7 @@ export const Header: React.FC = () => {
             className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
             href="#"
           >
-            Shopping
-          </a>
-          <a
-            className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
-            href="#"
-          >
-            Diet
+            Armed Reserve
           </a>
           <a
             className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
