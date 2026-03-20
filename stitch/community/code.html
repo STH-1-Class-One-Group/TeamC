@@ -6,7 +6,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -79,20 +78,21 @@
 </head>
 <body class="bg-background font-body text-on-background antialiased">
 <!-- TopNavBar -->
-<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg no-border shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
-<nav class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto font-['Inter'] tracking-tight">
-<div class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-200">SENTINEL</div>
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<nav class="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto font-['Inter'] tracking-tight font-medium text-sm">
+<div class="text-2xl font-black tracking-tighter text-blue-800 dark:text-blue-300">SENTINEL</div>
 <div class="hidden md:flex items-center space-x-8">
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Dashboard</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Shopping</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Diet</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Recruitment</a>
-<a class="text-blue-700 dark:text-blue-400 font-semibold border-b-2 border-blue-600" href="#">Community</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Shopping</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Armed Reserve</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Recruitment</a>
+<a class="text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">Community</a>
 </div>
 <div class="flex items-center space-x-6">
-<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">notifications</button>
+<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">dark_mode</button>
+<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">confirmation_number</button>
 <button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">shopping_cart</button>
-<button class="material-symbols-outlined text-slate-600 hover:text-blue-600 transition-all">account_circle</button>
+<button class="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95">Login</button>
 </div>
 </nav>
 </header>
@@ -103,58 +103,122 @@
 <p class="text-on-surface-variant text-lg max-w-2xl leading-relaxed">장병들과 소통하고 정보를 나누는 자유로운 공간입니다.</p>
 </section>
 <!-- Community Post List -->
-<!-- Following the "No-Line" Rule: separation via background shifts and spacing -->
 <div class="bg-surface-container-low rounded-xl p-8 md:p-12">
-<div class="grid grid-cols-1 gap-4">
+<div class="flex justify-end mb-6">
+<button class="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-full font-semibold hover:bg-primary/90 transition-all active:scale-95 shadow-md shadow-primary/20">
+<span class="material-symbols-outlined">edit</span>
+<span>글쓰기</span>
+</button>
+</div><div class="grid grid-cols-1 gap-4">
 <!-- Post Item 1 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">오늘 급식 메뉴 추천합니다</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2시간 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">오늘 급식 메뉴 추천합니다</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">김철수 병장</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 1.2k</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">2시간 전</span>
 </div>
 <!-- Post Item 2 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">휴가 복귀할 때 꼭 챙겨야 할 것</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">3시간 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">휴가 복귀할 때 꼭 챙겨야 할 것</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">이영희 상병</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 856</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">3시간 전</span>
 </div>
 <!-- Post Item 3 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">자기계발 비용 신청 방법 질문입니다</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">5시간 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">자기계발 비용 신청 방법 질문입니다</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">박민수 일병</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 432</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">5시간 전</span>
 </div>
 <!-- Post Item 4 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">신병 교육대 생활 꿀팁 대방출</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">8시간 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">신병 교육대 생활 꿀팁 대방출</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">정우성 상사</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 2.5k</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">8시간 전</span>
 </div>
 <!-- Post Item 5 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">군인 할인 혜택 정리해봤습니다</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">12시간 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">군인 할인 혜택 정리해봤습니다</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">강호동 일병</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 1.8k</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">12시간 전</span>
 </div>
 <!-- Post Item 6 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">전역 후 진로 고민이 많네요</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">어제</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">전역 후 진로 고민이 많네요</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">유재석 병장</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 921</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">어제</span>
 </div>
 <!-- Post Item 7 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">운동 루틴 공유합니다 (복근 위주)</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">어제</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">운동 루틴 공유합니다 (복근 위주)</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">김종국 중사</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 3.1k</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">어제</span>
 </div>
 <!-- Post Item 8 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">BX 신상 간식 후기</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2일 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">BX 신상 간식 후기</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">하동훈 이병</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 567</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">2일 전</span>
 </div>
 <!-- Post Item 9 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">부대 근처 맛집 추천 부탁드려요</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">2일 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">부대 근처 맛집 추천 부탁드려요</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">송지효 상병</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 234</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">2일 전</span>
 </div>
 <!-- Post Item 10 -->
-<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex justify-between items-center">
-<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors">군 e-러닝 수강신청 기간 공지</span>
-<span class="text-on-surface-variant text-sm whitespace-nowrap ml-4">3일 전</span>
+<div class="group bg-surface-container-lowest hover:bg-surface-bright p-6 rounded-lg transition-all duration-300 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center">
+<div class="flex flex-col mb-4 md:mb-0">
+<span class="text-lg font-medium text-on-surface group-hover:text-primary transition-colors mb-1">군 e-러닝 수강신청 기간 공지</span>
+<div class="flex items-center space-x-3 text-sm text-on-surface-variant">
+<span class="font-medium">관리자</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 5.2k</span>
+</div>
+</div>
+<span class="text-on-surface-variant text-sm whitespace-nowrap">3일 전</span>
 </div>
 </div>
 <!-- Pagination/Load More -->
@@ -164,18 +228,27 @@
 </div>
 </main>
 <!-- Footer -->
-<footer class="w-full pt-16 pb-8 bg-slate-50 dark:bg-slate-950">
-<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-screen-2xl mx-auto space-y-6 md:space-y-0">
-<div class="font-bold text-blue-900 dark:text-blue-100">SENTINEL</div>
-<div class="flex flex-wrap justify-center gap-8 text-sm font-['Inter'] leading-relaxed">
-<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Privacy Policy</a>
-<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Terms of Service</a>
-<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Contact Support</a>
-<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Accessibility</a>
+<footer class="w-full py-16 px-8 mt-20 bg-slate-50 dark:bg-slate-950 font-['Inter'] text-sm leading-relaxed">
+<div class="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+<div class="space-y-4">
+<div class="text-xl font-bold text-slate-900 dark:text-slate-100">SENTINEL</div>
+<p class="text-slate-500 dark:text-slate-400">© 2024 SENTINEL Military Services. All rights reserved.</p>
 </div>
-<div class="text-slate-500 dark:text-slate-400 text-sm">
-                © 2024 Modern Sentinel Military Services. All rights reserved.
-            </div>
+<div class="flex flex-col space-y-3">
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 mb-2">Legal</h4>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col space-y-3">
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 mb-2">Support</h4>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Contact Support</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="#">Institutional Oversight</a>
+</div>
+<div class="flex items-start">
+<div class="text-slate-500 dark:text-slate-400 text-xs italic">
+                    Supporting those who serve with modern solutions.
+                </div>
+</div>
 </div>
 </footer>
 </body></html>
