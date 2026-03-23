@@ -107,12 +107,12 @@
 <section class="relative">
 <div class="max-w-3xl">
 <h1 class="text-[3.5rem] font-extrabold tracking-tighter leading-tight text-on-surface mb-6">
-                당신의 군 생활을 위한<br/>
+                    당신의 군 생활을 위한<br/>
 <span class="text-primary">통합 지휘 본부.</span>
 </h1>
 <p class="text-on-surface-variant text-lg leading-relaxed max-w-xl">
-                효율적인 일정 관리와 최신 국방 정보, 맞춤형 서비스를 한곳에서 제어하십시오. 현대적이고 직관적인 센티넬 대시보드입니다.
-            </p>
+                    효율적인 일정 관리와 최신 국방 정보, 맞춤형 서비스를 한곳에서 제어하십시오. 현대적이고 직관적인 센티넬 대시보드입니다.
+                </p>
 </div>
 <!-- Decorative Element (Asymmetry) -->
 <div class="absolute -top-10 -right-20 w-96 h-96 signature-gradient opacity-10 rounded-full blur-[100px] -z-10"></div>
@@ -153,27 +153,57 @@
 </div>
 </div>
 </div>
-<!-- Reservist Status (Side Card) -->
-<div class="md:col-span-4 bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
-<div class="flex items-center gap-3 mb-8">
+<!-- Rank & Step Status (Refactored Card) -->
+<div class="md:col-span-4 bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-lg" data-icon="military_tech">military_tech</span>
-<h2 class="text-xl font-bold text-on-surface">예비군 훈련 현황</h2>
+<h2 class="text-xl font-bold text-on-surface">계급 및 호봉 현황</h2>
 </div>
-<div class="space-y-6">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="award_star">award_star</span>
+</div>
+<span class="text-[10px] font-bold text-primary uppercase tracking-tighter">예상 계급</span>
+</div>
+</div>
+<div class="space-y-8">
 <div>
-<p class="text-xs text-on-surface-variant mb-1">현재 연차</p>
-<p class="text-xl font-bold">전역 1년차 (희망배정)</p>
+<p class="text-xs font-bold text-primary tracking-widest uppercase mb-1">Current Status</p>
+<p class="text-xl font-bold text-on-surface">병장 3호봉 (상병 만기)</p>
 </div>
-<div class="p-4 bg-surface-container-low rounded-lg space-y-4">
-<div class="flex justify-between items-start">
-<div>
-<p class="text-sm font-bold">동원훈련 (2박 3일)</p>
-<p class="text-xs text-on-surface-variant">2024. 09. 12 ~ 09. 14</p>
+<!-- Rank Progress -->
+<div class="space-y-3">
+<div class="flex justify-between items-end"><div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-tight">계급 진척도 (Rank)</span>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-medium text-on-surface-variant">진급일: 2024. 05. 01</span>
+<span class="bg-surface-container-low px-2 py-0.5 rounded-full text-[10px] font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]" data-icon="timer">timer</span>D-45
+</span>
 </div>
-<span class="bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded text-[10px] font-bold">대기중</span>
 </div>
-<div class="border-t border-outline-variant/15 pt-3">
-<p class="text-xs text-on-surface-variant">장소: 경기도 파주시 예비군 훈련장</p>
+<span class="text-2xl font-extrabold text-primary tracking-tighter">75<span class="text-sm">%</span></span></div>
+<div class="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full signature-gradient rounded-full" style="width: 75%;"></div>
+</div>
+</div>
+<!-- Step Progress -->
+<div class="space-y-3">
+<div class="flex justify-between items-end"><div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-tight">호봉 진척도 (Step)</span>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-medium text-on-surface-variant">승봉일: 2024. 04. 01</span>
+<span class="bg-surface-container-low px-2 py-0.5 rounded-full text-[10px] font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]" data-icon="timer">timer</span>D-15
+</span>
+</div>
+</div>
+<span class="text-2xl font-extrabold text-primary tracking-tighter">40<span class="text-sm">%</span></span></div>
+<div class="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full signature-gradient rounded-full" style="width: 40%;"></div>
+</div>
 </div>
 </div>
 </div>
@@ -213,7 +243,7 @@
 </div>
 </div>
 <button class="mt-auto pt-6 text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">
-                전체 식단표 보기 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                    전체 식단표 보기 <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
 </button>
 </div>
 <!-- Defense News Section (Editorial List) -->
@@ -229,8 +259,8 @@
 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Military base landscape with sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCRa5qOGIkDJyWP3IL_0CcIcZbSZgBJCbS4xrLN5lsySdUc5V2HkIYLCsL5A42G1afKfh__mr43K2BJ6OQjQr-EhmUwV1NuQlhKc-l4-DETcGEgcYp8QRRNOFkFZ0s9k7MlYsN8laG9BeJjgJFrKQCZ7NbCgJPvUXz7iRqnxvd2WhxsUMVASDy0bnwZxlMjpNJbaSc4G2xdmxRkPRd4prujeom3kppvVLa532fTc9nxCc2xhwYj-ccihKtMrSqoUwIY3-rnvMq8A0l"/>
 </div>
 <h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
-                        차세대 주력 전차 K-3 개발 착수, 국방부 공식 발표
-                    </h3>
+                            차세대 주력 전차 K-3 개발 착수, 국방부 공식 발표
+                        </h3>
 </div>
 <!-- News Item 2 -->
 <div class="group cursor-pointer">
@@ -238,8 +268,8 @@
 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Futuristic military technology digital interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjGNVtsQaHAlpv-j4_AciKjVdKqMEgE-UlO4QmbCZQo37bJUHttkXn8G6hDQSjpsdYKP4pVLBebEl27Vc4V79h2ipb0shxMdOzcSo1HV8vwaQ7VTN3khF6QqtVwVZ_QA2Ej84HcbRY-PTItre462C2Y94GQNw3dbxrSz1CCUf6ecB-enxIZTvcrpcg-UxX9DNW_b6My4110tsM2tMZ9bRBs4latlpSZNSSEDcvYfOfEz36qfgS-JUcMWyEDxsy3ptr7yLtb-H0JpaX"/>
 </div>
 <h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
-                        군 장병 복지 향상을 위한 '스마트 병영 2.0' 로드맵 공개
-                    </h3>
+                            군 장병 복지 향상을 위한 '스마트 병영 2.0' 로드맵 공개
+                        </h3>
 </div>
 <!-- News Item 3 -->
 <div class="group cursor-pointer">
@@ -247,8 +277,8 @@
 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Army helicopters flying in formation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUDHS7JbJvZ_2dIbzc8nuvElFWP_9oPsmK_A_3KYAA0HARntSYtTrs_TP2lYilULRaB6USJHdcc7Riif6wO1P_1iGOuyzYu3L97x5KNMiUa-P4w9bb6SmWwx3v1PAmRMtzkTzXnFkTYXVKhXk-burP5qcPWqFbteerJIbQT6PfZua3g1RoKPYYmq9byTdBw6dTh1c1kJEtPcWA6h7CxaqmPTqbZOcVjMJB5SpnM2-0IsiN66x4kHGCiiequJt-JGth_h5DLvF0MAOf"/>
 </div>
 <h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
-                        한미 합동 공중 기동 훈련 실시, 최고 수준 경계 태세 유지
-                    </h3>
+                            한미 합동 공중 기동 훈련 실시, 최고 수준 경계 태세 유지
+                        </h3>
 </div>
 <!-- News Item 4 -->
 <div class="group cursor-pointer">
@@ -256,8 +286,8 @@
 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Modern military uniform detail with patch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9cTB-vpNV_i6PHm-Xwqymu9BvIHjB5iTp4035_sJ5_tl36M10FbFWgpq65o21h2hgrcMA311TkjMkBTkEFh-424_hDDR9pfcQ8lAI-mhH8CDgnu3-N8ReBtmo1BXcfHVTWIz3btEhkCCb-2W8ITi_GnMONSuZ2Nkh4RwIs3hHjfmvrfFlAUzL7qgOuyLJmoihmvHU9DFXG-zxEcJswdJocPXK0cOLxqzijbL9iKC6Lr45GRz7D-78zRgyf6AYYPjfJH1XQm4_XrqI"/>
 </div>
 <h3 class="text-base font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
-                        내년부터 병 봉급 인상... 상병 기준 월 150만원 시대
-                    </h3>
+                            내년부터 병 봉급 인상... 상병 기준 월 150만원 시대
+                        </h3>
 </div>
 </div>
 </div>
@@ -267,8 +297,8 @@
 <footer class="w-full border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-950">
 <div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 max-w-7xl mx-auto">
 <div class="text-xs text-slate-500 dark:text-slate-400 font-['Inter'] mb-4 md:mb-0">
-            © 2024 Modern Sentinel Military Services. All rights reserved.
-        </div>
+                © 2024 Modern Sentinel Military Services. All rights reserved.
+            </div>
 <div class="flex gap-8">
 <a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs" href="#">Terms of Service</a>
 <a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs" href="#">Privacy Policy</a>
