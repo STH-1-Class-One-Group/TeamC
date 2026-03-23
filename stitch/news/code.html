@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#9fcaff",
+              "primary": "#0061a5",
+              "secondary-fixed": "#e4e2e1",
+              "on-primary-container": "#002f55",
+              "on-tertiary-container": "#242f40",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed-variant": "#474747",
+              "secondary-fixed-dim": "#c8c6c5",
+              "primary-fixed": "#d2e4ff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#eae7e7",
+              "on-primary": "#ffffff",
+              "tertiary": "#545f72",
+              "error-container": "#ffdad6",
+              "tertiary-fixed-dim": "#bcc7dd",
+              "secondary-container": "#e4e2e1",
+              "on-surface-variant": "#3f4753",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#d8e3fa",
+              "on-tertiary-fixed": "#111c2c",
+              "surface-container": "#f0eded",
+              "surface-container-low": "#f6f3f2",
+              "on-tertiary-fixed-variant": "#3c475a",
+              "surface": "#fcf9f8",
+              "surface-container-highest": "#e4e2e1",
+              "outline-variant": "#bfc7d5",
+              "inverse-primary": "#9fcaff",
+              "inverse-on-surface": "#f3f0f0",
+              "on-background": "#1b1c1c",
+              "background": "#fcf9f8",
+              "surface-bright": "#fcf9f8",
+              "primary-container": "#0d99ff",
+              "inverse-surface": "#303030",
+              "tertiary-container": "#8b96ab",
+              "on-secondary-container": "#656464",
+              "secondary": "#5f5e5e",
+              "on-primary-fixed": "#001c37",
+              "on-secondary": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e4e2e1",
+              "surface-tint": "#0061a5",
+              "outline": "#707884",
+              "on-surface": "#1b1c1c",
+              "error": "#ba1a1a",
+              "surface-dim": "#dcd9d9",
+              "on-primary-fixed-variant": "#00497e"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed-dim">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="flex items-center justify-between px-8 py-4 max-w-screen-2xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-[#0061A5] dark:text-[#0D99FF]">
+            The Modern Sentinel
+        </div>
+<nav class="hidden md:flex items-center space-x-8 font-['Inter'] font-medium text-sm tracking-tight">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] transition-colors" href="#">Shopping</a>
+<a class="text-[#0061A5] dark:text-[#0D99FF] border-b-2 border-[#0061A5] pb-1 font-semibold" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] transition-colors" href="#">Armed Reserve</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] transition-colors" href="#">Recruitment</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0061A5] transition-colors" href="#">Community</a>
+</nav>
+<div class="flex items-center space-x-5">
+<button class="material-symbols-outlined text-slate-600 dark:text-slate-400 hover:opacity-80 transition-all duration-200 active:scale-95">dark_mode</button>
+<button class="material-symbols-outlined text-slate-600 dark:text-slate-400 hover:opacity-80 transition-all duration-200 active:scale-95">redeem</button>
+<button class="material-symbols-outlined text-slate-600 dark:text-slate-400 hover:opacity-80 transition-all duration-200 active:scale-95">shopping_cart</button>
+<button class="material-symbols-outlined text-slate-600 dark:text-slate-400 hover:opacity-80 transition-all duration-200 active:scale-95">login</button>
+</div>
+</div>
+</header>
+<main class="pt-28 pb-20 px-6 max-w-screen-2xl mx-auto">
+<!-- Search & Editorial Header -->
+<section class="mb-16">
+<div class="flex flex-col items-center justify-center space-y-8">
+<h1 class="text-5xl font-extrabold tracking-tight text-center text-on-surface">국방 뉴스 리포트</h1>
+<p class="text-on-surface-variant max-w-2xl text-center font-body text-lg leading-relaxed">
+                최신 국방 기술, 군 전략 및 안보 소식을 전문가의 시선으로 분석하여 전달합니다.
+            </p>
+<div class="w-full max-w-3xl flex items-center space-x-4">
+<div class="relative flex-1 group">
+<span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-full py-5 pl-16 pr-8 text-on-surface placeholder:text-outline transition-all duration-300 shadow-sm focus:shadow-md" placeholder="관심 있는 뉴스 키워드를 입력하세요" type="text"/>
+</div>
+<button class="w-16 h-16 rounded-full bg-surface-container-high hover:bg-surface-container-highest flex items-center justify-center text-primary transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-3xl">bookmark</span>
+</button>
+</div>
+</div>
+</section>
+<!-- News Grid (Uniform 8-item grid) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- News Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Stealth fighter jet during sunset takeoff" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCjTon3MZr1fRRsJ6WpuhV_Vc5IVQgO-x8LXHpcyLBB1MrI7kZCmIBZ9ErpGMud--BvNc5SluMHiQi7ipmtDbSb_IU-TCd8WinJDSGds3RwufbRiLJYKm7j1YYn42REnbDAPY4kFgXNdFOEw2LisKs5Z0QdkPvOCIVaXhApmCgPfh0i-GF5JUq7W1xXvmykq5b7xeKeR5ZowmU65Ah_yGPdSKxBQfH_GW_McLJb1OLeOI5or6Fd_uoSE9RTXwnbwHUnC0HQSQx1M_l"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">2시간 전</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">차세대 스텔스 전투기 비행 시험 성공적 완료</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">국방과학연구소는 오늘 차세대 국산 스텔스 전투기의 최종 비행 시험이 성공적으로 마무리되었다고 발표했습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Soldiers training with futuristic AR headsets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFY-MHYGLeeb859sX1jMXmZeiGTYdCvLJtbxQ--HBoMdczFZOPFeqhtFViC09otIziOTsIugl_VQx2dHPPa3AiwtavuDbJMVahaUxx7k0qdoec7YHKxcSX62Y-NejsHUt1xVZa9knkEH307CFk2DxC_SPBMLtRdLCaR8p09ntLmD20LM6lA2roNrVlsyxYMcJr_rVpcOPSQLqt4hS1RZMGmGrNe2OH4V44XEMk-x2tkLRetRfn9eDrPToSxb9E9MqVpq7fi9q7dWa4"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">오늘</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">메타버스 기반 가상 훈련 시스템 전군 확대 도입</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">실감형 가상 현실 기술을 활용한 전술 훈련 체계가 전 부대에 순차적으로 도입될 예정입니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up of a modern military communication device" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAySS4IthS_j6OitFcu0P_grw0Qz0HJ9qnu_21BU9mTGw2eJne_X1rEAPG5EDZtat8r31CceGqMf742kZJga_H1AbvjW_TDTnfGL6k23k4YcfaTiZeHst1UDVrZrNYKO2pHvwKD3pGdVn6q7SugSyhWWbEaIiEGS6y6LVBJMmC5ANr4kGQIN-Y1IkqoJSNVitmCN4aiXWqZRD6PCtItBLkfg27jCZV5WRTR5_5eDpUYydYjWX3VVqGKJ9ZiBY4zbLqDVHXjOyYms8sy"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">6시간 전</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">AI 기반 사이버 보안 관제 센터 24시간 가동</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">국방부는 인공지능 기술을 접목한 새로운 사이버 위협 탐지 시스템의 성능을 공개했습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="High-tech drone fleet in formation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBblmsPR1FNsppjl0d_9dAqr7tvcaEz5r37LpDBkRsaodJz-N7cQgFad1wdD1jCQZqdRonlP0SCEScyCr8LBzEjVoaKXYSGPQfKdwIyAEBTlG_-pxJy1VD_k2Bq_Cga_eYLJP9UVm_3609irD6Swb_Gufh-7g5ZVoWPr4y1lRyl9P5qmSWva-j_dE59WQzrwZmluwfGevcs0WhC6XaPQAWiGLrMyCXMRzp7r5Pnt29hecLuGlFK66DD7NImU04bsOoMqTkw9EgG1P73"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">어제</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">드론봇 전투단 연합 훈련 공개... 정밀 타격 시연</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">최첨단 드론과 로봇이 협업하여 가상 적 기지를 무력화하는 전술적 성과를 거두었습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 5 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Navy ship patrolling arctic waters" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeKdejjeI9ZEPDKIH4IJqIZ58oKpD-1yPioXhQnYkNXnWNG-oiqsipGe_CIXJ8MtptWlz1mKsxxZqYZL0Oa7RUuiu4RotAz6GZ31aw7SQGGH4_kudDg8QV_v7xG7hjBrx5LCNZFVko9OonaY_DaQ3_KYhgXuGA0mTT7P1KgT9roBDfwAPYfDxblBiJ4i7o0gGvxgCvFZAgvkojWsPaFBCVqACLGgYsap2a8yf71zbATEAt5gapTdFRN8vTpgrvLNjXD-trq3TTcY8Y"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">어제</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">해군 신형 구축함 진수식... 해상 억제력 대폭 강화</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">다양한 미사일 방어 체계를 갖춘 8,000톤급 최신 구축함이 오늘 정식으로 진수되었습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 6 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Abstract satellite imagery of terrain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyinAKfvcTXF-eM3We0PpP6FrLG15vccvOIbGB14zrSbCXJSm31blrgG40QxK_kStzCYH0Y3ERbgVsdXY-bPyzRthK4m9P4ZKlrX5cgGArxjsLmIIVXbzzdB8u7-GFOPPNdjgwhJwXQG6uO8njCIY2Ajeem9UakdpDHAUVzWvIox_pGXpnP406B6Jm5bZPCp15yhYW4PvC6EZjfAFE4rr_QUQceOKyS4LzHXXAhZj6IRro24lmy9aILBCQL4YLYZ-4VZJ0C9YYt1WM"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">2일 전</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">독자 정찰 위성 3호기 발사 성공... 감시망 정밀화</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">우주 궤도에 안착한 정찰 위성을 통해 한반도 주변 정밀 감시 역량이 한 차원 높아졌습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 7 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Scientific research lab with military personnel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl9v2-Kxt-a4TVzz4V2bf4wsvd8F0Qi74HFtX1eQBbaB8suTtUNGLqSc4ccERkVux7n1yrWgBFV2wcs7HVkmo_YjTlmpQP72U_2frpyMcj1DE4VHD0DizfEDTEIetYCoEP_hrF8qOEsMBvy8cT5aedrcJ7L0RTrdYAGxXsPKoyR1nNrBlVXwkcR98bB6HqIhRrbDpotbav-V5UqS-gmtjA8dG77UYlwRdKvMvK2rYKl8lMqml6P5bEXcJ-eiojn-x-CzSCnrxZ_5AV"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">3일 전</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">레이저 대공 무기 체계 양산 개시... 드론 위협 원천 봉쇄</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">초저가로 드론을 격추할 수 있는 꿈의 레이저 무기가 마침내 실전 배치를 앞두고 있습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+<!-- News Card 8 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col group h-full">
+<div class="aspect-video overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Classroom setting for military strategy education" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ5Bl7FGyKeGGXNC1iue01yJ3BXbyHrbMyMlxO2pWS5Ku5pzpw4oCzC5fjJLl0FbubMi9S_oHDOK5vaDyhmVWBY5UEqKIOPU9vwdGnzKAvW4xbcLwfTWNxyZkh7_qyY8bSomec1AuwiqrqjRpMZpsWjLm8WdWCc-osLYXjxbs1CgAuwH63E5TbQbGcZ8y-Lnz75WfEu4VUGmJWTZWO1b3P91GVp6P6mznFzENOBj_eAmkwYccEOMoOtzWkZozFqbF5Jq9YUxKmCdqY"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<span class="text-xs text-outline mb-2">4일 전</span>
+<h3 class="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors">미래 국방 인재 양성을 위한 군-학 협력 포럼 개최</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 mb-6">주요 대학과 협업하여 4차 산업혁명 핵심 기술을 이해하는 장교 육성 방안을 논의했습니다.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/15">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary text-xl">bookmark</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-20 flex items-center justify-center space-x-2">
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-outline hover:bg-surface-container hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 rounded-lg text-on-surface hover:bg-surface-container transition-colors">2</button>
+<button class="w-10 h-10 rounded-lg text-on-surface hover:bg-surface-container transition-colors">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="w-10 h-10 rounded-lg text-on-surface hover:bg-surface-container transition-colors">12</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-outline hover:bg-surface-container hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-20 bg-[#f6f3f2] dark:bg-slate-950">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start mb-6 md:mb-0">
+<div class="text-lg font-bold text-slate-900 dark:text-white mb-2">Modern Sentinel</div>
+<div class="font-['Inter'] text-sm leading-relaxed text-slate-500 dark:text-slate-400">© 2024 Modern Sentinel Military Services. All rights reserved.</div>
+</div>
+<div class="flex flex-wrap justify-center gap-8 font-['Inter'] text-sm leading-relaxed">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0D99FF] transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0D99FF] transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0D99FF] transition-colors" href="#">Contact Support</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#0D99FF] transition-colors" href="#">Unit Directory</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#0d99ff",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-container": "#002f55",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary-container": "#8b96ab",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#9fcaff",
+                        "secondary-container": "#e4e2e1",
+                        "on-tertiary-fixed": "#111c2c",
+                        "outline-variant": "#bfc7d5",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-variant": "#e4e2e1",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1b1c1c",
+                        "on-background": "#1b1c1c",
+                        "surface-container-low": "#f6f3f2",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "inverse-primary": "#9fcaff",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dcd9d9",
+                        "outline": "#707884",
+                        "on-primary-fixed": "#001c37",
+                        "on-error-container": "#93000a",
+                        "surface": "#fcf9f8",
+                        "primary-fixed": "#d2e4ff",
+                        "primary": "#0061a5",
+                        "tertiary-fixed-dim": "#bcc7dd",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "surface-tint": "#0061a5",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary-container": "#656464",
+                        "tertiary-fixed": "#d8e3fa",
+                        "on-primary-fixed-variant": "#00497e",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#545f72",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "background": "#fcf9f8",
+                        "surface-container-highest": "#e4e2e1",
+                        "surface-container": "#f0eded",
+                        "secondary": "#5f5e5e",
+                        "on-surface-variant": "#3f4753",
+                        "surface-bright": "#fcf9f8",
+                        "on-tertiary-container": "#242f40",
+                        "inverse-surface": "#303030"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+        }
+        .glass-effect {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body class="text-on-surface bg-surface overflow-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg flex justify-between items-center px-8 h-16 max-w-full font-['Inter'] tracking-tight antialiased shadow-[0_12px_40px_rgba(27,28,28,0.06)]">
+<div class="text-xl font-bold tracking-tighter text-[#0061A5] dark:text-[#0D99FF]">
+            Vanguard Modern
+        </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#0D99FF] transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#0D99FF] transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Shopping</a>
+<a class="text-[#0061A5] dark:text-[#0D99FF] border-b-2 border-[#0061A5] font-semibold hover:text-[#0D99FF] transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Armed Reserve</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#0D99FF] transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Recruitment</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#0D99FF] transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Community</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- Main Content Canvas (Background Diet Schedule) -->
+<main class="pt-24 px-8 max-w-7xl mx-auto pb-24">
+<div class="mb-12">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Military Diet Schedule</h1>
+<p class="text-on-surface-variant body-lg">Strategic nutritional planning for peak operational performance.</p>
+</div>
+<!-- Asymmetric Bento Grid for Background -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 opacity-40 grayscale-[0.5]">
+<!-- Day 1 Card -->
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<h3 class="text-2xl font-bold text-primary">Monday, May 20</h3>
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-xs font-bold">ACTIVE DUTY</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="p-4 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Breakfast</p>
+<p class="text-sm font-semibold">Oatmeal &amp; Protein</p>
+<p class="text-xs text-on-surface-variant">450 kcal</p>
+</div>
+<div class="p-4 bg-primary-container/10 rounded-lg border-l-4 border-primary-container">
+<p class="text-xs font-bold text-primary-container uppercase tracking-wider mb-1">Lunch</p>
+<p class="text-sm font-semibold">Korean Beef Soup</p>
+<p class="text-xs text-on-surface-variant">980 kcal</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Dinner</p>
+<p class="text-sm font-semibold">Grilled Chicken</p>
+<p class="text-xs text-on-surface-variant">720 kcal</p>
+</div>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
+<div>
+<h3 class="text-xl font-bold mb-4">Daily Goal</h3>
+<div class="flex items-end gap-2 mb-2">
+<span class="text-4xl font-black text-primary">2,150</span>
+<span class="text-on-surface-variant font-medium pb-1">/ 2,500 kcal</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[86%]"></div>
+</div>
+</div>
+<div class="mt-8 flex gap-4">
+<div class="flex-1 text-center">
+<p class="text-xs font-bold text-outline">PROTEIN</p>
+<p class="text-lg font-bold">145g</p>
+</div>
+<div class="flex-1 text-center border-x border-outline-variant/30">
+<p class="text-xs font-bold text-outline">CARBS</p>
+<p class="text-lg font-bold">210g</p>
+</div>
+<div class="flex-1 text-center">
+<p class="text-xs font-bold text-outline">FATS</p>
+<p class="text-lg font-bold">65g</p>
+</div>
+</div>
+</div>
+<!-- Day 2 & 3 Peeking -->
+<div class="bg-surface-container-lowest p-6 rounded-xl">
+<h4 class="font-bold text-on-surface mb-3">Tuesday, May 21</h4>
+<div class="space-y-2 opacity-60">
+<div class="h-4 bg-surface-container-low rounded w-3/4"></div>
+<div class="h-4 bg-surface-container-low rounded w-1/2"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl">
+<h4 class="font-bold text-on-surface mb-3">Wednesday, May 22</h4>
+<div class="space-y-2 opacity-60">
+<div class="h-4 bg-surface-container-low rounded w-3/4"></div>
+<div class="h-4 bg-surface-container-low rounded w-1/2"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl">
+<h4 class="font-bold text-on-surface mb-3">Thursday, May 23</h4>
+<div class="space-y-2 opacity-60">
+<div class="h-4 bg-surface-container-low rounded w-3/4"></div>
+<div class="h-4 bg-surface-container-low rounded w-1/2"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm"></div>
+<!-- Modal Content -->
+<div class="relative w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.15)] overflow-hidden">
+<!-- Modal Header -->
+<div class="p-6 flex justify-between items-start border-surface-container-low">
+<div>
+<div class="inline-flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary scale-75" data-icon="restaurant">restaurant</span>
+<span class="text-xs font-bold text-primary tracking-widest uppercase">Meal Detail</span>
+</div>
+<h2 class="text-2xl font-black text-on-surface tracking-tight">중식 상세 정보 (05.20)</h2>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Image / Identity -->
+<!-- Menu List -->
+<div class="p-6">
+<div class="">
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">현미밥</span>
+</div>
+<span class="text-on-surface-variant font-medium">320 kcal</span>
+</div>
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">황태해장국</span>
+</div>
+<span class="text-on-surface-variant font-medium">120 kcal</span>
+</div>
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">소불고기</span>
+</div>
+<span class="text-on-surface-variant font-medium">380 kcal</span>
+</div>
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">배추김치</span>
+</div>
+<span class="text-on-surface-variant font-medium">25 kcal</span>
+</div>
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">김구이</span>
+</div>
+<span class="text-on-surface-variant font-medium">15 kcal</span>
+</div>
+<div class="flex justify-between items-center group">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></div>
+<span class="font-medium text-on-surface">사과</span>
+</div>
+<span class="text-on-surface-variant font-medium">120 kcal</span>
+</div>
+</div>
+<!-- Total Calorie Bar -->
+<div class="mt-8 pt-6 border-t border-surface-container-low">
+<div class="flex justify-between items-end mb-4">
+<span class="text-on-surface-variant font-bold text-sm">TOTAL ENERGY</span>
+<div class="text-right">
+<span class="text-3xl font-black text-primary">980</span>
+<span class="text-on-surface-variant font-bold text-lg"> kcal</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="py-3 px-4 bg-surface-container-high text-on-surface font-bold rounded-xl text-sm hover:bg-surface-variant transition-colors">
+                            Nutrient Info
+                        </button>
+<button class="py-3 px-4 bg-primary text-on-primary font-bold rounded-xl text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+                            Log Meal
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] z-50">
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-[10px] font-medium uppercase tracking-widest mt-1">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="local_mall">local_mall</span>
+<span class="text-[10px] font-medium uppercase tracking-widest mt-1">Shop</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0061A5] dark:text-[#0D99FF] scale-110 tap-highlight-transparent active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="shield" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-[10px] font-medium uppercase tracking-widest mt-1">Reserve</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+<span class="text-[10px] font-medium uppercase tracking-widest mt-1">Recruit</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="diversity_3">diversity_3</span>
+<span class="text-[10px] font-medium uppercase tracking-widest mt-1">Social</span>
+</div>
+</nav>
+</body></html>
