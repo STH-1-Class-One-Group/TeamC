@@ -16,37 +16,37 @@ import { useCartContext } from '../context/CartContext';
 import { CartDrawer } from './CartDrawer';
 
 export const CartModal: React.FC = () => {
-  const { isOpen, closeCart } = useCartContext();
+    const { isOpen, closeCart } = useCartContext();
 
-  return (
-    <>
-      {/* ── 배경 오버레이 ── */}
-      {/* isOpen일 때만 렌더. 클릭하면 Drawer 닫힘 */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
-          onClick={closeCart}
-        />
-      )}
+    return (
+        <>
+            {/* ── 배경 오버레이 ── */}
+            {/* isOpen일 때만 렌더. 클릭하면 Drawer 닫힘 */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+                    onClick={closeCart}
+                />
+            )}
 
-      {/* ── 슬라이드 패널 ── */}
-      {/*
+            {/* ── 슬라이드 패널 ── */}
+            {/*
         translate-x-full  → 화면 오른쪽 밖에 숨겨둠 (닫힌 상태)
         translate-x-0     → 제자리로 슬라이드인 (열린 상태)
         transition-transform으로 300ms 부드럽게 애니메이션
       */}
-      <aside
-        className={`
+            <aside
+                className={`
           fixed top-0 right-0 h-full w-full max-w-sm
           bg-white dark:bg-slate-900
           shadow-2xl z-50
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
-      >
-        {/* 실제 내용은 CartDrawer가 전담 */}
-        <CartDrawer />
-      </aside>
-    </>
-  );
+            >
+                {/* 실제 내용은 CartDrawer가 전담 */}
+                <CartDrawer />
+            </aside>
+        </>
+    );
 };
