@@ -4,27 +4,29 @@ interface MealData {
   dates: string;
   brst?: string;
   brst_cal?: string;
-  lunc?: string;
   lnch?: string;
-  lunc_cal?: string;
   lnch_cal?: string;
-  dinr?: string;
   dnr?: string;
-  dinr_cal?: string;
   dnr_cal?: string;
   sum_cal?: string;
 }
 
-const fallbackData: MealData[] = [
-   {"dates":"2024-09-01(일)","brst":"밥","brst_cal":"374.13kcal","lunc":"밥","lunc_cal":"374.13kcal","dinr":"밥","dinr_cal":"374.13kcal","sum_cal":"2961.19kcal"},
-   {"dates":"2024-09-01(일)","brst":"참치 고추장찌개(05)(06)(09)(16)","brst_cal":"148.73kcal","lunc":"황태채미역국(05)(06)(16)","lunc_cal":"41.88kcal","dinr":"닭볶음탕(05)(15)","dinr_cal":"451.14kcal","sum_cal":"2961.19kcal"},
-   {"dates":"2024-09-01(일)","brst":"새송이버섯야채볶음(05)(06)(10)(18)","brst_cal":"111.5kcal","lunc":"사천식캐슈넛멸치볶음(04)(05)","lunc_cal":"102.06kcal","dinr":"사골우거지국(02)(05)(06)(16)(18)","dinr_cal":"164.58kcal","sum_cal":"2961.19kcal"},
-   {"dates":"2024-09-01(일)","brst":"계란말이(완)(01)(05)(12)","brst_cal":"106kcal","lunc":"고추장돼지불고기(완제품)(05)(10)","lunc_cal":"482.33kcal","dinr":"느타리버섯볶음(05)","dinr_cal":"37.98kcal","sum_cal":"2961.19kcal"},
-   {"dates":"2024-09-01(일)","brst":"배추김치(수의계약)","brst_cal":"13.8kcal","lunc":"배추김치(수의계약)","lunc_cal":"13.8kcal","dinr":"토핑형발효유(02)(06)","dinr_cal":"165kcal","sum_cal":"2961.19kcal"},
-   {"dates":"2024-09-01(일)","brst":"","brst_cal":"","lunc":"","lunc_cal":"","dinr":"배추김치","dinr_cal":"0kcal","sum_cal":"2961.19kcal"}
-];
+interface MealApiResponse {
+  success: boolean;
+  date: string;
+  data: MealData[];
+  is_fallback: boolean;
+}
 
 const getTodayString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getTodayDisplayString = () => {
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -40,24 +42,35 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        // Attempt to fetch from Cloudflare KV Workers
-        const response = await fetch('https://meals.7aae3335fb024377b2868d2b7833b765.workers.dev');
+        // FastAPI 백엔드를 통해 Cloudflare KV에서 식단 데이터 가져오기
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const todayDate = getTodayString();
+        const response = await fetch(`${apiUrl}/api/v1/meals/${todayDate}`);
+
         if (!response.ok) {
           throw new Error('Failed to fetch');
         }
-        const data = await response.json();
-        
-        const todayStr = getTodayString();
-        let todayData = (data.DATA || data).filter((item: MealData) => item.dates === todayStr);
-        
-        if (!todayData || todayData.length === 0) {
-          throw new Error('No data for today');
+
+        const result: MealApiResponse = await response.json();
+
+        if (!result.success || !result.data || result.data.length === 0) {
+          throw new Error('No data available');
         }
-        processMealData(todayData);
+
+        processMealData(result.data);
       } catch (error) {
-        const todayStr = getTodayString();
-        const fallbackMapped = fallbackData.map(item => ({ ...item, dates: todayStr }));
-        processMealData(fallbackMapped);
+        console.error('[DashboardPage] 식단 데이터 로드 실패, fallback 사용:', error);
+        // fallback: 백엔드 연결 실패 시 기본 데이터 표시
+        const todayDisplay = getTodayDisplayString();
+        const fallbackData: MealData[] = [
+          {"dates": todayDisplay, "brst": "밥", "brst_cal": "374.13kcal", "lnch": "밥", "lnch_cal": "374.13kcal", "dnr": "밥", "dnr_cal": "374.13kcal", "sum_cal": "2961.19kcal"},
+          {"dates": todayDisplay, "brst": "참치 고추장찌개(05)(06)(09)(16)", "brst_cal": "148.73kcal", "lnch": "황태채미역국(05)(06)(16)", "lnch_cal": "41.88kcal", "dnr": "닭볶음탕(05)(15)", "dnr_cal": "451.14kcal", "sum_cal": "2961.19kcal"},
+          {"dates": todayDisplay, "brst": "새송이버섯야채볶음(05)(06)(10)(18)", "brst_cal": "111.5kcal", "lnch": "사천식캐슈넛멸치볶음(04)(05)", "lnch_cal": "102.06kcal", "dnr": "사골우거지국(02)(05)(06)(16)(18)", "dnr_cal": "164.58kcal", "sum_cal": "2961.19kcal"},
+          {"dates": todayDisplay, "brst": "계란말이(완)(01)(05)(12)", "brst_cal": "106kcal", "lnch": "고추장돼지불고기(완제품)(05)(10)", "lnch_cal": "482.33kcal", "dnr": "느타리버섯볶음(05)", "dnr_cal": "37.98kcal", "sum_cal": "2961.19kcal"},
+          {"dates": todayDisplay, "brst": "배추김치(수의계약)", "brst_cal": "13.8kcal", "lnch": "배추김치(수의계약)", "lnch_cal": "13.8kcal", "dnr": "토핑형발효유(02)(06)", "dnr_cal": "165kcal", "sum_cal": "2961.19kcal"},
+          {"dates": todayDisplay, "brst": "", "brst_cal": "", "lnch": "", "lnch_cal": "", "dnr": "배추김치", "dnr_cal": "0kcal", "sum_cal": "2961.19kcal"},
+        ];
+        processMealData(fallbackData);
       }
     };
 
@@ -65,8 +78,8 @@ export const DashboardPage: React.FC = () => {
       const cleanString = (str?: string) => str ? str.replace(/\([^)]*\)/g, '').trim() : '';
 
       const breakfastItems = data.map(item => cleanString(item.brst)).filter(item => item !== '');
-      const lunchItems = data.map(item => cleanString(item.lunc || item.lnch)).filter(item => item !== '');
-      const dinnerItems = data.map(item => cleanString(item.dinr || item.dnr)).filter(item => item !== '');
+      const lunchItems = data.map(item => cleanString(item.lnch)).filter(item => item !== '');
+      const dinnerItems = data.map(item => cleanString(item.dnr)).filter(item => item !== '');
       
       setMealInfo({
         breakfast: breakfastItems.length > 0 ? breakfastItems.join(', ') : '메뉴 없음',
