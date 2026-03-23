@@ -62,9 +62,11 @@ export const DashboardPage: React.FC = () => {
     };
 
     const processMealData = (data: MealData[]) => {
-      const breakfastItems = data.map(item => item.brst).filter(item => item && item.trim() !== '');
-      const lunchItems = data.map(item => item.lunc || item.lnch).filter(item => item && item.trim() !== '');
-      const dinnerItems = data.map(item => item.dinr || item.dnr).filter(item => item && item.trim() !== '');
+      const cleanString = (str?: string) => str ? str.replace(/\([^)]*\)/g, '').trim() : '';
+
+      const breakfastItems = data.map(item => cleanString(item.brst)).filter(item => item !== '');
+      const lunchItems = data.map(item => cleanString(item.lunc || item.lnch)).filter(item => item !== '');
+      const dinnerItems = data.map(item => cleanString(item.dinr || item.dnr)).filter(item => item !== '');
       
       setMealInfo({
         breakfast: breakfastItems.length > 0 ? breakfastItems.join(', ') : '메뉴 없음',
