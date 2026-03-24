@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CalendarPopup } from './components/CalendarPopup';
 
 interface MealItem {
   name: string;
@@ -20,8 +21,8 @@ interface DayMealData {
   dailyTotal: number;
 }
 
-const getDateInfo = (offset: number) => {
-  const target = new Date();
+const getDateInfo = (baseDate: Date, offset: number) => {
+  const target = new Date(baseDate);
   target.setDate(target.getDate() + offset);
   
   const year = target.getFullYear();
@@ -100,23 +101,24 @@ const processMealsAPI = (data: any[], _displayString: string): { b: ParsedMeal, 
 };
 
 export const MealPage: React.FC = () => {
-  const [baseOffset, setBaseOffset] = useState(0); // Navigation offset (if needed later)
+  const [baseDate, setBaseDate] = useState<Date>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [mealDays, setMealDays] = useState<DayMealData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // 현재 기준 날짜(Header)
-  const currentInfo = getDateInfo(baseOffset);
-  const headerDateStr = `${new Date().getFullYear()}. ${currentInfo.shortDate}`; 
+  const currentInfo = getDateInfo(baseDate, 0);
+  const headerDateStr = `${baseDate.getFullYear()}. ${currentInfo.shortDate}`; 
 
   useEffect(() => {
     const fetchAllMeals = async () => {
       setIsLoading(true);
       const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       
-      const offsets = [baseOffset - 1, baseOffset, baseOffset + 1]; // 어제, 오늘, 내일
+      const offsets = [-1, 0, 1]; // 어제, 오늘, 내일
       
       const promises = offsets.map(async (offset) => {
-        const info = getDateInfo(offset);
+        const info = getDateInfo(baseDate, offset);
         let finalData: any[] = [];
         try {
           const res = await fetch(`${apiUrl}/api/v1/meals/${info.apiString}`);
@@ -134,9 +136,9 @@ export const MealPage: React.FC = () => {
         const parsed = processMealsAPI(finalData, info.displayString);
         
         let title = '';
-        if (offset === baseOffset - 1) title = '어제';
-        else if (offset === baseOffset) title = '오늘';
-        else if (offset === baseOffset + 1) title = '내일';
+        if (offset === -1) title = '어제';
+        else if (offset === 0) title = '오늘';
+        else if (offset === 1) title = '내일';
 
         return {
           title,
@@ -155,7 +157,7 @@ export const MealPage: React.FC = () => {
     };
 
     fetchAllMeals();
-  }, [baseOffset]);
+  }, [baseDate.getTime()]);
 
   const renderMealBox = (mealCode: 'brst' | 'lnch' | 'dnr', parsed: ParsedMeal, isToday: boolean) => {
     let icon = '';
@@ -224,11 +226,14 @@ export const MealPage: React.FC = () => {
           <button 
             className="material-symbols-outlined text-primary dark:text-blue-400 hover:bg-surface-container-low dark:hover:bg-slate-800 p-2 rounded-full transition-all active:scale-90" 
             translate="no"
-            onClick={() => setBaseOffset(p => p - 1)}
+            onClick={() => setBaseDate(prev => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 1))}
           >
             arrow_back
           </button>
-          <button className="group flex items-center space-x-3 focus:outline-none">
+          <button 
+            className="group flex items-center space-x-3 focus:outline-none"
+            onClick={() => setIsCalendarOpen(true)}
+          >
             <span className="text-2xl font-bold tracking-tight text-on-surface dark:text-white">
               {headerDateStr}
             </span>
@@ -237,7 +242,7 @@ export const MealPage: React.FC = () => {
           <button 
             className="material-symbols-outlined text-primary dark:text-blue-400 hover:bg-surface-container-low dark:hover:bg-slate-800 p-2 rounded-full transition-all active:scale-90" 
             translate="no"
-            onClick={() => setBaseOffset(p => p + 1)}
+            onClick={() => setBaseDate(prev => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 1))}
           >
             arrow_forward
           </button>
@@ -289,6 +294,14 @@ export const MealPage: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* 달력 팝업 컴포넌트 */}
+      <CalendarPopup 
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        selectedDate={baseDate}
+        onSelectDate={(date) => setBaseDate(date)}
+      />
     </div>
   );
 };
