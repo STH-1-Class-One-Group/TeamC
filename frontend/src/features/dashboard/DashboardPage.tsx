@@ -20,6 +20,13 @@ interface MealApiResponse {
   is_fallback: boolean;
 }
 
+interface NewsItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  thumbnail: string;
+}
+
 const getTodayString = () => {
   const today = new Date();
   const year = today.getFullYear();
@@ -41,6 +48,8 @@ const getTodayDisplayString = () => {
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [mealInfo, setMealInfo] = useState({ breakfast: '불러오는 중...', lunch: '불러오는 중...', dinner: '불러오는 중...' });
+  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const [isNewsLoading, setIsNewsLoading] = useState(true);
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedMealType, setSelectedMealType] = useState('');
@@ -56,10 +65,11 @@ export const DashboardPage: React.FC = () => {
   });
 
   useEffect(() => {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
     const fetchMeals = async () => {
       try {
         // FastAPI 백엔드를 통해 Cloudflare KV에서 식단 데이터 가져오기
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
         const todayDate = getTodayString();
         const response = await fetch(`${apiUrl}/api/v1/meals/${todayDate}`);
 
@@ -87,6 +97,20 @@ export const DashboardPage: React.FC = () => {
           {"dates": todayDisplay, "brst": "", "brst_cal": "", "lnch": "", "lnch_cal": "", "dnr": "배추김치", "dnr_cal": "0kcal", "sum_cal": "2961.19kcal"},
         ];
         processMealData(fallbackData);
+      }
+    };
+
+    const fetchNews = async () => {
+      try {
+        setIsNewsLoading(true);
+        const response = await fetch(`${apiUrl}/api/v1/news`);
+        if (!response.ok) throw new Error('News fetch failed');
+        const data = await response.json();
+        setNewsList(data);
+      } catch (error) {
+        console.error('[DashboardPage] 뉴스 데이터 로드 실패:', error);
+      } finally {
+        setIsNewsLoading(false);
       }
     };
 
@@ -150,6 +174,7 @@ export const DashboardPage: React.FC = () => {
     };
 
     fetchMeals();
+    fetchNews();
   }, []);
 
   const handleMealClick = (mealType: string, items: MealItem[]) => {
@@ -299,21 +324,36 @@ export const DashboardPage: React.FC = () => {
             <button className="text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-400">전체보기</button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {[
-              { title: "차세대 주력 전차 K-3 개발 착수, 국방부 공식 발표", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCCRa5qOGIkDJyWP3IL_0CcIcZbSZgBJCbS4xrLN5lsySdUc5V2HkIYLCsL5A42G1afKfh__mr43K2BJ6OQjQr-EhmUwV1NuQlhKc-l4-DETcGEgcYp8QRRNOFkFZ0s9k7MlYsN8laG9BeJjgJFrKQCZ7NbCgJPvUXz7iRqnxvd2WhxsUMVASDy0bnwZxlMjpNJbaSc4G2xdmxRkPRd4prujeom3kppvVLa532fTc9nxCc2xhwYj-ccihKtMrSqoUwIY3-rnvMq8A0l" },
-              { title: "군 장병 복지 향상을 위한 '스마트 병영 2.0' 로드맵 공개", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDjGNVtsQaHAlpv-j4_AciKjVdKqMEgE-UlO4QmbCZQo37bJUHttkXn8G6hDQSjpsdYKP4pVLBebEl27Vc4V79h2ipb0shxMdOzcSo1HV8vwaQ7VTN3khF6QqtVwVZ_QA2Ej84HcbRY-PTItre462C2Y94GQNw3dbxrSz1CCUf6ecB-enxIZTvcrpcg-UxX9DNW_b6My4110tsM2tMZ9bRBs4latlpSZNSSEDcvYfOfEz36qfgS-JUcMWyEDxsy3ptr7yLtb-H0JpaX" },
-              { title: "한미 합동 공중 기동 훈련 실시, 최고 수준 경계 태세 유지", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBUDHS7JbJvZ_2dIbzc8nuvElFWP_9oPsmK_A_3KYAA0HARntSYtTrs_TP2lYilULRaB6USJHdcc7Riif6wO1P_1iGOuyzYu3L97x5KNMiUa-P4w9bb6SmWwx3v1PAmRMtzkTzXnFkTYXVKhXk-burP5qcPWqFbteerJIbQT6PfZua3g1RoKPYYmq9byTdBw6dTh1c1kJEtPcWA6h7CxaqmPTqbZOcVjMJB5SpnM2-0IsiN66x4kHGCiiequJt-JGth_h5DLvF0MAOf" },
-              { title: "내년부터 병 봉급 인상... 상병 기준 월 150만원 시대", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA9cTB-vpNV_i6PHm-Xwqymu9BvIHjB5iTp4035_sJ5_tl36M10FbFWgpq65o21h2hgrcMA311TkjMkBTkEFh-424_hDDR9pfcQ8lAI-mhH8CDgnu3-N8ReBtmo1BXcfHVTWIz3btEhkCCb-2W8ITi_GnMONSuZ2Nkh4RwIs3hHjfmvrfFlAUzL7qgOuyLJmoihmvHU9DFXG-zxEcJswdJocPXK0cOLxqzijbL9iKC6Lr45GRz7D-78zRgyf6AYYPjfJH1XQm4_XrqI" }
-            ].map((news, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <div className="aspect-video w-full rounded-lg bg-surface-dim dark:bg-slate-800 mb-4 overflow-hidden">
-                  <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={news.img} alt="News thumbnail" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+            {isNewsLoading ? (
+              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">뉴스를 불러오는 중입니다...</div>
+            ) : newsList.length > 0 ? (
+              newsList.map((news, idx) => (
+                <div 
+                  key={idx} 
+                  className="group cursor-pointer"
+                  onClick={() => window.open(news.link, '_blank')}
+                >
+                  <div className="aspect-video w-full rounded-lg bg-surface-dim dark:bg-slate-800 mb-4 overflow-hidden">
+                    <img 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      src={news.thumbnail} 
+                      alt={news.title} 
+                      crossOrigin="anonymous" 
+                      referrerPolicy="no-referrer" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/300x200?text=No+Image";
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                    {news.title}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant dark:text-slate-500 mt-2">{news.pubDate}</p>
                 </div>
-                <h3 className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
-                  {news.title}
-                </h3>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">최근 국방 뉴스가 없습니다.</div>
+            )}
           </div>
         </div>
       </div>
