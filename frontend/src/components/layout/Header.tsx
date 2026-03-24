@@ -3,15 +3,17 @@ import { NavLink } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 import { LoginModal } from '../common/LoginModal';
 import { CartIcon } from '../../features/cart/components/CartIcon';
+import { Profile } from '../common/ProfileSetupModal';
 
 // ── Props 인터페이스 ──────────────────────────────────────────
 // App.tsx에서 내려주는 user 정보와 로그아웃 함수를 타입으로 명시
 interface HeaderProps {
   user: User | null;       // 로그인 상태면 User 객체, 아니면 null
+  profile: Profile | null; // 서비스 내 프로필 (없으면 null)
   onSignOut: () => void;   // 로그아웃 실행 함수
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
+export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -52,8 +54,10 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   };
 
   // 프로필 이미지: OAuth 제공자에서 받은 avatar_url 사용, 없으면 기본 이니셜
-  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
-  const displayName = (user?.user_metadata?.full_name as string)
+  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
+  // 서비스 프로필 닉네임 우선, 없으면 OAuth 이름, 없으면 이메일
+  const displayName = profile?.nickname
+    || (user?.user_metadata?.full_name as string)
     || user?.email
     || '사용자';
   // 이름 첫 글자를 이니셜로 → 이미지가 없을 때 표시
@@ -92,9 +96,16 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
           <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
             Recruitment
           </a>
-          <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
+          <NavLink
+            to="/Community"
+            className={({ isActive }) =>
+              isActive
+                ? "text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-['Inter'] text-sm tracking-tight"
+                : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
+            }
+          >
             Community
-          </a>
+          </NavLink>
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
@@ -152,6 +163,9 @@ export const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
                     <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
                       {displayName}
                     </p>
+                    {profile?.rank && (
+                      <p className="text-xs text-primary mt-0.5">{profile.rank}{profile.unit ? ` · ${profile.unit}` : ''}</p>
+                    )}
                   </div>
                   {/* 로그아웃 버튼 */}
                   <button

@@ -10,12 +10,15 @@ import { ShopPage } from './features/shop/ShopPage';
 import { CartProvider } from './features/cart/context/CartContext';
 import { CartModal } from './features/cart/components/CartModal';
 import { supabase } from './api/supabaseClient';
+import { ProfileSetupModal, Profile } from './components/common/ProfileSetupModal';
 
 const App: React.FC = () => {
   // ── 로그인 상태 관리 ──────────────────────────────────────────
   // User | null: 로그인 시 User 객체, 비로그인 시 null
   // undefined: 아직 Supabase에서 상태를 받아오기 전(로딩 중)
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   useEffect(() => {
     // 1) 앱 최초 로드 시 현재 세션 확인
@@ -29,8 +32,28 @@ const App: React.FC = () => {
     //    - SIGNED_IN : 로그인 성공 → session.user로 상태 업데이트
     //    - SIGNED_OUT: 로그아웃   → null로 상태 업데이트
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
+      async (_event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          // 로그인 시 profiles 테이블 조회 → 없으면 프로필 설정 모달 표시
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+          if (data) {
+            setProfile(data as Profile);
+            setShowProfileSetup(false);
+          } else {
+            setProfile(null);
+            setShowProfileSetup(true);
+          }
+        } else {
+          // 로그아웃 시 프로필 초기화
+          setProfile(null);
+          setShowProfileSetup(false);
+        }
       }
     );
 
@@ -54,8 +77,8 @@ const App: React.FC = () => {
     <CartProvider>
       <BrowserRouter>
         <div className="min-h-screen flex flex-col bg-surface dark:bg-slate-950 transition-colors">
-          {/* user와 handleSignOut을 Header에 props로 전달 */}
-          <Header user={user} onSignOut={handleSignOut} />
+          {/* user, profile, handleSignOut을 Header에 props로 전달 */}
+          <Header user={user} profile={profile ?? null} onSignOut={handleSignOut} />
           <main className="flex-grow pt-32 pb-20 px-6 max-w-7xl mx-auto w-full">
             <Routes>
               <Route path="/" element={<ShopPage />} />
@@ -67,6 +90,16 @@ const App: React.FC = () => {
           <Footer />
         </div>
         <CartModal />
+        {/* 신규 유저 프로필 설정 모달 (닫기 불가) */}
+        {showProfileSetup && user && (
+          <ProfileSetupModal
+            user={user}
+            onProfileCreated={(newProfile) => {
+              setProfile(newProfile);
+              setShowProfileSetup(false);
+            }}
+          />
+        )}
       </BrowserRouter>
     </CartProvider>
   );
