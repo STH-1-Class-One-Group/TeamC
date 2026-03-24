@@ -321,7 +321,11 @@ export const DashboardPage: React.FC = () => {
         <div className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] border border-transparent dark:border-slate-800 transition-all">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-bold text-on-surface dark:text-white">국방 뉴스 섹션</h2>
-            <button className="text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-400">전체보기</button>
+            <button 
+               onClick={() => navigate('/News')}
+               className="text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-400">
+               전체보기
+            </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {isNewsLoading ? (
@@ -336,18 +340,18 @@ export const DashboardPage: React.FC = () => {
                   <div className="aspect-video w-full rounded-lg bg-surface-dim dark:bg-slate-800 mb-4 overflow-hidden">
                     <img 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      src={news.thumbnail} 
+                      src={news.thumbnail && news.thumbnail !== "https://via.placeholder.com/300x200?text=No+Image" ? `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/v1/news/image?url=${encodeURIComponent(news.thumbnail)}` : "https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png"} 
                       alt={news.title} 
-                      crossOrigin="anonymous" 
                       referrerPolicy="no-referrer" 
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/300x200?text=No+Image";
+                        (e.target as HTMLImageElement).src = "https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png";
                       }}
                     />
                   </div>
-                  <h3 className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                    {news.title}
-                  </h3>
+                  <h3 
+                    className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-2"
+                    dangerouslySetInnerHTML={{ __html: news.title }}
+                  />
                   <p className="text-xs text-on-surface-variant dark:text-slate-500 mt-2">{news.pubDate}</p>
                 </div>
               ))
