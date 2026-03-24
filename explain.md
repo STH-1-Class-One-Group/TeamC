@@ -40,4 +40,6 @@
    ,{"dates":"2024-09-01(일)","brst":"계란말이(완)(01)(05)(12)","brst_cal":"106kcal","lunc":"고추장돼지불고기(완제품)(05)(10)","lunc_cal":"482.33kcal","dinr":"느타리버섯볶음(05)","dinr_cal":"37.98kcal","sum_cal":"2961.19kcal"}
    ,{"dates":"2024-09-01(일)","brst":"배추김치(수의계약)","brst_cal":"13.8kcal","lunc":"배추김치(수의계약)","lunc_cal":"13.8kcal","dinr":"토핑형발효유(02)(06)","dinr_cal":"165kcal","sum_cal":"2961.19kcal"}
    ,{"dates":"2024-09-01(일)","brst":"","brst_cal":"","lunc":"","lunc_cal":"","dinr":"배추김치","dinr_cal":"0kcal","sum_cal":"2961.19kcal"}
-   이 데이터 메뉴 데이터를 가져와서 기본 식단 데이터로 표현해보았으면 좋겠어(dates값은 데이터가 없는 날짜의 값으로 치환했으면 해) 참고로 디자인은 stitch 폴더에
+   이 데이터 메뉴 데이터를 가져와서 기본 식단 데이터로 표현해보았으면 좋겠어(dates값은 데이터가 없는 날짜의 값으로 치환했으면 해) 참고로 디자인은 stitch/meals에서 code.html, screen.png를 참고해서 만들어주었으면 해, 기능은 plan.md를 참고해주면 되고
+
+10.
