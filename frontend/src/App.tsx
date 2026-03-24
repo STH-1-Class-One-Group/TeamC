@@ -4,6 +4,7 @@ import { User } from '@supabase/supabase-js';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { DashboardPage } from './features/dashboard/DashboardPage';
+import { MealPage } from './features/meal/MealPage';
 import { ShopPage } from './features/shop/ShopPage';
 import { CartProvider } from './features/cart/context/CartContext';
 import { CartModal } from './features/cart/components/CartModal';
@@ -58,6 +59,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<ShopPage />} />
               <Route path="/Dashboard" element={<DashboardPage />} />
+              <Route path="/Meal" element={<MealPage />} />
             </Routes>
           </main>
           <Footer />
