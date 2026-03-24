@@ -1,0 +1,158 @@
+-- ============================================================
+-- Modern Sentinel - Community Schema
+-- Supabase 대시보드 SQL Editor에서 실행하세요.
+-- ============================================================
+
+-- ────────────────────────────────────────────────────────────
+-- 1. profiles 테이블 (auth.users와 1:1, 서비스 내 회원 정보)
+-- ────────────────────────────────────────────────────────────
+create table if not exists public.profiles (
+  id          uuid primary key references auth.users(id) on delete cascade,
+  nickname    text not null unique,
+  rank        text,                        -- 계급 (선택)
+  unit        text,                        -- 소속부대 (선택)
+  avatar_url  text,                        -- OAuth 프로필 이미지
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+comment on table public.profiles is '서비스 내 사용자 프로필 (auth.users와 1:1)';
+
+-- RLS 활성화
+alter table public.profiles enable row level security;
+
+-- 누구나 프로필 조회 가능
+create policy "profiles: 전체 조회 허용"
+  on public.profiles for select
+  using (true);
+
+-- 본인 프로필만 생성 가능
+create policy "profiles: 본인만 생성"
+  on public.profiles for insert
+  with check (auth.uid() = id);
+
+-- 본인 프로필만 수정 가능
+create policy "profiles: 본인만 수정"
+  on public.profiles for update
+  using (auth.uid() = id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 2. community_posts 테이블 (커뮤니티 게시글)
+-- ────────────────────────────────────────────────────────────
+create table if not exists public.community_posts (
+  id          uuid primary key default gen_random_uuid(),
+  author_id   uuid not null references public.profiles(id) on delete cascade,
+  title       text not null,
+  content     text not null,
+  category    text not null default 'general'
+                check (category in ('general', 'question', 'info')),
+  views       integer not null default 0,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+comment on table public.community_posts is '커뮤니티 게시글';
+comment on column public.community_posts.category is 'general=자유게시판, question=질문게시판, info=정보공유';
+
+-- RLS 활성화
+alter table public.community_posts enable row level security;
+
+-- 누구나 게시글 조회 가능 (비로그인 포함)
+create policy "posts: 전체 조회 허용"
+  on public.community_posts for select
+  using (true);
+
+-- 로그인한 사용자만 게시글 작성 가능
+create policy "posts: 인증 사용자만 작성"
+  on public.community_posts for insert
+  with check (auth.uid() = author_id);
+
+-- 본인 게시글만 수정 가능
+create policy "posts: 본인만 수정"
+  on public.community_posts for update
+  using (auth.uid() = author_id);
+
+-- 본인 게시글만 삭제 가능
+create policy "posts: 본인만 삭제"
+  on public.community_posts for delete
+  using (auth.uid() = author_id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 3. community_comments 테이블 (게시글 댓글, 단일 레벨)
+-- ────────────────────────────────────────────────────────────
+create table if not exists public.community_comments (
+  id          uuid primary key default gen_random_uuid(),
+  post_id     uuid not null references public.community_posts(id) on delete cascade,
+  author_id   uuid not null references public.profiles(id) on delete cascade,
+  content     text not null,
+  created_at  timestamptz not null default now()
+);
+
+comment on table public.community_comments is '커뮤니티 게시글 댓글 (단일 레벨, 대댓글 없음)';
+
+-- RLS 활성화
+alter table public.community_comments enable row level security;
+
+-- 누구나 댓글 조회 가능
+create policy "comments: 전체 조회 허용"
+  on public.community_comments for select
+  using (true);
+
+-- 로그인한 사용자만 댓글 작성 가능
+create policy "comments: 인증 사용자만 작성"
+  on public.community_comments for insert
+  with check (auth.uid() = author_id);
+
+-- 본인 댓글만 삭제 가능
+create policy "comments: 본인만 삭제"
+  on public.community_comments for delete
+  using (auth.uid() = author_id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 4. 조회수 증가 헬퍼 함수
+--    security definer: RLS를 우회하여 views 컬럼만 증가
+-- ────────────────────────────────────────────────────────────
+create or replace function public.increment_post_views(p_post_id uuid)
+returns void
+language sql
+security definer
+as $$
+  update public.community_posts
+  set views = views + 1
+  where id = p_post_id;
+$$;
+
+comment on function public.increment_post_views is '게시글 조회수 1 증가 (RLS 우회, 인증 불필요)';
+
+
+-- ────────────────────────────────────────────────────────────
+-- 5. updated_at 자동 갱신 트리거 (posts)
+-- ────────────────────────────────────────────────────────────
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+create trigger trg_posts_updated_at
+  before update on public.community_posts
+  for each row execute function public.set_updated_at();
+
+create trigger trg_profiles_updated_at
+  before update on public.profiles
+  for each row execute function public.set_updated_at();
+
+
+-- ────────────────────────────────────────────────────────────
+-- 완료 확인용 쿼리 (선택)
+-- ────────────────────────────────────────────────────────────
+-- select table_name from information_schema.tables
+-- where table_schema = 'public'
+--   and table_name in ('profiles', 'community_posts', 'community_comments');
