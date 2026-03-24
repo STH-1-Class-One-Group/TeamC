@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     cf_kv_namespace_id: str = ""
     cf_api_token: str = ""
 
+    # Naver API
+    naver_client_id: str = ""
+    naver_client_secret: str = ""
+
     class Config:
         env_file = ".env"
 
