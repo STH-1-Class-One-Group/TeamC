@@ -6,11 +6,14 @@ from app.services.news_fetcher import get_defense_news
 router = APIRouter()
 
 @router.get("/news", response_model=List[Dict])
-async def fetch_defense_news(limit: int = Query(4, ge=1, le=100)):
+async def fetch_defense_news(
+    limit: int = Query(4, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+):
     """
     국방 관련 뉴스를 가져옵니다.
     """
-    return await get_defense_news(limit=limit)
+    return await get_defense_news(limit=limit, start=start)
 
 @router.get("/news/image")
 async def proxy_news_image(url: str):

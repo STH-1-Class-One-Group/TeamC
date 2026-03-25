@@ -8,12 +8,10 @@ import { Profile } from '../common/ProfileSetupModal';
 
 const brandLogoSrc = `${process.env.PUBLIC_URL}/logo.png`;
 
-// ── Props 인터페이스 ──────────────────────────────────────────
-// App.tsx에서 내려주는 user 정보와 로그아웃 함수를 타입으로 명시
 interface HeaderProps {
-  user: User | null;       // 로그인 상태면 User 객체, 아니면 null
-  profile: Profile | null; // 서비스 내 프로필 (없으면 null)
-  onSignOut: () => Promise<void> | void;   // 로그아웃 실행 함수
+  user: User | null;
+  profile: Profile | null;
+  onSignOut: () => Promise<void> | void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
@@ -26,8 +24,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
   });
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  // 드롭다운 메뉴(로그아웃 버튼) 열림/닫힘 상태
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -41,7 +37,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
     }
   }, [isDarkMode]);
 
-  // 드롭다운 외부 클릭 시 닫힘 처리
   useEffect(() => {
     if (!isDropdownOpen) return;
 
@@ -60,14 +55,12 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // 로그아웃: 함수 실행 후 드롭다운도 닫기
   const handleSignOut = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setIsDropdownOpen(false);
-    await onSignOut(); // App.tsx에서 내려온 supabase.auth.signOut()
+    await onSignOut();
   };
 
-  // 서비스 프로필 닉네임 우선, 없으면 OAuth 이름, 없으면 이메일
   const displayName = profile?.nickname
     || (user?.user_metadata?.full_name as string)
     || user?.email
@@ -128,7 +121,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
-          {/* 다크모드 토글 */}
           <button
             onClick={toggleDarkMode}
             className="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -143,16 +135,13 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             confirmation_number
           </span>
 
-          {/* 장바구니 아이콘 */}
           <CartIcon />
 
-          {/* ── 로그인 상태에 따라 다른 UI 렌더링 ── */}
           {user ? (
-            // ✅ 로그인 상태: 프로필 이미지 + 드롭다운
             <div ref={profileMenuRef} className="relative">
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // 외부 클릭 닫힘 방지
+                  e.stopPropagation();
                   setIsDropdownOpen(!isDropdownOpen);
                 }}
                 className="flex items-center justify-center ring-2 ring-blue-500 hover:ring-blue-400 rounded-full transition-all"
@@ -166,10 +155,8 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 />
               </button>
 
-              {/* 드롭다운 메뉴 */}
               {isDropdownOpen && (
                 <div className="absolute right-0 top-11 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
-                  {/* 유저 이름 표시 */}
                   <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
                     <p className="text-xs text-slate-500 dark:text-slate-400">로그인됨</p>
                     <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
@@ -179,7 +166,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                       <p className="text-xs text-primary mt-0.5">{profile.rank}{profile.unit ? ` · ${profile.unit}` : ''}</p>
                     )}
                   </div>
-                  {/* 로그아웃 버튼 */}
                   <button
                     onClick={handleSignOut}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -191,7 +177,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
               )}
             </div>
           ) : (
-            // ❌ 비로그인 상태: 로그인 버튼
             <button
               onClick={() => setIsLoginModalOpen(true)}
               className="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -205,7 +190,6 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
         </div>
       </nav>
 
-      {/* 로그인 모달: 비로그인 상태에서만 의미 있음 */}
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );

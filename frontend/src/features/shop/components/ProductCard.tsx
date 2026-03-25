@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Product } from '../hooks/useProducts';
+import type { Product } from '../types';
 import { supabase } from '../../../api/supabaseClient';
-import { addToCart } from '../../cart/services/cartService';
+import { requestPayment } from '../../cart/services/paymentService';
 import { useCartContext } from '../../cart/context/CartContext';
 
 interface ProductCardProps {
@@ -11,21 +11,34 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [cartLoading, setCartLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null);
-  const { openCart } = useCartContext();
+  
+  // ⭐ Context에서 미리 만들어둔 handleAddToCart를 가져옵니다.
+  // 이 함수는 DB 저장 + 목록 새로고침 + 장바구니 열기를 한 번에 해줍니다.
+  const { handleAddToCart } = useCartContext();
 
-  // 이미지 URL 처리 (Storage 경로면 publicUrl로 변환)
+  const buyNow = () => {
+    const orderName = product.name;
+    const customerName = '사용자'; 
+    const successUrl = `${window.location.origin}/payment-success`;
+    
+    // 결제 서비스 호출
+    requestPayment(product.price, orderName, customerName, successUrl);
+  };
+
+  // 이미지 URL 처리
   const imageUrl = product.image_url.startsWith('http')
     ? product.image_url
     : supabase.storage.from('food-images').getPublicUrl(product.image_url).data.publicUrl;
 
-  const handleAddToCart = async () => {
+  // ⭐ 장바구니 담기 버튼 클릭 핸들러
+  const onAddToCartClick = async () => {
     setCartLoading(true);
     setFeedback(null);
     try {
-      // food_id는 number 타입 (INTEGER) 그대로 전달
-      await addToCart({ food_id: product.id });
+      // Context의 함수를 호출하여 복잡한 과정을 한 번에 처리합니다.
+      await handleAddToCart(product.id);
+      
       setFeedback({ msg: '✅ 장바구니에 담겼습니다!', ok: true });
-      // 2초 후 메시지 사라짐
       setTimeout(() => setFeedback(null), 2000);
     } catch (err: any) {
       const isAuthError = err.message === '로그인이 필요합니다.';
@@ -52,7 +65,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <h3 className="text-lg font-bold text-on-surface mb-2 tracking-tight">{product.name}</h3>
         <p className="text-on-surface-variant text-sm mb-4 line-clamp-2">칼로리: {product.calories} kcal</p>
 
-        {/* 피드백 메시지 — 담기 성공/실패 시 표시 */}
         {feedback && (
           <p className={`text-xs mb-2 text-center font-medium ${feedback.ok ? 'text-green-600' : 'text-red-500'}`}>
             {feedback.msg}
@@ -62,12 +74,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex items-center justify-between">
           <span className="text-lg font-extrabold text-primary">₩ {product.price.toLocaleString()}</span>
           <div className="flex gap-2">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all">
+            <button
+              onClick={buyNow}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all"
+              aria-label="바로 구매"
+            >
               <span className="material-symbols-outlined text-[20px]" translate="no">credit_card</span>
             </button>
-            {/* 장바구니 담기 버튼 */}
             <button
-              onClick={handleAddToCart}
+              onClick={onAddToCartClick}
               disabled={cartLoading}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-primary hover:text-on-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="장바구니에 담기"

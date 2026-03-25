@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { SearchBar } from '../../components/common/SearchBar';
 
 interface NewsItem {
   title: string;
@@ -8,23 +9,60 @@ interface NewsItem {
 }
 
 export const NewsPage: React.FC = () => {
-  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const didInitRef = useRef(false);
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // 페이지당 표시할 뉴스 개수
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const itemsPerPage = 8;
+  const filteredNews = allNews.filter((news) => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return (
+      news.title.toLowerCase().includes(normalizedQuery) ||
+      news.pubDate.toLowerCase().includes(normalizedQuery)
+    );
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentNews = filteredNews.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
+    if (didInitRef.current) {
+      return;
+    }
+    didInitRef.current = true;
+
     const fetchNews = async () => {
       try {
         setIsLoading(true);
+        setAllNews([]);
         const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-        // 30개의 뉴스 기사 요청
-        const response = await fetch(`${apiUrl}/api/v1/news?limit=30`);
-        if (!response.ok) throw new Error('News fetch failed');
-        const data = await response.json();
-        setNewsList(data);
+        for (let start = 1; start <= 30; start += 1) {
+          const response = await fetch(`${apiUrl}/api/v1/news?limit=1&start=${start}`);
+
+          if (!response.ok) {
+            throw new Error(`News fetch failed at item ${start}`);
+          }
+
+          const data: NewsItem[] = await response.json();
+          if (data.length > 0) {
+            setAllNews((prev) => {
+              if (prev.some((item) => item.link === data[0].link)) {
+                return prev;
+              }
+              return [...prev, data[0]];
+            });
+          }
+        }
       } catch (error) {
-        console.error('[NewsPage] 뉴스 데이터 로드 실패:', error);
+        console.error('[NewsPage] failed to load news:', error);
+        setAllNews([]);
       } finally {
         setIsLoading(false);
       }
@@ -33,95 +71,128 @@ export const NewsPage: React.FC = () => {
     fetchNews();
   }, []);
 
-  // 페이지네이션 처리
-  const totalPages = Math.ceil(newsList.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentNews = newsList.slice(startIndex, startIndex + itemsPerPage);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handlePrevPage = () => {
-    setCurrentPage(prev => (prev > 1 ? prev - 1 : prev));
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
   };
 
   return (
     <div className="w-full">
-      {/* Date Navigation Header */}
+      <section className="max-w-3xl mx-auto mb-10">
+        <SearchBar
+          searchType="news"
+          placeholder="제목이나 날짜로 뉴스 검색"
+          localItems={allNews}
+          searchKeys={['title', 'pubDate']}
+          maxResults={6}
+          onQueryChange={setSearchQuery}
+          onSearchSelect={(item) => {
+            if (item?.title) {
+              setSearchQuery(item.title);
+            }
+          }}
+          renderItem={(item) => (
+            <div>
+              <div className="text-sm font-bold text-on-surface dark:text-white line-clamp-2">
+                {item.title}
+              </div>
+              <div className="mt-1 text-xs text-on-surface-variant dark:text-slate-400">
+                {item.pubDate}
+              </div>
+            </div>
+          )}
+        />
+      </section>
+
       <header className="mb-12 flex flex-col items-center justify-center space-y-4">
         <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tighter text-on-surface dark:text-white">
-          국방 브리핑 <span className="text-primary dark:text-blue-400">네트워크.</span>
+          뉴스 브리핑 <span className="text-primary dark:text-blue-400">아카이브</span>
         </h1>
         <p className="text-on-surface-variant dark:text-slate-400 font-medium text-sm">
-          현 시간부로 업데이트된 주요 국방 및 K-방산 동향을 확인하십시오.
+          최신 30개의 국방 뉴스를 제목이나 발행일로 필터링하세요.
         </p>
       </header>
 
-      {/* Main Content Area */}
       <div className="bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] border border-transparent dark:border-slate-800 transition-all">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-bold text-on-surface dark:text-white flex items-center gap-2">
             <span className="material-symbols-outlined text-primary dark:text-blue-400" translate="no">breaking_news</span>
-            최신 뉴스 속보
+            최신 뉴스
           </h2>
           <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">
-            총 {newsList.length}건
+            {searchQuery.trim() ? `${filteredNews.length}개 결과` : `전체 ${allNews.length}`}
           </span>
         </div>
 
-        {/* News Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[400px]">
-          {isLoading ? (
-            <div className="col-span-full flex justify-center items-center">
-              <span className="text-on-surface-variant dark:text-slate-400 font-medium">뉴스를 불러오는 중입니다...</span>
-            </div>
-          ) : currentNews.length > 0 ? (
-            currentNews.map((news, idx) => {
-              const proxyUrl = news.thumbnail && news.thumbnail !== "https://via.placeholder.com/300x200?text=No+Image" 
-                ? `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/v1/news/image?url=${encodeURIComponent(news.thumbnail)}` 
-                : "https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png";
-                
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-start gap-6 ${
+            !isLoading && currentNews.length > 0 && currentNews.length <= 4 ? '' : 'min-h-[400px]'
+          }`}
+        >
+          {currentNews.length > 0 ? (
+            currentNews.map((news) => {
+              const proxyUrl =
+                news.thumbnail && news.thumbnail !== 'https://via.placeholder.com/300x200?text=No+Image'
+                  ? `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/v1/news/image?url=${encodeURIComponent(news.thumbnail)}`
+                  : 'https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png';
+
               return (
-                <div 
-                  key={idx} 
-                  className="group cursor-pointer flex flex-col h-full"
+                <div
+                  key={news.link}
+                  className="group cursor-pointer self-start"
                   onClick={() => window.open(news.link, '_blank')}
                 >
                   <div className="aspect-video w-full rounded-lg bg-surface-dim dark:bg-slate-800 mb-4 overflow-hidden flex-shrink-0">
-                    <img 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      src={proxyUrl} 
-                      alt={news.title} 
-                      referrerPolicy="no-referrer" 
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={proxyUrl}
+                      alt={news.title}
+                      referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png";
+                        (e.target as HTMLImageElement).src =
+                          'https://szpwchwghfsswtdrtrmr.supabase.co/storage/v1/object/public/food-media/thumbnail.png';
                       }}
                     />
                   </div>
-                  <div className="flex flex-col flex-grow">
-                    <h3 
+                  <div>
+                    <h3
                       className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-3 mb-2"
                       dangerouslySetInnerHTML={{ __html: news.title }}
                     />
-                    <p className="text-xs text-on-surface-variant dark:text-slate-500 mt-auto font-medium">
+                    <p className="text-xs text-on-surface-variant dark:text-slate-500 font-medium">
                       {news.pubDate}
                     </p>
                   </div>
                 </div>
               );
             })
+          ) : isLoading ? (
+            <div className="col-span-full flex justify-center items-center">
+              <span className="text-on-surface-variant dark:text-slate-400 font-medium">뉴스를 불러오는 중...</span>
+            </div>
           ) : (
             <div className="col-span-full flex justify-center items-center text-on-surface-variant dark:text-slate-400 font-medium">
-              국방 뉴스를 찾을 수 없습니다.
+              검색 결과와 일치하는 뉴스가 없습니다.
             </div>
           )}
         </div>
 
-        {/* Pagination Controls */}
-        {!isLoading && totalPages > 0 && (
+        {isLoading && currentNews.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <span className="text-sm text-on-surface-variant dark:text-slate-400">뉴스를 더 불러오는 중...</span>
+          </div>
+        )}
+
+        {!isLoading && filteredNews.length > 0 ? (
           <div className="mt-12 flex justify-center items-center space-x-6">
-            <button 
+            <button
               onClick={handlePrevPage}
               disabled={currentPage === 1}
               className="p-2 rounded-full flex items-center justify-center transition-colors text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
@@ -131,7 +202,7 @@ export const NewsPage: React.FC = () => {
             <span className="text-sm font-bold tracking-widest text-on-surface dark:text-white">
               {currentPage} <span className="text-on-surface-variant/50 mx-1">/</span> {totalPages}
             </span>
-            <button 
+            <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
               className="p-2 rounded-full flex items-center justify-center transition-colors text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
@@ -139,7 +210,7 @@ export const NewsPage: React.FC = () => {
               <span className="material-symbols-outlined" translate="no">chevron_right</span>
             </button>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

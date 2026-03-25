@@ -5,7 +5,7 @@ from app.core.config import settings
 NAVER_NEWS_API_URL = "https://openapi.naver.com/v1/search/news.json"
 NAVER_IMAGE_API_URL = "https://openapi.naver.com/v1/search/image"
 
-async def fetch_naver_news(query: str, display: int = 4) -> List[Dict]:
+async def fetch_naver_news(query: str, display: int = 4, start: int = 1) -> List[Dict]:
     """
     네이버 뉴스 검색 API를 호출합니다.
     """
@@ -16,6 +16,7 @@ async def fetch_naver_news(query: str, display: int = 4) -> List[Dict]:
     params = {
         "query": query,
         "display": display,
+        "start": start,
         "sort": "sim"
     }
 
@@ -56,12 +57,12 @@ async def fetch_news_thumbnail(title: str) -> Optional[str]:
             print(f"Error fetching image for title '{title}': {e}")
             return None
 
-async def get_defense_news(limit: int = 4) -> List[Dict]:
+async def get_defense_news(limit: int = 4, start: int = 1) -> List[Dict]:
     """
     국방 관련 뉴스와 썸네일을 가져옵니다.
     """
     query = "국방 OR \"방위산업\" OR \"K-방산\""
-    news_items = await fetch_naver_news(query, display=limit)
+    news_items = await fetch_naver_news(query, display=limit, start=start)
 
     results = []
     for item in news_items:

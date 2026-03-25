@@ -14,6 +14,7 @@ import { ProfileSetupModal, Profile } from './components/common/ProfileSetupModa
 import { CommunityPage } from './features/community/CommunityPage';
 import { PostDetailPage } from './features/community/PostDetailPage';
 import { PostWritePage } from './features/community/PostWritePage';
+import PaymentSuccess from './features/cart/components/PaymentSuccess';
 
 type StorageEntry = {
   key: string;
@@ -63,9 +64,6 @@ const loadProfile = async (currentUser: User): Promise<Profile | null> => {
 };
 
 const App: React.FC = () => {
-  // ── 로그인 상태 관리 ──────────────────────────────────────────
-  // User | null: 로그인 시 User 객체, 비로그인 시 null
-  // undefined: 아직 Supabase에서 상태를 받아오기 전(로딩 중)
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
@@ -152,9 +150,6 @@ const App: React.FC = () => {
     };
   }, [user]);
 
-  // ── 로그아웃 함수 ─────────────────────────────────────────────
-  // Header에 props로 내려줄 함수. 호출하면 Supabase 세션이 종료되고
-  // onAuthStateChange가 SIGNED_OUT 이벤트를 발생시켜 user → null
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut({ scope: 'local' });
     if (error) {
@@ -181,16 +176,14 @@ const App: React.FC = () => {
     }
   };
 
-  // user가 undefined면 아직 인증 상태 로딩 중 → 빈 화면 방지용
   if (user === undefined) {
-    return null; // 또는 <SplashScreen /> 같은 로딩 UI로 교체 가능
+    return null;
   }
 
   return (
     <CartProvider>
       <BrowserRouter>
         <div className="min-h-screen flex flex-col bg-surface dark:bg-slate-950 transition-colors">
-          {/* user, profile, handleSignOut을 Header에 props로 전달 */}
           <Header user={user} profile={profile ?? null} onSignOut={handleSignOut} />
           <main className="flex-grow pt-32 pb-20 px-6 max-w-7xl mx-auto w-full">
             <Routes>
@@ -198,6 +191,7 @@ const App: React.FC = () => {
               <Route path="/Dashboard" element={<DashboardPage />} />
               <Route path="/Meal" element={<MealPage />} />
               <Route path="/News" element={<NewsPage />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/Community" element={<CommunityPage user={user} profile={profile ?? null} />} />
               <Route path="/Community/write" element={<PostWritePage user={user} profile={profile ?? null} />} />
               <Route path="/Community/:postId" element={<PostDetailPage user={user} profile={profile ?? null} />} />
@@ -207,7 +201,6 @@ const App: React.FC = () => {
           <Footer />
         </div>
         <CartModal />
-        {/* 신규 유저 프로필 설정 모달 (닫기 불가) */}
         {showProfileSetup && user && (
           <ProfileSetupModal
             user={user}

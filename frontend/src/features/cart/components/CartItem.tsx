@@ -15,9 +15,10 @@ import type { CartItemWithFood } from '../types/cart.types';
 interface CartItemProps {
   item: CartItemWithFood; // food_id: number를 포함한 확장 타입
   onRemove: (cartItemId: string) => void; // 삭제 콜백 (부모에서 처리)
+  onUpdateQuantity: (cartItemId: string, newQuantity: number) => void; // 수량 업데이트 콜백
 }
 
-export const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
+export const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdateQuantity }) => {
   // 이미지 URL 처리: Storage 경로면 publicUrl로 변환, 이미 http면 그대로 사용
   const imageUrl = item.food_items.image_url.startsWith('http')
     ? item.food_items.image_url
@@ -48,13 +49,32 @@ export const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
       </div>
 
       {/* 삭제 버튼: 실제 삭제 처리는 부모(CartDrawer)가 담당 */}
-      <button
-        onClick={() => onRemove(item.id)}
-        className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 transition-colors flex-shrink-0"
-        aria-label="장바구니에서 삭제"
-      >
-        <span className="material-symbols-outlined text-[18px]">delete</span>
-      </button>
+      <div className="flex flex-col gap-1 flex-shrink-0">
+        {/* + 버튼 */}
+        <button
+          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-green-100 dark:hover:bg-green-900/30 text-green-500 transition-colors"
+          aria-label="수량 증가"
+        >
+          <span className="material-symbols-outlined text-[18px]">add</span>
+        </button>
+        {/* - 버튼 */}
+        <button
+          onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-500 transition-colors"
+          aria-label="수량 감소"
+        >
+          <span className="material-symbols-outlined text-[18px]">remove</span>
+        </button>
+        {/* 삭제 버튼 */}
+        <button
+          onClick={() => onRemove(item.id)}
+          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 transition-colors"
+          aria-label="장바구니에서 삭제"
+        >
+          <span className="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
     </div>
   );
 };

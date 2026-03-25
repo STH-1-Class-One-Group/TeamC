@@ -1,13 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../../../api/supabaseClient';
-
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  calories: number;
-  image_url: string;
-}
+import { useEffect, useState } from 'react';
+import { fetchShopProducts } from '../api/shopApi';
+import type { Product } from '../types';
 
 export const useProducts = (page: number = 1, pageSize: number = 8) => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,33 +9,42 @@ export const useProducts = (page: number = 1, pageSize: number = 8) => {
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    let isActive = true;
+    const abortController = new AbortController();
+
+    const loadProducts = async () => {
       setLoading(true);
       setError(null);
+      setProducts([]);
+
       try {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize - 1;
+        const response = await fetchShopProducts(page, pageSize, abortController.signal);
 
-        const { data, error, count } = await supabase
-          .from('food_items')
-          .select('*', { count: 'exact' })
-          .order('id', { ascending: true })
-          .range(from, to);
-
-        if (error) {
-          throw error;
+        if (!isActive) {
+          return;
         }
 
-        setProducts(data || []);
-        if (count !== null) setTotalCount(count);
+        setProducts(response.items || []);
+        setTotalCount(response.total_count || 0);
       } catch (err: any) {
+        if (!isActive || err?.name === 'AbortError') {
+          return;
+        }
+
         setError(err.message || 'Failed to fetch products');
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchProducts();
+    loadProducts();
+
+    return () => {
+      isActive = false;
+      abortController.abort();
+    };
   }, [page, pageSize]);
 
   return { products, loading, error, totalCount };
