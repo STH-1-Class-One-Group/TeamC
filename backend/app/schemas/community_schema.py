@@ -1,0 +1,52 @@
+from pydantic import BaseModel
+from typing import Optional, List
+
+
+class AuthorInfo(BaseModel):
+    id: str
+    nickname: str
+    rank: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+
+class PostCreate(BaseModel):
+    title: str
+    content: str
+    category: str = "general"
+
+
+class PostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    category: Optional[str] = None
+
+
+class PostResponse(BaseModel):
+    id: str
+    post_number: int
+    title: str
+    content: str
+    category: str
+    views: int
+    created_at: str
+    updated_at: str
+    author: AuthorInfo
+
+
+class PostListResponse(BaseModel):
+    posts: List[PostResponse]
+    total: int
+    page: int
+    per_page: int
+
+
+class CommentCreate(BaseModel):
+    content: str
+
+
+class CommentResponse(BaseModel):
+    id: str
+    post_id: str
+    content: str
+    created_at: str
+    author: AuthorInfo

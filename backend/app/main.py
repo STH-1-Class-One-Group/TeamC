@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.meal import router as meal_router
 from app.api.v1.news import router as news_router
+from app.api.v1.community import router as community_router
+from app.services import community_service
 
 app = FastAPI(
     title="TeamC Backend API",
@@ -25,8 +27,14 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(meal_router, prefix="/api/v1", tags=["meals"])
 app.include_router(news_router, prefix="/api/v1", tags=["news"])
+app.include_router(community_router, prefix="/api/v1", tags=["community"])
 
 
 @app.get("/")
 def root():
     return {"message": "TeamC Backend API is running"}
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await community_service.close_http_client()

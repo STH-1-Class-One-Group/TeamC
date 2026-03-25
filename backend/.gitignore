@@ -1,5 +1,9 @@
 __pycache__/
 *.py[cod]
 venv/
+.venv/
+.tmp/
+*.out
+*.err
 .env
 .env.example

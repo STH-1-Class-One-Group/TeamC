@@ -6,15 +6,24 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+type OAuthProvider = 'google' | 'kakao' | 'naver';
+
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const handleLogin = async (provider: 'google' | 'kakao' | 'notion' | any) => {
+  const handleLogin = async (provider: OAuthProvider) => {
     try {
-      // note: 네이버의 경우 Supabase에서 추가 설정이 필요할 수 있습니다.
-      // 현재는 UI 세팅용으로 provider 명칭들을 바로 넘겨줍니다.
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
+        provider:
+          provider as Parameters<typeof supabase.auth.signInWithOAuth>[0]['provider'],
+        options:
+          provider === 'google'
+            ? {
+                queryParams: {
+                  prompt: 'select_account',
+                },
+              }
+            : undefined,
       });
       if (error) throw error;
     } catch (error: any) {
