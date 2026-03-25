@@ -60,6 +60,13 @@ comment on column public.community_posts.category is 'general=자유게시판, q
 -- RLS 활성화
 alter table public.community_posts enable row level security;
 
+-- 목록/검색/권한 체크 성능 최적화용 인덱스
+create index if not exists community_posts_author_id_idx
+  on public.community_posts (author_id);
+
+create index if not exists community_posts_category_post_number_idx
+  on public.community_posts (category, post_number desc);
+
 -- 누구나 게시글 조회 가능 (비로그인 포함)
 create policy "posts: 전체 조회 허용"
   on public.community_posts for select
@@ -96,6 +103,12 @@ comment on table public.community_comments is '커뮤니티 게시글 댓글 (�
 
 -- RLS 활성화
 alter table public.community_comments enable row level security;
+
+create index if not exists community_comments_post_id_created_at_idx
+  on public.community_comments (post_id, created_at);
+
+create index if not exists community_comments_author_id_idx
+  on public.community_comments (author_id);
 
 -- 누구나 댓글 조회 가능
 create policy "comments: 전체 조회 허용"
@@ -155,7 +168,20 @@ create trigger trg_profiles_updated_at
 
 
 -- ────────────────────────────────────────────────────────────
--- 완료 확인용 쿼리 (선택)
+-- 6. 검색 성능 최적화 (ILIKE 대응)
+--    title/content 검색은 trigram 인덱스로 가속
+-- ────────────────────────────────────────────────────────────
+create extension if not exists pg_trgm;
+
+create index if not exists community_posts_title_trgm_idx
+  on public.community_posts using gin (title gin_trgm_ops);
+
+create index if not exists community_posts_content_trgm_idx
+  on public.community_posts using gin (content gin_trgm_ops);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 7. 완료 확인용 쿼리 (선택)
 -- ────────────────────────────────────────────────────────────
 -- select table_name from information_schema.tables
 -- where table_schema = 'public'

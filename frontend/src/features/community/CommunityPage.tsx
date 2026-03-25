@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 import { Profile } from '../../components/common/ProfileSetupModal';
@@ -38,7 +38,10 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
   const [searchInput, setSearchInput] = useState('');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const hasLoadedOnceRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchPosts = useCallback(async (
     category: string,
@@ -47,7 +50,17 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
     keyword: string,
     currentSearchType: SearchType,
   ) => {
-    setIsLoading(true);
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const isInitialLoad = !hasLoadedOnceRef.current;
+
+    if (isInitialLoad) {
+      setIsLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
+
     setError('');
 
     try {
@@ -65,28 +78,47 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
         params.append('search_type', currentSearchType);
       }
 
-      const res = await fetch(`${apiUrl}/api/v1/community/posts?${params.toString()}`);
+      const res = await fetch(`${apiUrl}/api/v1/community/posts?${params.toString()}`, {
+        signal: controller.signal,
+      });
 
       if (!res.ok) {
         throw new Error('게시글을 불러오지 못했습니다.');
       }
 
       const data: PostListResponse = await res.json();
+      hasLoadedOnceRef.current = true;
       setPosts(data.posts);
       setTotal(data.total);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
+
       console.error(err);
-      setPosts([]);
-      setTotal(0);
+      if (!hasLoadedOnceRef.current) {
+        setPosts([]);
+        setTotal(0);
+      }
       setError('게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
-      setIsLoading(false);
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     fetchPosts(selectedCategory, page, pageSize, searchKeyword, searchType);
   }, [selectedCategory, page, pageSize, searchKeyword, searchType, fetchPosts]);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -181,8 +213,17 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                 · 검색어: <span className="font-semibold text-on-surface dark:text-white">{searchKeyword}</span>
               </span>
             )}
+            {isRefreshing && (
+              <span className="ml-2 text-primary">· 목록 업데이트 중...</span>
+            )}
           </div>
         </div>
+
+        {error && posts.length > 0 && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+            {error}
+          </div>
+        )}
 
         <div className="overflow-x-auto rounded-lg border border-outline-variant/25 dark:border-slate-700">
           <table className="min-w-[840px] w-full table-fixed bg-surface-container-lowest dark:bg-slate-800">
@@ -196,13 +237,13 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading && posts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-20 text-center text-on-surface-variant dark:text-slate-400">
                     불러오는 중...
                   </td>
                 </tr>
-              ) : error ? (
+              ) : error && posts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-20 text-center text-red-500">
                     {error}
