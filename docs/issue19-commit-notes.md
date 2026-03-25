@@ -11,6 +11,27 @@
 
 ---
 
+## `(next)` `perf: optimize community RLS policies`
+
+### 무엇을 했는가
+- 커뮤니티 RLS 정책을 Supabase 권장 성능 패턴으로 정리하는 SQL을 추가했습니다.
+
+### 왜 필요한가
+- 기존 정책은 `auth.uid() = column` 형태라 행 수가 늘어날수록 정책 평가 비용이 커질 수 있습니다.
+- Supabase 가이드는 `(select auth.uid()) = column` 형태를 권장합니다.
+
+### 핵심 변경
+- `backend/sql/community_schema.sql`
+  - 신규 설치 시 바로 최적화된 RLS 정책이 생성되도록 수정
+- `backend/sql/community_rls_performance_patch.sql`
+  - 이미 생성된 DB 정책을 drop/recreate 해서 성능 패턴으로 바꾸는 patch SQL 추가
+
+### 팀원이 알아야 할 점
+- 기존 DB는 `community_rls_performance_patch.sql`을 직접 실행해야 반영됩니다.
+- 이 변경은 기능 변경이 아니라 정책 평가 성능 최적화입니다.
+
+---
+
 ## `4704f83` `perf: improve community board responsiveness`
 
 ### 무엇을 했는가

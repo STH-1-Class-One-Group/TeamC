@@ -29,12 +29,15 @@ create policy "profiles: 전체 조회 허용"
 -- 본인 프로필만 생성 가능
 create policy "profiles: 본인만 생성"
   on public.profiles for insert
-  with check (auth.uid() = id);
+  to authenticated
+  with check ((select auth.uid()) = id);
 
 -- 본인 프로필만 수정 가능
 create policy "profiles: 본인만 수정"
   on public.profiles for update
-  using (auth.uid() = id);
+  to authenticated
+  using ((select auth.uid()) = id)
+  with check ((select auth.uid()) = id);
 
 
 -- ────────────────────────────────────────────────────────────
@@ -75,17 +78,21 @@ create policy "posts: 전체 조회 허용"
 -- 로그인한 사용자만 게시글 작성 가능
 create policy "posts: 인증 사용자만 작성"
   on public.community_posts for insert
-  with check (auth.uid() = author_id);
+  to authenticated
+  with check ((select auth.uid()) = author_id);
 
 -- 본인 게시글만 수정 가능
 create policy "posts: 본인만 수정"
   on public.community_posts for update
-  using (auth.uid() = author_id);
+  to authenticated
+  using ((select auth.uid()) = author_id)
+  with check ((select auth.uid()) = author_id);
 
 -- 본인 게시글만 삭제 가능
 create policy "posts: 본인만 삭제"
   on public.community_posts for delete
-  using (auth.uid() = author_id);
+  to authenticated
+  using ((select auth.uid()) = author_id);
 
 
 -- ────────────────────────────────────────────────────────────
@@ -118,12 +125,14 @@ create policy "comments: 전체 조회 허용"
 -- 로그인한 사용자만 댓글 작성 가능
 create policy "comments: 인증 사용자만 작성"
   on public.community_comments for insert
-  with check (auth.uid() = author_id);
+  to authenticated
+  with check ((select auth.uid()) = author_id);
 
 -- 본인 댓글만 삭제 가능
 create policy "comments: 본인만 삭제"
   on public.community_comments for delete
-  using (auth.uid() = author_id);
+  to authenticated
+  using ((select auth.uid()) = author_id);
 
 
 -- ────────────────────────────────────────────────────────────
