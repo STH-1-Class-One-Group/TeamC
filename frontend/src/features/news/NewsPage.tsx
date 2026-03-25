@@ -30,6 +30,7 @@ export const NewsPage: React.FC = () => {
   const totalPages = Math.max(1, Math.ceil(filteredNews.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentNews = filteredNews.slice(startIndex, startIndex + itemsPerPage);
+  const hasSingleRowResults = !isLoading && currentNews.length > 0 && currentNews.length <= 4;
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -115,7 +116,11 @@ export const NewsPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[400px]">
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${
+            hasSingleRowResults ? '' : 'min-h-[400px]'
+          }`}
+        >
           {isLoading ? (
             <div className="col-span-full flex justify-center items-center">
               <span className="text-on-surface-variant dark:text-slate-400 font-medium">Loading news...</span>
@@ -130,7 +135,7 @@ export const NewsPage: React.FC = () => {
               return (
                 <div
                   key={news.link}
-                  className="group cursor-pointer flex flex-col h-full"
+                  className={`group cursor-pointer flex flex-col ${hasSingleRowResults ? '' : 'h-full'}`}
                   onClick={() => window.open(news.link, '_blank')}
                 >
                   <div className="aspect-video w-full rounded-lg bg-surface-dim dark:bg-slate-800 mb-4 overflow-hidden flex-shrink-0">
@@ -145,7 +150,7 @@ export const NewsPage: React.FC = () => {
                       }}
                     />
                   </div>
-                  <div className="flex flex-col flex-grow">
+                  <div className={`flex flex-col ${hasSingleRowResults ? '' : 'flex-grow'}`}>
                     <h3
                       className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-3 mb-2"
                       dangerouslySetInnerHTML={{ __html: news.title }}
