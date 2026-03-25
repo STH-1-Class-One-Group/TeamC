@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Product } from '../hooks/useProducts';
+import type { Product } from '../types';
 import { supabase } from '../../../api/supabaseClient';
 import { requestPayment } from '../../cart/services/paymentService';
 import { useCartContext } from '../../cart/context/CartContext';
