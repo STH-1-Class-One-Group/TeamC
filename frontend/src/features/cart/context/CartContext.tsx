@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { getCartItems, removeFromCart, clearCart, updateQuantity, addToCart } from '../services/cartService';
+import { requestPayment } from '../services/paymentService';
 import type { CartItemWithFood } from '../types/cart.types';
 
-// 1. 설계도 정의
 interface CartContextType {
   isOpen: boolean;
   openCart: () => void;
@@ -17,6 +17,7 @@ interface CartContextType {
   handleRemove: (id: string) => Promise<void>;
   handleClear: () => Promise<void>;
   handleUpdateQuantity: (id: string, q: number) => Promise<void>;
+  onGroupPayment: () => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -27,12 +28,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // [데이터 새로고침 함수]
   const fetchCart = useCallback(async () => {
     try {
       setLoading(true);
       const items = await getCartItems();
-      // ⭐ 새 배열로 교체하여 리액트가 변화를 감지하게 함
       setCartItems([...items]);
     } catch (err: any) {
       setError(err.message);
@@ -41,28 +40,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // 앱 시작 시 초기 로드
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  // ⭐ [장바구니 담기] 실시간 반영의 핵심
+  // ⭐ 순서 중요: totalPrice 계산을 먼저 합니다.
+  const totalPrice = cartItems.reduce(
+    (sum, item: CartItemWithFood) => sum + (item.food_items?.price || 0) * item.quantity,
+    0
+  );
+  const totalCount = cartItems.reduce((sum, item: CartItemWithFood) => sum + item.quantity, 0);
+
+  // ⭐ 그 다음에 onGroupPayment 함수를 만듭니다.
+  const onGroupPayment = useCallback(() => {
+    if (cartItems.length === 0) {
+      alert('장바구니가 비어 있습니다.');
+      return;
+    }
+    const firstItemName = cartItems[0].food_items?.name || '상품';
+    const remainingCount = cartItems.length - 1;
+    const orderName = remainingCount > 0 ? `${firstItemName} 외 ${remainingCount}건` : firstItemName;
+    const successUrl = `${window.location.origin}/payment-success?from=cart`;
+    
+    requestPayment(totalPrice, orderName, '사용자', successUrl);
+  }, [cartItems, totalPrice]);
+
   const handleAddToCart = async (food_id: number) => {
     try {
       setLoading(true);
-      // 1. DB에 데이터 추가 완료 대기
       await addToCart({ food_id, quantity: 1 });
-      
-      // 2. 추가 성공 후, DB에서 최신 목록을 다시 긁어옴
       const freshItems = await getCartItems();
-      
-      // 3. ⭐ 리액트 상태(State)를 최신 데이터로 덮어씌움 -> 여기서 화면이 바뀜!
       setCartItems([...freshItems]);
-      
-      // 4. 사용자 경험을 위해 장바구니 창을 자동으로 열어줌
       setIsOpen(true);
-      
-      console.log("실시간 반영 완료:", freshItems.length);
     } catch (err: any) {
       alert("장바구니 담기 실패: " + err.message);
     } finally {
@@ -102,13 +111,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 실시간 합계/수량 계산
-  const totalPrice = cartItems.reduce(
-    (sum, item: CartItemWithFood) => sum + (item.food_items?.price || 0) * item.quantity,
-    0
-  );
-  const totalCount = cartItems.reduce((sum, item: CartItemWithFood) => sum + item.quantity, 0);
-
   return (
     <CartContext.Provider
       value={{
@@ -125,11 +127,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         handleRemove,
         handleClear,
         handleUpdateQuantity,
+        onGroupPayment,
       }}
     >
       {children}
     </CartContext.Provider>
-  );
+  );  
 }
 
 export function useCartContext() {

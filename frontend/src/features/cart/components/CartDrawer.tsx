@@ -1,11 +1,11 @@
 import React from 'react';
-import { useCart } from '../hooks/useCart'; // 훅 하나만 사용
+import { useCart } from '../hooks/useCart';
 import { CartItem } from './CartItem';
 
 export const CartDrawer: React.FC = () => {
-  // 모든 필요한 기능을 useCart에서 한 번에 가져옵니다.
+  // ⭐ 기존 기능에 onGroupPayment만 추가로 가져옵니다.
   const {
-    closeCart, // 여기서 가져옵니다!
+    closeCart,
     cartItems,
     loading,
     error,
@@ -14,6 +14,7 @@ export const CartDrawer: React.FC = () => {
     handleRemove,
     handleClear,
     handleUpdateQuantity,
+    onGroupPayment, // 여기서 결제 함수를 가져옵니다.
   } = useCart();
 
   return (
@@ -22,7 +23,6 @@ export const CartDrawer: React.FC = () => {
       <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
         <h2 className="text-lg font-bold text-on-surface dark:text-white">
           🛒 장바구니
-          {/* totalCount가 실시간으로 반영되는지 확인하는 핵심 포인트 */}
           {totalCount > 0 && (
             <span className="ml-2 text-sm font-medium text-primary">
               ({totalCount}개)
@@ -76,7 +76,8 @@ export const CartDrawer: React.FC = () => {
           </div>
           <button
             className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold hover:opacity-90 transition-opacity"
-            onClick={() => alert('주문 기능은 준비 중입니다!')}
+            // ⭐ alert를 지우고 실제 결제 함수인 onGroupPayment를 연결했습니다.
+            onClick={onGroupPayment}
           >
             주문하기
           </button>
