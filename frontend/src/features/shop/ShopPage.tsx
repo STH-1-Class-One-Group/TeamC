@@ -33,7 +33,7 @@ export const ShopPage: React.FC = () => {
       <section className="max-w-2xl mx-auto mb-16 px-4">
         <SearchBar
           searchType="food"
-          placeholder="Search military food or product name"
+          placeholder="찾으시는 식품이나 상품명을 입력하세요"
           localItems={allProducts}
           searchKeys={['name']}
           onSearchSelect={(item) => setSelectedProduct(item)}
@@ -43,10 +43,10 @@ export const ShopPage: React.FC = () => {
       <section className="mb-12 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-extrabold tracking-tighter mb-4 text-on-surface dark:text-white">
-            PX Food and Snack Catalog
+            밀리터리 푸드 & 군것질 보관함
           </h1>
           <p className="text-on-surface-variant dark:text-slate-400 text-lg leading-relaxed">
-            Military food items are loaded from Supabase as soon as they arrive.
+            엄격한 기준을 통과한 고품질 군용 식품들을 만나보세요. 모든 품목은 현지 직송으로 공수되어 최상의 상태를 유지합니다.
           </p>
         </div>
       </section>
@@ -56,24 +56,24 @@ export const ShopPage: React.FC = () => {
           <ProductCard key={selectedProduct.id} product={selectedProduct} />
         ) : error ? (
           <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center py-20">
-            <span className="text-error">Error loading products: {error}</span>
+            <span className="text-error">상품 로드 오류: {error}</span>
           </div>
         ) : products.length > 0 ? (
           products.map((product) => <ProductCard key={product.id} product={product} />)
         ) : loading ? (
           <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center py-20">
-            <span className="text-on-surface-variant dark:text-slate-400">Loading products...</span>
+            <span className="text-on-surface-variant dark:text-slate-400">상품을 불러오는 중...</span>
           </div>
         ) : (
           <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-center py-20">
-            <span className="text-on-surface-variant dark:text-slate-400">No products available.</span>
+            <span className="text-on-surface-variant dark:text-slate-400">판매 중인 상품이 없습니다.</span>
           </div>
         )}
       </section>
 
       {!selectedProduct && loading && products.length > 0 && (
         <section className="flex justify-center mb-8">
-          <span className="text-sm text-on-surface-variant dark:text-slate-400">Loading more products...</span>
+          <span className="text-sm text-on-surface-variant dark:text-slate-400">상품을 더 불러오는 중...</span>
         </section>
       )}
 

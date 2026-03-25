@@ -88,7 +88,7 @@ export const NewsPage: React.FC = () => {
       <section className="max-w-3xl mx-auto mb-10">
         <SearchBar
           searchType="news"
-          placeholder="Search news by title or date"
+          placeholder="제목이나 날짜로 뉴스 검색"
           localItems={allNews}
           searchKeys={['title', 'pubDate']}
           maxResults={6}
@@ -113,10 +113,10 @@ export const NewsPage: React.FC = () => {
 
       <header className="mb-12 flex flex-col items-center justify-center space-y-4">
         <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tighter text-on-surface dark:text-white">
-          News Briefing <span className="text-primary dark:text-blue-400">Archive</span>
+          뉴스 브리핑 <span className="text-primary dark:text-blue-400">아카이브</span>
         </h1>
         <p className="text-on-surface-variant dark:text-slate-400 font-medium text-sm">
-          Filter the latest 30 defense news items by title or publication date.
+          최신 30개의 국방 뉴스를 제목이나 발행일로 필터링하세요.
         </p>
       </header>
 
@@ -124,10 +124,10 @@ export const NewsPage: React.FC = () => {
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-bold text-on-surface dark:text-white flex items-center gap-2">
             <span className="material-symbols-outlined text-primary dark:text-blue-400" translate="no">breaking_news</span>
-            Latest News
+            최신 뉴스
           </h2>
           <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">
-            {searchQuery.trim() ? `${filteredNews.length} matches` : `Total ${allNews.length}`}
+            {searchQuery.trim() ? `${filteredNews.length}개 결과` : `전체 ${allNews.length}`}
           </span>
         </div>
 
@@ -175,18 +175,18 @@ export const NewsPage: React.FC = () => {
             })
           ) : isLoading ? (
             <div className="col-span-full flex justify-center items-center">
-              <span className="text-on-surface-variant dark:text-slate-400 font-medium">Loading news...</span>
+              <span className="text-on-surface-variant dark:text-slate-400 font-medium">뉴스를 불러오는 중...</span>
             </div>
           ) : (
             <div className="col-span-full flex justify-center items-center text-on-surface-variant dark:text-slate-400 font-medium">
-              No news matched your search.
+              검색 결과와 일치하는 뉴스가 없습니다.
             </div>
           )}
         </div>
 
         {isLoading && currentNews.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <span className="text-sm text-on-surface-variant dark:text-slate-400">Loading more news...</span>
+            <span className="text-sm text-on-surface-variant dark:text-slate-400">뉴스를 더 불러오는 중...</span>
           </div>
         )}
 
