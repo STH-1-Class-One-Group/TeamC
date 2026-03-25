@@ -87,7 +87,7 @@ erDiagram
         string nickname "unique, 필수"
         string rank "계급 (선택)"
         string unit "소속부대 (선택)"
-        string avatar_url "OAuth 프로필 이미지"
+        string avatar_url "Supabase Storage 프로필 이미지 경로"
         timestamptz created_at
         timestamptz updated_at
     }
@@ -147,7 +147,7 @@ create table public.profiles (
   nickname   text not null unique,   -- 서비스 내 닉네임 (필수, 중복 불가)
   rank       text,                   -- 계급 (선택)
   unit       text,                   -- 소속부대 (선택)
-  avatar_url text,                   -- OAuth 제공자 프로필 이미지
+  avatar_url text,                   -- Supabase Storage 프로필 이미지 경로
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -290,6 +290,12 @@ SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6...
 ```
 
 > `SUPABASE_URL`과 `SUPABASE_ANON_KEY`는 Supabase 대시보드 → **Project Settings → API** 에서 확인 가능
+
+프로필 이미지 정책:
+- `profiles.avatar_url`는 외부 OAuth URL이 아니라 Supabase Storage 경로로 사용
+- Storage 버킷: `profile-images`
+- 파일명 규칙: `0.png~18.png`
+- 계급이 없으면 `default.png`
 
 ### Step 3. 확인 쿼리
 ```sql

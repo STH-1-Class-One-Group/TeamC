@@ -11,7 +11,7 @@ create table if not exists public.profiles (
   nickname    text not null unique,
   rank        text,                        -- 계급 (선택)
   unit        text,                        -- 소속부대 (선택)
-  avatar_url  text,                        -- OAuth 프로필 이미지
+  avatar_url  text,                        -- Supabase Storage 프로필 이미지 경로
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ProfileAvatar } from '../../../components/common/ProfileAvatar';
 import { Comment, formatRelativeTime } from '../types';
 import { Profile } from '../../../components/common/ProfileSetupModal';
 import { supabase } from '../../../api/supabaseClient';
@@ -75,8 +76,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, profile,
     }
   };
 
-  const getInitial = (nickname: string) => nickname.charAt(0).toUpperCase();
-
   return (
     <section className="mt-12 bg-surface-container-lowest dark:bg-slate-800 rounded-xl p-8">
       <h3 className="text-lg font-bold text-on-surface dark:text-white mb-6">
@@ -87,12 +86,12 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, profile,
       {profile ? (
         <form onSubmit={handleSubmit} className="flex gap-3 mb-8">
           {/* 아바타 */}
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0">
-            {profile.avatar_url
-              ? <img src={profile.avatar_url} alt={profile.nickname} className="w-full h-full rounded-full object-cover" />
-              : getInitial(profile.nickname)
-            }
-          </div>
+          <ProfileAvatar
+            nickname={profile.nickname}
+            rank={profile.rank}
+            avatar_url={profile.avatar_url}
+            containerClassName="w-10 h-10 rounded-full overflow-hidden shrink-0"
+          />
           <div className="flex-1 flex flex-col gap-2">
             <textarea
               value={newComment}
@@ -135,12 +134,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, profile,
             return (
               <div key={comment.id} className="flex gap-4">
                 {/* 아바타 */}
-                <div className="w-10 h-10 rounded-full bg-surface-container-high dark:bg-slate-600 flex items-center justify-center text-on-surface-variant dark:text-slate-300 text-sm font-bold shrink-0 overflow-hidden">
-                  {comment.author.avatar_url
-                    ? <img src={comment.author.avatar_url} alt={comment.author.nickname} className="w-full h-full object-cover" />
-                    : getInitial(comment.author.nickname)
-                  }
-                </div>
+                <ProfileAvatar
+                  nickname={comment.author.nickname}
+                  rank={comment.author.rank}
+                  avatar_url={comment.author.avatar_url}
+                  containerClassName="w-10 h-10 rounded-full overflow-hidden shrink-0"
+                  fallbackClassName="bg-surface-container-high dark:bg-slate-600 text-on-surface-variant dark:text-slate-300 text-sm font-bold"
+                />
                 {/* 내용 */}
                 <div className="flex-1">
                   <div className="flex items-center justify-between">

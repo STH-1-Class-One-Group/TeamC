@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
+import { ProfileAvatar } from '../../components/common/ProfileAvatar';
 import { Profile } from '../../components/common/ProfileSetupModal';
 import { CommentSection } from './components/CommentSection';
 import { Post, CATEGORIES, formatRelativeTime } from './types';
@@ -100,12 +101,12 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
           {/* 작성자 정보 + 수정/삭제 */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold overflow-hidden">
-                {post.author.avatar_url
-                  ? <img src={post.author.avatar_url} alt={post.author.nickname} className="w-full h-full object-cover" />
-                  : post.author.nickname.charAt(0).toUpperCase()
-                }
-              </div>
+              <ProfileAvatar
+                nickname={post.author.nickname}
+                rank={post.author.rank}
+                avatar_url={post.author.avatar_url}
+                containerClassName="w-12 h-12 rounded-full overflow-hidden"
+              />
               <div>
                 <p className="font-bold text-on-surface dark:text-white">{authorLabel}</p>
                 <div className="flex items-center gap-2 text-sm text-on-surface-variant dark:text-slate-400">

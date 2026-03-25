@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../api/supabaseClient';
 import { User } from '@supabase/supabase-js';
+import { getRankAvatarPath } from '../../utils/profileAvatar';
 
 export interface Profile {
   id: string;
@@ -20,7 +21,7 @@ interface ProfileSetupModalProps {
 
 const RANKS = [
   '이병', '일병', '상병', '병장',
-  '하사', '중사', '상사', '원사',
+  '하사', '중사', '상사', '원사', '준위',
   '소위', '중위', '대위', '소령', '중령', '대령',
   '준장', '소장', '중장', '대장',
 ];
@@ -66,7 +67,7 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onPr
         nickname: nickname.trim(),
         rank: rank || null,
         unit: unit.trim() || null,
-        avatar_url: (user.user_metadata?.avatar_url as string) || null,
+        avatar_url: getRankAvatarPath(rank || null),
       })
       .select()
       .single();

@@ -11,6 +11,28 @@
 
 ---
 
+## `(next)` `feat: use rank-based default profile avatars`
+
+### 무엇을 했는가
+- 구글 OAuth 프로필 사진 대신 계급별 기본 프로필 이미지를 사용하도록 규칙을 바꿨습니다.
+
+### 왜 필요한가
+- 현재 `profiles.avatar_url`에 구글 프로필 URL이 저장되어 있어 서비스 내 세계관/브랜딩과 맞지 않았습니다.
+- 계급을 이미 입력받고 있으므로 그 값을 기본 프로필 이미지에 직접 반영할 수 있습니다.
+
+### 핵심 변경
+- 프론트 공통 프로필 아바타 렌더링 헬퍼/컴포넌트 추가
+- 신규 가입 시 `avatar_url`에 rank별 숫자 파일명 또는 `default.png` 저장
+- 헤더/게시글 상세/댓글에서 모두 같은 계급 이미지 규칙 사용
+- `backend/sql/profile_rank_avatar_backfill.sql`
+  - 기존 유저의 `profiles.avatar_url`를 숫자 파일명 규칙으로 일괄 갱신하는 SQL 추가
+
+### 팀원이 알아야 할 점
+- `avatar_url`는 더 이상 외부 OAuth URL이 아니라 Supabase Storage 이미지 경로 의미로 사용됩니다.
+- Storage 버킷은 `profile-images`, 파일명 규칙은 `0.png~18.png`, 기본 이미지는 `default.png`입니다.
+
+---
+
 ## `1c8204b` `perf: optimize community RLS policies`
 
 ### 무엇을 했는가

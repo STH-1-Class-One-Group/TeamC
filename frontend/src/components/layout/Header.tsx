@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 import { LoginModal } from '../common/LoginModal';
+import { ProfileAvatar } from '../common/ProfileAvatar';
 import { CartIcon } from '../../features/cart/components/CartIcon';
 import { Profile } from '../common/ProfileSetupModal';
 
@@ -66,15 +67,11 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
     await onSignOut(); // App.tsx에서 내려온 supabase.auth.signOut()
   };
 
-  // 프로필 이미지: OAuth 제공자에서 받은 avatar_url 사용, 없으면 기본 이니셜
-  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
   // 서비스 프로필 닉네임 우선, 없으면 OAuth 이름, 없으면 이메일
   const displayName = profile?.nickname
     || (user?.user_metadata?.full_name as string)
     || user?.email
     || '사용자';
-  // 이름 첫 글자를 이니셜로 → 이미지가 없을 때 표시
-  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <>
@@ -158,22 +155,15 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                   e.stopPropagation(); // 외부 클릭 닫힘 방지
                   setIsDropdownOpen(!isDropdownOpen);
                 }}
-                className="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden ring-2 ring-blue-500 hover:ring-blue-400 transition-all"
+                className="flex items-center justify-center ring-2 ring-blue-500 hover:ring-blue-400 rounded-full transition-all"
                 aria-label="프로필 메뉴"
               >
-                {avatarUrl ? (
-                  // OAuth 제공자(구글·카카오 등)에서 받은 프로필 사진
-                  <img
-                    src={avatarUrl}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  // 사진 없으면 이름 첫 글자 이니셜
-                  <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                    {initial}
-                  </div>
-                )}
+                <ProfileAvatar
+                  nickname={displayName}
+                  rank={profile?.rank}
+                  avatar_url={profile?.avatar_url}
+                  containerClassName="w-9 h-9 rounded-full overflow-hidden"
+                />
               </button>
 
               {/* 드롭다운 메뉴 */}
