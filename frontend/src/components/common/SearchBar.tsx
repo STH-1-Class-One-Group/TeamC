@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from '../../api/supabaseClient';
+import { getSupabaseErrorMessage, supabase } from '../../api/supabaseClient';
 
 type SearchType = 'food' | 'news' | 'recruitment';
 
@@ -106,7 +106,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
         setResults([]);
       } catch (error) {
-        console.error('[SearchBar] search failed:', error);
+        console.error('[SearchBar] search failed:', getSupabaseErrorMessage(error));
         setResults([]);
       } finally {
         setLoading(false);
