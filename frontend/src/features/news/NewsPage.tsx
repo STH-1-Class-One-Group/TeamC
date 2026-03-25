@@ -44,25 +44,23 @@ export const NewsPage: React.FC = () => {
         setIsLoading(true);
         setAllNews([]);
         const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-        await Promise.all(
-          Array.from({ length: 30 }, (_, index) => index + 1).map(async (start) => {
-            const response = await fetch(`${apiUrl}/api/v1/news?limit=1&start=${start}`);
+        for (let start = 1; start <= 30; start += 1) {
+          const response = await fetch(`${apiUrl}/api/v1/news?limit=1&start=${start}`);
 
-            if (!response.ok) {
-              throw new Error(`News fetch failed at item ${start}`);
-            }
+          if (!response.ok) {
+            throw new Error(`News fetch failed at item ${start}`);
+          }
 
-            const data: NewsItem[] = await response.json();
-            if (data.length > 0) {
-              setAllNews((prev) => {
-                if (prev.some((item) => item.link === data[0].link)) {
-                  return prev;
-                }
-                return [...prev, data[0]];
-              });
-            }
-          })
-        );
+          const data: NewsItem[] = await response.json();
+          if (data.length > 0) {
+            setAllNews((prev) => {
+              if (prev.some((item) => item.link === data[0].link)) {
+                return prev;
+              }
+              return [...prev, data[0]];
+            });
+          }
+        }
       } catch (error) {
         console.error('[NewsPage] failed to load news:', error);
         setAllNews([]);
@@ -139,11 +137,7 @@ export const NewsPage: React.FC = () => {
             hasSingleRowResults ? '' : 'min-h-[400px]'
           }`}
         >
-          {isLoading ? (
-            <div className="col-span-full flex justify-center items-center">
-              <span className="text-on-surface-variant dark:text-slate-400 font-medium">Loading news...</span>
-            </div>
-          ) : currentNews.length > 0 ? (
+          {currentNews.length > 0 ? (
             currentNews.map((news) => {
               const proxyUrl =
                 news.thumbnail && news.thumbnail !== 'https://via.placeholder.com/300x200?text=No+Image'
@@ -180,12 +174,22 @@ export const NewsPage: React.FC = () => {
                 </div>
               );
             })
+          ) : isLoading ? (
+            <div className="col-span-full flex justify-center items-center">
+              <span className="text-on-surface-variant dark:text-slate-400 font-medium">Loading news...</span>
+            </div>
           ) : (
             <div className="col-span-full flex justify-center items-center text-on-surface-variant dark:text-slate-400 font-medium">
               No news matched your search.
             </div>
           )}
         </div>
+
+        {isLoading && currentNews.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <span className="text-sm text-on-surface-variant dark:text-slate-400">Loading more news...</span>
+          </div>
+        )}
 
         {!isLoading && filteredNews.length > 0 ? (
           <div className="mt-12 flex justify-center items-center space-x-6">
