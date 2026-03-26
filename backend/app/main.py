@@ -1,10 +1,17 @@
 # FastAPI app initialization
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.meal import router as meal_router
 from app.api.v1.news import router as news_router
 from app.api.v1.community import router as community_router
 from app.services import community_service
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
 
 app = FastAPI(
     title="TeamC Backend API",
