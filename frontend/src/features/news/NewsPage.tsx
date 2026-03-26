@@ -55,7 +55,7 @@ export const NewsPage: React.FC = () => {
           try {
             const response = await fetchNewsBatch(batchSize, start, {
               signal: controller.signal,
-              forceRefresh: true,
+              forceRefresh: false,
             });
 
             if (!response.ok) {

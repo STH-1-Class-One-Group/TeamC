@@ -204,7 +204,7 @@ export const DashboardPage: React.FC = () => {
       try {
         const response = await fetchNewsBatch(4, 1, {
           signal: controller.signal,
-          forceRefresh: true,
+          forceRefresh: false,
         });
         if (!response.ok) {
           throw new Error('Failed to fetch defense news');
