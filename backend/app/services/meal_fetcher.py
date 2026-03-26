@@ -5,15 +5,30 @@ from typing import List, Optional
 from app.core.config import settings
 
 
+import time
+
 # Cloudflare KV REST API 기본 URL
 CF_KV_BASE_URL = "https://api.cloudflare.com/client/v4/accounts/{account_id}/storage/kv/namespaces/{namespace_id}/values/{key_name}"
+
+# Simple In-memory cache
+_meal_cache: Optional[List[dict]] = None
+_meal_cache_time: float = 0
+CACHE_TTL = 300  # 5 minutes
 
 
 async def fetch_all_meals() -> Optional[List[dict]]:
     """
     Cloudflare KV에서 전체 식단 데이터를 가져옵니다.
     KV key 이름: 'meals' (바인딩 이름과 동일)
+    캐싱을 적용하여 외부 요청 횟수를 줄입니다.
     """
+    global _meal_cache, _meal_cache_time
+
+    # Check cache
+    current_time = time.time()
+    if _meal_cache is not None and (current_time - _meal_cache_time) < CACHE_TTL:
+        return _meal_cache
+
     account_id = settings.cf_account_id
     namespace_id = settings.cf_kv_namespace_id
     api_token = settings.cf_api_token
@@ -42,10 +57,16 @@ async def fetch_all_meals() -> Optional[List[dict]]:
             data = response.json()
 
             # DATA 배열이 있는 경우와 배열 자체인 경우 모두 처리
+            meals_result = None
             if isinstance(data, dict) and "DATA" in data:
-                return data["DATA"]
+                meals_result = data["DATA"]
             elif isinstance(data, list):
-                return data
+                meals_result = data
+            
+            if meals_result is not None:
+                _meal_cache = meals_result
+                _meal_cache_time = time.time()
+                return meals_result
             else:
                 print(f"[meal_fetcher] 예상치 못한 데이터 형식: {type(data)}")
                 return None

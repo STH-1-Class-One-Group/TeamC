@@ -20,6 +20,26 @@ DEFENSE_NEWS_QUERY = '국방 OR "방위산업" OR "K-방산"'
 NETWORK_TIMEOUT = httpx.Timeout(5.0, connect=2.0)
 
 
+_http_client: Optional[httpx.AsyncClient] = None
+
+
+def get_news_http_client() -> httpx.AsyncClient:
+    global _http_client
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(
+            timeout=NETWORK_TIMEOUT,
+            limits=httpx.Limits(max_connections=50, max_keepalive_connections=20),
+        )
+    return _http_client
+
+
+async def close_news_http_client() -> None:
+    global _http_client
+    if _http_client is not None and not _http_client.is_closed:
+        await _http_client.aclose()
+    _http_client = None
+
+
 def infer_supabase_url_from_database_url() -> str:
     if not settings.database_url:
         return ""
@@ -221,12 +241,12 @@ async def fetch_cached_news_from_supabase_debug(
     }
 
     try:
-        async with httpx.AsyncClient(timeout=NETWORK_TIMEOUT) as client:
-            response = await client.get(
-                f"{supabase_url}/rest/v1/defense_news",
-                headers=headers,
-                params=params,
-            )
+        client = get_news_http_client()
+        response = await client.get(
+            f"{supabase_url}/rest/v1/defense_news",
+            headers=headers,
+            params=params,
+        )
         debug["status_code"] = response.status_code
         debug["response_text"] = truncate_text(response.text)
 
@@ -318,13 +338,13 @@ async def upsert_defense_news_to_supabase_debug(
     }
 
     try:
-        async with httpx.AsyncClient(timeout=NETWORK_TIMEOUT) as client:
-            response = await client.post(
-                f"{supabase_url}/rest/v1/defense_news",
-                headers=request_headers,
-                params={"on_conflict": "link", "select": "link"},
-                json=payload,
-            )
+        client = get_news_http_client()
+        response = await client.post(
+            f"{supabase_url}/rest/v1/defense_news",
+            headers=request_headers,
+            params={"on_conflict": "link", "select": "link"},
+            json=payload,
+        )
 
         debug["status_code"] = response.status_code
         debug["response_text"] = truncate_text(response.text)
@@ -345,11 +365,6 @@ async def upsert_defense_news_to_supabase_debug(
             get_supabase_auth_mode(user_authorization),
             response.text,
         )
-        if get_supabase_auth_mode(user_authorization) == "anon":
-            logger.error(
-                "Supabase REST is using anon auth. If your RLS policy only allows authenticated inserts, "
-                "this request will be rejected unless you forward a user token or use a service role key."
-            )
     except Exception as error:
         debug["reason"] = f"{type(error).__name__}: {error}"
         logger.exception("Supabase REST upsert raised an exception.")
@@ -477,19 +492,22 @@ async def fetch_cached_news(
     user_authorization: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     supabase_debug = await fetch_cached_news_from_supabase_debug(limit, start, user_authorization)
-    if supabase_debug["items"]:
+    if len(supabase_debug["items"]) >= limit:
         return supabase_debug["items"]
 
     db_debug = await asyncio.to_thread(fetch_cached_news_from_db_debug, limit, start)
-    return db_debug["items"]
+    return db_debug["items"] if len(db_debug["items"]) >= limit else (supabase_debug["items"] or db_debug["items"])
 
 
 async def persist_defense_news(
     items: List[Dict[str, Any]],
     user_authorization: Optional[str] = None,
 ) -> Dict[str, Any]:
-    supabase_debug = await upsert_defense_news_to_supabase_debug(items, user_authorization)
-    db_debug = await asyncio.to_thread(upsert_defense_news_to_db_debug, items)
+    # Persist concurrently
+    supabase_task = upsert_defense_news_to_supabase_debug(items, user_authorization)
+    db_task = asyncio.to_thread(upsert_defense_news_to_db_debug, items)
+    
+    supabase_debug, db_debug = await asyncio.gather(supabase_task, db_task)
 
     if not supabase_debug["success"] and not db_debug["success"]:
         logger.error("Defense news cache persistence failed on both Supabase REST and direct DB paths.")
@@ -512,20 +530,20 @@ async def fetch_naver_news(query: str, display: int = 4, start: int = 1) -> List
         "sort": "sim",
     }
 
-    async with httpx.AsyncClient(timeout=NETWORK_TIMEOUT) as client:
-        try:
-            response = await client.get(NAVER_NEWS_API_URL, headers=headers, params=params)
-            response.raise_for_status()
-            data = response.json()
-            items = data.get("items", [])
-            logger.info("Fetched %s items from Naver News API.", len(items))
-            return items
-        except Exception:
-            logger.exception("Naver news fetch failed.")
-            return []
+    client = get_news_http_client()
+    try:
+        response = await client.get(NAVER_NEWS_API_URL, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        items = data.get("items", [])
+        logger.info("Fetched %s items from Naver News API.", len(items))
+        return items
+    except Exception:
+        logger.exception("Naver news fetch failed.")
+        return []
 
 
-async def fetch_news_thumbnail(title: str) -> Optional[str]:
+async def fetch_news_thumbnail(title: str, client: Optional[httpx.AsyncClient] = None) -> Optional[str]:
     headers = {
         "X-Naver-Client-Id": settings.naver_client_id,
         "X-Naver-Client-Secret": settings.naver_client_secret,
@@ -536,30 +554,36 @@ async def fetch_news_thumbnail(title: str) -> Optional[str]:
         "sort": "sim",
     }
 
-    async with httpx.AsyncClient(timeout=NETWORK_TIMEOUT) as client:
-        try:
-            response = await client.get(NAVER_IMAGE_API_URL, headers=headers, params=params)
-            response.raise_for_status()
-            data = response.json()
-            items = data.get("items", [])
-            if items:
-                return items[0].get("link")
-            return None
-        except Exception:
-            logger.exception("Naver image fetch failed for title '%s'.", title)
-            return None
+    if client is None:
+        client = get_news_http_client()
+
+    try:
+        response = await client.get(NAVER_IMAGE_API_URL, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        items = data.get("items", [])
+        if items:
+            return items[0].get("link")
+        return None
+    except Exception:
+        logger.exception("Naver image fetch failed for title '%s'.", title)
+        return None
 
 
 async def enrich_news_items(news_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     semaphore = asyncio.Semaphore(5)
+    client = get_news_http_client()
 
     async def enrich_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         clean_title = clean_news_title(item.get("title", ""))
         if not clean_title or not item.get("link"):
             return None
 
-        async with semaphore:
-            thumbnail = await fetch_news_thumbnail(clean_title)
+        # If item already has a thumbnail from some source, skip Naver Image API
+        thumbnail = item.get("thumbnail")
+        if not thumbnail or thumbnail == get_default_thumbnail_url():
+            async with semaphore:
+                thumbnail = await fetch_news_thumbnail(clean_title, client=client)
 
         return normalize_news_item(
             {
@@ -582,17 +606,23 @@ async def get_defense_news(
 ) -> List[Dict[str, Any]]:
     if not force_refresh:
         cached_news = await fetch_cached_news(limit, start, user_authorization)
-        if len(cached_news) == limit:
+        # return if we have enough items, or some items at least
+        if len(cached_news) >= limit:
             return cached_news
 
     news_items = await fetch_naver_news(DEFENSE_NEWS_QUERY, display=limit, start=start)
+    if not news_items and not force_refresh:
+        return await fetch_cached_news(limit, start, user_authorization)
 
     results = await enrich_news_items(news_items)
 
+    # Persist in background task or just await it if we want to ensure it's saved
+    # But for responsiveness, we could return 'results' immediately and fire-and-forget persistence
+    # However, let's keep it awaited but optimized.
     await persist_defense_news(results, user_authorization)
 
-    refreshed_news = await fetch_cached_news(limit, start, user_authorization)
-    return refreshed_news or results
+    # Return the results we just fetched instead of re-fetching from DB
+    return results
 
 
 async def debug_defense_news(
