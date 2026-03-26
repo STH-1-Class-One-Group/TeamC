@@ -5,7 +5,6 @@ import { getAvailableCouponsForUser } from '../services/cartService';
 import type { Coupon } from '../types/cart.types';
 
 export const CartDrawer: React.FC = () => {
-  // ⭐ 기존 기능에 onGroupPayment만 추가로 가져옵니다.
   const {
     closeCart,
     cartItems,
@@ -21,7 +20,7 @@ export const CartDrawer: React.FC = () => {
     handleUpdateQuantity,
     applyCoupon,
     clearCoupon,
-    onGroupPayment, // 여기서 결제 함수를 가져옵니다.
+    onGroupPayment,
   } = useCart();
 
   const [couponMenuOpen, setCouponMenuOpen] = useState(false);
@@ -50,10 +49,10 @@ export const CartDrawer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900">
       {/* ── 헤더 ── */}
-      <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
-        <h2 className="text-lg font-bold text-on-surface dark:text-white">
+      <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
           🛒 장바구니
           {totalCount > 0 && (
             <span className="ml-2 text-sm font-medium text-primary">
@@ -63,10 +62,10 @@ export const CartDrawer: React.FC = () => {
         </h2>
         <button
           onClick={closeCart}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high dark:hover:bg-slate-700 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           aria-label="장바구니 닫기"
         >
-          <span className="material-symbols-outlined text-[20px] text-on-surface-variant">
+          <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-slate-400">
             close
           </span>
         </button>
@@ -75,11 +74,11 @@ export const CartDrawer: React.FC = () => {
       {/* ── 아이템 목록 (스크롤) ── */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {loading ? (
-          <p className="text-center py-10">불러오는 중...</p>
+          <p className="text-center py-10 text-slate-500 dark:text-slate-400">불러오는 중...</p>
         ) : error ? (
           <p className="text-center text-red-500 py-10">{error}</p>
         ) : cartItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-600">
             <span className="material-symbols-outlined text-6xl mb-3">
               shopping_cart
             </span>
@@ -99,42 +98,42 @@ export const CartDrawer: React.FC = () => {
 
       {/* ── 하단: 합계 + 버튼 ── */}
       {cartItems.length > 0 && (
-        <div className="p-5 border-t border-slate-200 dark:border-slate-700 space-y-3 flex-shrink-0">
+        <div className="p-5 border-t border-slate-200 dark:border-slate-800 space-y-4 flex-shrink-0 bg-white dark:bg-slate-900">
           <button
-            className="w-full py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-100 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-100 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             onClick={toggleCouponMenu}
           >
             쿠폰 선택
           </button>
 
           {appliedCoupon ? (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/30 p-3 text-sm space-y-1">
+            <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/20 p-3 text-sm space-y-1">
               <div className="flex justify-between items-center">
-                <span>
-                  적용된 쿠폰: <strong>{appliedCoupon.name}</strong>
+                <span className="text-emerald-900 dark:text-emerald-100 font-bold">
+                  적용된 쿠폰: {appliedCoupon.name}
                 </span>
                 <button
-                  className="text-xs text-red-600 dark:text-red-300 hover:underline"
+                  className="text-xs font-semibold text-red-500 dark:text-red-400 hover:underline"
                   onClick={clearCoupon}
                 >
                   취소
                 </button>
               </div>
-              <p>할인: {appliedCoupon.discount_type === 'amount' ? `₩ ${appliedCoupon.discount_value.toLocaleString()}` : `${appliedCoupon.discount_value}%`}</p>
-              <p>최소 주문: ₩ {appliedCoupon.min_order_amount.toLocaleString()} 이상</p>
+              <p className="text-emerald-700 dark:text-emerald-300">할인: {appliedCoupon.discount_type === 'amount' ? `₩ ${appliedCoupon.discount_value.toLocaleString()}` : `${appliedCoupon.discount_value}%`}</p>
+              <p className="text-emerald-600 dark:text-emerald-400/80">최소 주문: ₩ {appliedCoupon.min_order_amount.toLocaleString()} 이상</p>
             </div>
           ) : (
-            <p className="text-xs text-slate-500 dark:text-slate-400">쿠폰을 적용하여 할인 받을 수 있습니다.</p>
+            <p className="text-xs text-center text-slate-500 dark:text-slate-400 font-medium">쿠폰을 적용하여 할인 받을 수 있습니다.</p>
           )}
 
           {couponMenuOpen && (
-            <div className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 space-y-2">
+            <div className="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 space-y-2 shadow-xl animate-in fade-in zoom-in-95">
               {couponLoading ? (
-                <p className="text-center text-sm">쿠폰을 불러오는 중...</p>
+                <p className="text-center text-sm text-slate-500 dark:text-slate-400">쿠폰을 불러오는 중...</p>
               ) : couponError ? (
                 <p className="text-center text-sm text-red-500">{couponError}</p>
               ) : availableCoupons.length === 0 ? (
-                <p className="text-center text-sm text-slate-500">사용 가능한 쿠폰이 없습니다.</p>
+                <p className="text-center text-sm text-slate-500 dark:text-slate-400">사용 가능한 쿠폰이 없습니다.</p>
               ) : (
                 availableCoupons.map((coupon) => (
                   <button
@@ -143,17 +142,17 @@ export const CartDrawer: React.FC = () => {
                       applyCoupon(coupon);
                       setCouponMenuOpen(false);
                     }}
-                    className="w-full text-left rounded-lg border border-slate-200 dark:border-slate-700 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    className="w-full text-left rounded-lg border border-slate-200 dark:border-slate-700 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
                   >
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold">{coupon.name}</span>
-                      <span className="text-sm text-primary">
+                      <span className="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors">{coupon.name}</span>
+                      <span className="text-sm font-black text-primary">
                         {coupon.discount_type === 'amount'
                           ? `₩ ${coupon.discount_value.toLocaleString()}`
                           : `${coupon.discount_value}%`}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                       최소 주문 ₩ {coupon.min_order_amount.toLocaleString()}
                     </p>
                   </button>
@@ -162,29 +161,32 @@ export const CartDrawer: React.FC = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-center">
-            <span className="text-on-surface-variant text-sm">합계</span>
-            <span className="text-xl font-extrabold text-on-surface dark:text-white">₩ {totalPrice.toLocaleString()}</span>
-          </div>
+          <div className="space-y-2 pt-2">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">합계</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white">₩ {totalPrice.toLocaleString()}</span>
+            </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-on-surface-variant text-sm">쿠폰 할인</span>
-            <span className="text-lg font-bold text-emerald-600 dark:text-emerald-300">- ₩ {discountValue.toLocaleString()}</span>
-          </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">쿠폰 할인</span>
+              <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">- ₩ {discountValue.toLocaleString()}</span>
+            </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-on-surface-variant text-sm">최종 결제</span>
-            <span className="text-xl font-extrabold text-primary">₩ {finalPrice.toLocaleString()}</span>
+            <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800">
+              <span className="text-slate-900 dark:text-white font-bold">최종 결제</span>
+              <span className="text-2xl font-black text-primary">₩ {finalPrice.toLocaleString()}</span>
+            </div>
           </div>
 
           <button
-            className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold hover:opacity-90 transition-opacity"
+            className="w-full py-4 rounded-2xl bg-primary text-white font-black text-lg hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
             onClick={onGroupPayment}
           >
             결제하기
           </button>
+          
           <button
-            className="w-full py-2 rounded-xl text-sm text-on-surface-variant hover:text-red-500 transition-colors"
+            className="w-full py-1 text-sm text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
             onClick={handleClear}
           >
             장바구니 비우기

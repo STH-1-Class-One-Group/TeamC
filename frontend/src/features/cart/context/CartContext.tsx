@@ -88,6 +88,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCoupon = useCallback(() => setAppliedCoupon(null), []);
 
+  /**
+   * [수정 포인트]: 결제 성공 URL에 선택된 쿠폰의 ID를 포함시킵니다.
+   */
   const onGroupPayment = useCallback(() => {
     if (cartItems.length === 0) {
       alert('장바구니가 비어 있습니다.');
@@ -97,10 +100,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const firstItemName = cartItems[0].food_items?.name || '상품';
     const remainingCount = cartItems.length - 1;
     const orderName = remainingCount > 0 ? `${firstItemName} 외 ${remainingCount}건` : firstItemName;
-    const successUrl = `${window.location.origin}/payment-success?from=cart`;
+    
+    // 기본 성공 URL 설정
+    let successUrl = `${window.location.origin}/payment-success?from=cart`;
+    
+    // ⭐ 적용된 쿠폰이 있다면 URL 파라미터에 추가 (is_used 처리를 위해)
+    if (appliedCoupon && (appliedCoupon as any).user_coupon_id) {
+      successUrl += `&couponId=${(appliedCoupon as any).user_coupon_id}`;
+    }
 
     requestPayment(finalPrice, orderName, '사용자', successUrl);
-  }, [cartItems, finalPrice]);
+  }, [cartItems, finalPrice, appliedCoupon]); // appliedCoupon 의존성 추가
 
   const handleAddToCart = async (food_id: number) => {
     try {
