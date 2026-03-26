@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { getCartItems, removeFromCart, clearCart, updateQuantity, addToCart } from '../services/cartService';
 import { requestPayment } from '../services/paymentService';
-import type { CartItemWithFood } from '../types/cart.types';
+import type { CartItemWithFood, Coupon } from '../types/cart.types';
 
 interface CartContextType {
   isOpen: boolean;
@@ -12,11 +12,16 @@ interface CartContextType {
   error: string | null;
   totalPrice: number;
   totalCount: number;
+  appliedCoupon: Coupon | null;
+  discountValue: number;
+  finalPrice: number;
   fetchCart: () => Promise<void>;
   handleAddToCart: (food_id: number) => Promise<void>;
   handleRemove: (id: string) => Promise<void>;
   handleClear: () => Promise<void>;
   handleUpdateQuantity: (id: string, q: number) => Promise<void>;
+  applyCoupon: (coupon: Coupon) => void;
+  clearCoupon: () => void;
   onGroupPayment: () => void;
 }
 
@@ -51,19 +56,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
   const totalCount = cartItems.reduce((sum, item: CartItemWithFood) => sum + item.quantity, 0);
 
-  // ⭐ 그 다음에 onGroupPayment 함수를 만듭니다.
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+
+  const discountValue = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    if (totalPrice < appliedCoupon.min_order_amount) return 0;
+
+    if (appliedCoupon.discount_type === 'amount') {
+      return Math.min(appliedCoupon.discount_value, totalPrice);
+    }
+
+    if (appliedCoupon.discount_type === 'percentage') {
+      return Math.floor((totalPrice * appliedCoupon.discount_value) / 100);
+    }
+
+    return 0;
+  }, [appliedCoupon, totalPrice]);
+
+  const finalPrice = Math.max(0, totalPrice - discountValue);
+
+  const applyCoupon = useCallback(
+    (coupon: Coupon) => {
+      if (totalPrice < coupon.min_order_amount) {
+        alert(`이 쿠폰은 최소 주문 금액 ${coupon.min_order_amount.toLocaleString()}원 이상에서 사용 가능합니다.`);
+        return;
+      }
+      setAppliedCoupon(coupon);
+    },
+    [totalPrice]
+  );
+
+  const clearCoupon = useCallback(() => setAppliedCoupon(null), []);
+
   const onGroupPayment = useCallback(() => {
     if (cartItems.length === 0) {
       alert('장바구니가 비어 있습니다.');
       return;
     }
+
     const firstItemName = cartItems[0].food_items?.name || '상품';
     const remainingCount = cartItems.length - 1;
     const orderName = remainingCount > 0 ? `${firstItemName} 외 ${remainingCount}건` : firstItemName;
     const successUrl = `${window.location.origin}/payment-success?from=cart`;
-    
-    requestPayment(totalPrice, orderName, '사용자', successUrl);
-  }, [cartItems, totalPrice]);
+
+    requestPayment(finalPrice, orderName, '사용자', successUrl);
+  }, [cartItems, finalPrice]);
 
   const handleAddToCart = async (food_id: number) => {
     try {
@@ -122,11 +159,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         error,
         totalPrice,
         totalCount,
+        appliedCoupon,
+        discountValue,
+        finalPrice,
         fetchCart,
         handleAddToCart,
         handleRemove,
         handleClear,
         handleUpdateQuantity,
+        applyCoupon,
+        clearCoupon,
         onGroupPayment,
       }}
     >

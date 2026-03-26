@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 import { LoginModal } from '../common/LoginModal';
 import { ProfileAvatar } from '../common/ProfileAvatar';
+import { MyCouponModal } from '../common/MyCouponModal';
 import { CartIcon } from '../../features/cart/components/CartIcon';
 import { Profile } from '../common/ProfileSetupModal';
 
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const [isMyCouponModalOpen, setIsMyCouponModalOpen] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -131,7 +133,10 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             </span>
           </button>
 
-          <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 cursor-pointer hover:text-blue-600 transition-all">
+          <span
+            className="material-symbols-outlined text-slate-500 dark:text-slate-400 cursor-pointer hover:text-blue-600 transition-all"
+            onClick={() => setIsMyCouponModalOpen(true)}
+          >
             confirmation_number
           </span>
 
@@ -191,6 +196,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
       </nav>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <MyCouponModal isOpen={isMyCouponModalOpen} onClose={() => setIsMyCouponModalOpen(false)} />
     </>
   );
 };

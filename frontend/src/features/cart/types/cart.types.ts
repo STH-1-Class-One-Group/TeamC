@@ -29,6 +29,18 @@ export interface CartItemWithFood extends CartItem {
 }
 
 /** 장바구니에 추가할 때 서비스 함수에 넘기는 최소 정보 */
+export type DiscountType = 'amount' | 'percentage';
+
+export interface Coupon {
+  user_coupon_id: string;
+  coupon_id: number;
+  name: string;
+  discount_type: DiscountType;
+  discount_value: number;
+  min_order_amount: number;
+  is_used: boolean;
+}
+
 export interface AddToCartPayload {
   food_id: number;    // 어떤 음식을?
   quantity?: number;  // 몇 개? (생략하면 1로 처리)

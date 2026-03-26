@@ -1,5 +1,5 @@
 import { supabase } from '../../../api/supabaseClient';
-import type { AddToCartPayload, CartItemWithFood } from '../types/cart.types';
+import type { AddToCartPayload, CartItemWithFood, Coupon } from '../types/cart.types';
 
 /**
  * 장바구니에 음식을 추가합니다. (Upsert 방식)
@@ -98,6 +98,73 @@ export async function clearCart(): Promise<void> {
     .eq('user_id', user.id);
 
   if (error) throw error;
+}
+
+/**
+ * 로그인 유저의 사용 가능한 쿠폰 목록을 조회합니다.
+ */
+export async function getAvailableCouponsForUser(): Promise<Coupon[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('user_coupons')
+    .select(`
+      id,
+      coupon_id,
+      is_used,
+      coupons (id, name, discount_type, discount_value, min_order_amount)
+    `)
+    .eq('user_id', user.id)
+    .eq('is_used', false);
+
+  if (error) {
+    console.error('쿠폰 조회 에러:', error);
+    throw error;
+  }
+
+  return (data ?? []).map((item: any) => ({
+    user_coupon_id: item.id,
+    coupon_id: item.coupon_id,
+    is_used: item.is_used,
+    name: item.coupons?.name ?? '알 수 없는 쿠폰',
+    discount_type: item.coupons?.discount_type ?? 'amount',
+    discount_value: item.coupons?.discount_value ?? 0,
+    min_order_amount: item.coupons?.min_order_amount ?? 0,
+  }));
+}
+
+/**
+ * 로그인 유저의 모든 쿠폰 목록을 조회합니다. (사용한 쿠폰 포함)
+ */
+export async function getUserCouponsForUser(): Promise<Coupon[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('user_coupons')
+    .select(`
+      id,
+      coupon_id,
+      is_used,
+      coupons (id, name, discount_type, discount_value, min_order_amount)
+    `)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('쿠폰 조회 에러:', error);
+    throw error;
+  }
+
+  return (data ?? []).map((item: any) => ({
+    user_coupon_id: item.id,
+    coupon_id: item.coupon_id,
+    is_used: item.is_used,
+    name: item.coupons?.name ?? '알 수 없는 쿠폰',
+    discount_type: item.coupons?.discount_type ?? 'amount',
+    discount_value: item.coupons?.discount_value ?? 0,
+    min_order_amount: item.coupons?.min_order_amount ?? 0,
+  }));
 }
 
 /**
