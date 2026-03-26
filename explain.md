@@ -73,3 +73,21 @@
 15-4. 뉴스 페이지에서 뉴스 요소의 날짜 부분이 또 하단의 영역까지 늘어나는 버그가 발생하고 있어 이 버그를 수정해주었으면 좋겠어, 그리고 메인페이지에서 군대 음식 데이터를 다 못받아오는 문제가 발생하고 있거든, 이 버그들을 수정해주었으면 좋겠어, 이번에는 메인페이지에서 supabase에서 데이터를 받아오는 것에 대한 통신에 실패했을 때와 supabase의 데이터 자체가 없을 때를 파악하기 위해 디버그 파악을 위한 콘솔 표시를 추가해주었으면 해, 구조의 형태는 GEMINI.md 문서의 내용을 참고해주었으면 해
 
 15-5. newspage에서 페이지네이션이 제대로 안되는 것 같거든, 예를 들어 30개의 뉴스를 받아오고, 한 페이지당 8개의 뉴스를 표시한다면, 총 4페이지가 될 것이고, 9개 이상부터는 2페이지로 이동을 해야 하는데, 1페이지에서 2페이지로 이동을 할 수 없더라고, 뉴스를 더 불러오는 중이라면서 모든 뉴스들을 다 받아와야 비로소 페이지네이션이 진행이 돼, 이 부분 수정해주었으면 해, 일단 데이터를 다 받아오면 바로 뉴스가 보이는 형태로 말이야, 구조의 형태는 GEMINI.md 문서의 내용을 참고해주었으면 해
+
+16. 네이버 api를 통해 받아온 값들("title","link","pubDate","thumbnail")을 defense_news 테이블에 저장하려고 해, defense_news 테이블에서는 각각 대응되는 속성이title(api) => title(defense_news), link(api) => link(defense_news), pubDate(api) => published_at(defense_news), thumbnail(api) => thumbnail_url(defense_news) 이야, 이 속성들에 맞추어서 데이터를 저장해주었으면 해, 그리고 api로 데이터를 받아올 때 받아온 데이터가 이미 defense_news 테이블에 저장된 상태에서는 defense_news 테이블에 저장된 데이터를 기반으로 전체 뉴스 리스트를 화면에 표시해주면 돼, 구조의 형태는 GEMINI.md 문서의 내용을 참고해주었으면 해
+
+16-1. 지금 defense_news 테이블에 api로 받아온 데이터들이 받아오지 않아지는 문제가 있거든, 참고로 rls 설정을 통해 insert 권한은 부여한 상황이야
+
+rls 권한 상황
+alter policy "Authenticated users can insert defense news"
+on "public"."defense_news"
+to authenticated
+with check (
+true
+);
+
+참고로 네이버 api로 받아오는 값은 title, link, pubDate, thumbnail이고, defense_news 테이블의 속성은 id(고유 uuid), title(text, 네이버 api의 title과 대응), link(text, 네이버 api의 link와 대응), published_at(timestamp, 네이버 api의 pubDate와 대응), thumbnail_url(text, 네이버 api의 thumbnail과 대응) 이야, 이 속성들에 맞추어서 데이터를 저장해주었으면 해, 구조의 형태는 GEMINI.md 문서의 내용을 참고해주었으면 해
+
+16-2. 지금 변경 된 파일들 중에서 보안상으로 위험할 수 있는 코드가 있다면 그것들 좀 XSS 공격이나 SQL 인잭션 공격 등의 보안 공격을 막기 위해 보안상으로 안전하게 변경해주고, 만약에 보안상으로 안전하다면 organize.md로 만들어서 어떻게 변하였는지 git 컨벤션까지 포함해서 정리해줘, 구조는 GEMINI.md 문서의 내용을 참고해주었으면 해
+
+17. profiles 테이블의 id(uuid)를 통해 bookmarks_news에서 user_id를 받고, defense_news 테이블에서 id(uuid)를 또 받아서 bookmarks_news의 user_id에 넣으려고 하거든? 그리고 유저가 특정 뉴스의 북마크를 지정을 하게 되면 bookmarks_news 테이블에 해당 유저와 해당 뉴스의 id를 불러오는 방식으로 구현하려고 해, 구조의 형태는 GEMINI.md 문서의 내용을 참고해주었으면 해
