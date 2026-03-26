@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SearchBar } from '../../components/common/SearchBar';
+import { fetchNewsBatch } from './newsApi';
 
 interface NewsItem {
   title: string;
@@ -42,27 +43,44 @@ export const NewsPage: React.FC = () => {
       try {
         setIsLoading(true);
         setAllNews([]);
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-        for (let start = 1; start <= 30; start += 1) {
-          const response = await fetch(`${apiUrl}/api/v1/news?limit=1&start=${start}`);
+        const targetCount = 30;
+        const batchSize = 10;
+        const collectedNews: NewsItem[] = [];
+        const seenLinks = new Set<string>();
 
-          if (!response.ok) {
-            throw new Error(`News fetch failed at item ${start}`);
-          }
+        for (let start = 1; start <= targetCount; start += batchSize) {
+          const controller = new AbortController();
+          const timeoutId = window.setTimeout(() => controller.abort(), 12000);
 
-          const data: NewsItem[] = await response.json();
-          if (data.length > 0) {
-            setAllNews((prev) => {
-              if (prev.some((item) => item.link === data[0].link)) {
-                return prev;
-              }
-              return [...prev, data[0]];
+          try {
+            const response = await fetchNewsBatch(batchSize, start, {
+              signal: controller.signal,
+              forceRefresh: true,
             });
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch news batch at start=${start}`);
+            }
+
+            const data: NewsItem[] = await response.json();
+            const uniqueBatch = data.filter((item) => item.link && !seenLinks.has(item.link));
+
+            uniqueBatch.forEach((item) => {
+              seenLinks.add(item.link);
+              collectedNews.push(item);
+            });
+
+            setAllNews([...collectedNews]);
+
+            if (data.length < batchSize || collectedNews.length >= targetCount) {
+              break;
+            }
+          } finally {
+            window.clearTimeout(timeoutId);
           }
         }
       } catch (error) {
         console.error('[NewsPage] failed to load news:', error);
-        setAllNews([]);
       } finally {
         setIsLoading(false);
       }
@@ -168,8 +186,9 @@ export const NewsPage: React.FC = () => {
                   <div>
                     <h3
                       className="text-base font-bold text-on-surface dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-blue-400 transition-colors line-clamp-3 mb-2"
-                      dangerouslySetInnerHTML={{ __html: news.title }}
-                    />
+                    >
+                      {news.title}
+                    </h3>
                     <p className="text-xs text-on-surface-variant dark:text-slate-500 font-medium">
                       {news.pubDate}
                     </p>
