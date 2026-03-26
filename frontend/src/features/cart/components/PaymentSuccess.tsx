@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
+import { supabase } from '../../../api/supabaseClient'; // supabase 클라이언트 임포트 확인 필요
 
 const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -9,16 +10,40 @@ const PaymentSuccess: React.FC = () => {
 
   const amount = searchParams.get('amount');
   const orderId = searchParams.get('orderId');
+  const couponId = searchParams.get('couponId'); // URL에서 쿠폰 ID 추출
 
   useEffect(() => {
-    const from = searchParams.get('from');
-    if (from === 'cart') {
-      handleClear();
-    }
-  }, [searchParams, handleClear]);
+    const processPaymentSuccess = async () => {
+      const from = searchParams.get('from');
+      
+      if (from === 'cart') {
+        // 1. 장바구니 비우기
+        handleClear();
+
+        // 2. 사용된 쿠폰이 있다면 DB 업데이트
+        if (couponId) {
+          try {
+            const { error } = await supabase
+              .from('user_coupons')
+              .update({ is_used: true })
+              .eq('id', couponId);
+
+            if (error) {
+              console.error("쿠폰 차감 중 오류 발생:", error.message);
+            } else {
+              console.log("쿠폰이 성공적으로 차감되었습니다.");
+            }
+          } catch (err) {
+            console.error("서버 통신 오류:", err);
+          }
+        }
+      }
+    };
+
+    processPaymentSuccess();
+  }, [searchParams, handleClear, couponId]);
 
   return (
-    // min-h-[60vh]로 높이를 조절하고 flex-col center로 중앙에 딱 붙였습니다.
     <div className="flex flex-col items-center justify-center min-h-[70vh] w-full animate-in fade-in duration-700">
       <div className="max-w-md w-full bg-white dark:bg-slate-900 p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-800 text-center">
         
