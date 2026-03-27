@@ -2,8 +2,9 @@
 import logging
 import re
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.api.v1.community import router as community_router
 from app.api.v1.meal import router as meal_router
 from app.api.v1.news import router as news_router
@@ -49,6 +50,12 @@ async def normalize_request_path(request, call_next):
 app.include_router(meal_router, prefix="/api/v1", tags=["meals"])
 app.include_router(news_router, prefix="/api/v1", tags=["news"])
 app.include_router(community_router, prefix="/api/v1", tags=["community"])
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logging.exception("Unhandled server error on %s %s", request.method, request.url.path, exc_info=exc)
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 @app.get("/")

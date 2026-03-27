@@ -1,22 +1,50 @@
-import httpx
-from typing import Optional
-from jose import JWTError, jwt
-from app.core.config import settings
+import logging
+from typing import Any, Optional
 
-SUPABASE_REST = f"{settings.supabase_url}/rest/v1"
+import httpx
+from fastapi import HTTPException
+from jose import JWTError, jwt
+
+from app.core.config import settings
+from app.services.news_fetcher import get_effective_supabase_url
+
+logger = logging.getLogger(__name__)
+
+NETWORK_TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 _http_client: Optional[httpx.AsyncClient] = None
 
 
-def _base_headers(token: Optional[str] = None) -> dict:
-    """Supabase REST API 공통 헤더 생성."""
-    headers = {
-        "apikey": settings.supabase_anon_key,
-        "Content-Type": "application/json",
-    }
+def _get_supabase_url() -> str:
+    supabase_url = get_effective_supabase_url().rstrip("/")
+    if not supabase_url:
+        raise HTTPException(status_code=500, detail="Supabase URL is not configured.")
+    return supabase_url
+
+
+def _get_supabase_rest_url() -> str:
+    return f"{_get_supabase_url()}/rest/v1"
+
+
+def _get_server_api_key() -> str:
+    api_key = settings.supabase_service_role_key or settings.supabase_anon_key
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Supabase credentials are not configured.")
+    return api_key
+
+
+def _base_headers(token: Optional[str] = None) -> dict[str, str]:
+    headers = {"Content-Type": "application/json"}
+
     if token:
+        if not settings.supabase_anon_key:
+            raise HTTPException(status_code=500, detail="Supabase anon key is not configured.")
+        headers["apikey"] = settings.supabase_anon_key
         headers["Authorization"] = f"Bearer {token}"
-    else:
-        headers["Authorization"] = f"Bearer {settings.supabase_anon_key}"
+        return headers
+
+    api_key = _get_server_api_key()
+    headers["apikey"] = api_key
+    headers["Authorization"] = f"Bearer {api_key}"
     return headers
 
 
@@ -25,7 +53,7 @@ def _get_http_client() -> httpx.AsyncClient:
 
     if _http_client is None or _http_client.is_closed:
         _http_client = httpx.AsyncClient(
-            timeout=httpx.Timeout(10.0, connect=5.0),
+            timeout=NETWORK_TIMEOUT,
             limits=httpx.Limits(max_connections=100, max_keepalive_connections=50),
         )
 
@@ -41,15 +69,54 @@ async def close_http_client() -> None:
     _http_client = None
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 관련
-# ────────────────────────────────────────────────────────────
+def _parse_supabase_error(response: httpx.Response) -> str:
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+
+    if isinstance(payload, dict):
+        for key in ("message", "msg", "detail", "error_description", "error"):
+            value = payload.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+    body = response.text.strip()
+    return body[:300] if body else "Community service upstream request failed."
+
+
+async def _request(method: str, url: str, **kwargs: Any) -> httpx.Response:
+    client = _get_http_client()
+
+    try:
+        response = await client.request(method, url, **kwargs)
+        response.raise_for_status()
+        return response
+    except httpx.HTTPStatusError as error:
+        response = error.response
+        detail = _parse_supabase_error(response)
+        status_code = response.status_code if 400 <= response.status_code < 500 else 502
+        logger.warning(
+            "Community upstream HTTP error: %s %s -> %s %s",
+            method,
+            url,
+            response.status_code,
+            detail,
+        )
+        raise HTTPException(status_code=status_code, detail=detail) from error
+    except httpx.RequestError as error:
+        logger.exception("Community upstream request failed: %s %s", method, url)
+        raise HTTPException(
+            status_code=502,
+            detail="Community service upstream request failed.",
+        ) from error
+
 
 def _build_post_filters(
     category: Optional[str],
     query: Optional[str],
     search_type: str,
-) -> dict:
+) -> dict[str, str]:
     filters: dict[str, str] = {}
     if category and category != "all":
         filters["category"] = f"eq.{category}"
@@ -65,167 +132,154 @@ def _build_post_filters(
     return filters
 
 
+def _normalize_profile(value: Any) -> dict[str, Any]:
+    if isinstance(value, list):
+        value = value[0] if value else {}
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
+def _author_payload(profile: Any) -> dict[str, Any]:
+    normalized_profile = _normalize_profile(profile)
+    return {
+        "id": normalized_profile.get("id", ""),
+        "nickname": normalized_profile.get("nickname", "알 수 없음"),
+        "rank": normalized_profile.get("rank"),
+        "avatar_url": normalized_profile.get("avatar_url"),
+    }
+
+
 async def get_posts(
     page: int,
     per_page: int,
     category: Optional[str],
     query: Optional[str],
     search_type: str,
-) -> dict:
-    """게시글 목록 조회 (author 프로필 JOIN, 페이지네이션)."""
-    offset = (page - 1) * per_page
-    select = "id,post_number,title,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)"
+) -> dict[str, Any]:
     params = {
-        "select": select,
+        "select": "id,post_number,title,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
         "order": "post_number.desc",
         "limit": str(per_page),
-        "offset": str(offset),
+        "offset": str((page - 1) * per_page),
     }
-    filters = _build_post_filters(category=category, query=query, search_type=search_type)
-    params.update(filters)
+    params.update(_build_post_filters(category=category, query=query, search_type=search_type))
 
-    client = _get_http_client()
-    headers = {**_base_headers(), "Prefer": "count=planned"}
-    res = await client.get(
-        f"{SUPABASE_REST}/community_posts",
-        headers=headers,
+    response = await _request(
+        "GET",
+        f"{_get_supabase_rest_url()}/community_posts",
+        headers={**_base_headers(), "Prefer": "count=planned"},
         params=params,
     )
-    res.raise_for_status()
-    rows = res.json()
-    total = _extract_total_count(res.headers.get("content-range"), fallback=len(rows))
+    rows = response.json()
+    total = _extract_total_count(response.headers.get("content-range"), fallback=len(rows))
+    return {
+        "posts": [_format_post_summary(row) for row in rows],
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+    }
 
-    posts = [_format_post_summary(r) for r in rows]
-    return {"posts": posts, "total": total, "page": page, "per_page": per_page}
 
-
-async def get_post_detail(post_id: str) -> Optional[dict]:
-    """게시글 상세 조회."""
-    select = "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)"
-    client = _get_http_client()
-    res = await client.get(
-        f"{SUPABASE_REST}/community_posts",
+async def get_post_detail(post_id: str) -> Optional[dict[str, Any]]:
+    response = await _request(
+        "GET",
+        f"{_get_supabase_rest_url()}/community_posts",
         headers=_base_headers(),
-        params={"select": select, "id": f"eq.{post_id}"},
+        params={
+            "select": "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
+            "id": f"eq.{post_id}",
+        },
     )
-    res.raise_for_status()
-    rows = res.json()
+    rows = response.json()
     if not rows:
         return None
     return _format_post(rows[0])
 
 
 async def increment_views(post_id: str) -> None:
-    """조회수 증가 (RPC 호출)."""
-    client = _get_http_client()
-    await client.post(
-        f"{settings.supabase_url}/rest/v1/rpc/increment_post_views",
+    await _request(
+        "POST",
+        f"{_get_supabase_rest_url()}/rpc/increment_post_views",
         headers=_base_headers(),
         json={"p_post_id": post_id},
     )
 
 
-async def create_post(data: dict, token: str) -> dict:
-    """게시글 작성 (author_id는 토큰에서 RLS가 검증)."""
-    # author_id는 Supabase RLS에서 auth.uid()로 검증되므로
-    # 토큰에서 직접 추출하여 삽입
+async def create_post(data: dict[str, Any], token: str) -> dict[str, Any]:
     user_id = await _get_user_id(token)
-    payload = {
-        "title": data["title"],
-        "content": data["content"],
-        "category": data.get("category", "general"),
-        "author_id": user_id,
-    }
-    client = _get_http_client()
-    res = await client.post(
-        f"{SUPABASE_REST}/community_posts",
+    response = await _request(
+        "POST",
+        f"{_get_supabase_rest_url()}/community_posts",
         headers={**_base_headers(token), "Prefer": "return=representation"},
-        json=payload,
+        json={
+            "title": data["title"],
+            "content": data["content"],
+            "category": data.get("category", "general"),
+            "author_id": user_id,
+        },
     )
-    res.raise_for_status()
-    rows = res.json()
+    rows = response.json()
     return rows[0] if rows else {}
 
 
-async def update_post(post_id: str, data: dict, token: str) -> dict:
-    """게시글 수정 (RLS: 본인만 가능)."""
-    payload = {k: v for k, v in data.items() if v is not None}
-    client = _get_http_client()
-    res = await client.patch(
-        f"{SUPABASE_REST}/community_posts",
+async def update_post(post_id: str, data: dict[str, Any], token: str) -> dict[str, Any]:
+    response = await _request(
+        "PATCH",
+        f"{_get_supabase_rest_url()}/community_posts",
         headers={**_base_headers(token), "Prefer": "return=representation"},
         params={"id": f"eq.{post_id}"},
-        json=payload,
+        json={key: value for key, value in data.items() if value is not None},
     )
-    res.raise_for_status()
-    rows = res.json()
+    rows = response.json()
     return rows[0] if rows else {}
 
 
 async def delete_post(post_id: str, token: str) -> None:
-    """게시글 삭제 (RLS: 본인만 가능)."""
-    client = _get_http_client()
-    res = await client.delete(
-        f"{SUPABASE_REST}/community_posts",
+    await _request(
+        "DELETE",
+        f"{_get_supabase_rest_url()}/community_posts",
         headers=_base_headers(token),
         params={"id": f"eq.{post_id}"},
     )
-    res.raise_for_status()
 
 
-# ────────────────────────────────────────────────────────────
-# 댓글 관련
-# ────────────────────────────────────────────────────────────
-
-async def get_comments(post_id: str) -> list:
-    """댓글 목록 조회 (author 프로필 JOIN)."""
-    select = "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)"
-    client = _get_http_client()
-    res = await client.get(
-        f"{SUPABASE_REST}/community_comments",
+async def get_comments(post_id: str) -> list[dict[str, Any]]:
+    response = await _request(
+        "GET",
+        f"{_get_supabase_rest_url()}/community_comments",
         headers=_base_headers(),
         params={
-            "select": select,
+            "select": "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)",
             "post_id": f"eq.{post_id}",
             "order": "created_at.asc",
         },
     )
-    res.raise_for_status()
-    return [_format_comment(r) for r in res.json()]
+    return [_format_comment(row) for row in response.json()]
 
 
-async def create_comment(post_id: str, content: str, token: str) -> dict:
-    """댓글 작성."""
+async def create_comment(post_id: str, content: str, token: str) -> dict[str, Any]:
     user_id = await _get_user_id(token)
-    payload = {"post_id": post_id, "content": content, "author_id": user_id}
-    client = _get_http_client()
-    res = await client.post(
-        f"{SUPABASE_REST}/community_comments",
+    response = await _request(
+        "POST",
+        f"{_get_supabase_rest_url()}/community_comments",
         headers={**_base_headers(token), "Prefer": "return=representation"},
-        json=payload,
+        json={"post_id": post_id, "content": content, "author_id": user_id},
     )
-    res.raise_for_status()
-    rows = res.json()
+    rows = response.json()
     return rows[0] if rows else {}
 
 
 async def delete_comment(comment_id: str, token: str) -> None:
-    """댓글 삭제 (RLS: 본인만 가능)."""
-    client = _get_http_client()
-    res = await client.delete(
-        f"{SUPABASE_REST}/community_comments",
+    await _request(
+        "DELETE",
+        f"{_get_supabase_rest_url()}/community_comments",
         headers=_base_headers(token),
         params={"id": f"eq.{comment_id}"},
     )
-    res.raise_for_status()
 
-
-# ────────────────────────────────────────────────────────────
-# 내부 헬퍼
-# ────────────────────────────────────────────────────────────
 
 async def _get_user_id(token: str) -> str:
-    """Supabase JWT에서 사용자 ID 조회."""
     try:
         claims = jwt.get_unverified_claims(token)
         user_id = claims.get("sub")
@@ -234,13 +288,16 @@ async def _get_user_id(token: str) -> str:
     except JWTError:
         pass
 
-    client = _get_http_client()
-    res = await client.get(
-        f"{settings.supabase_url}/auth/v1/user",
-        headers={"apikey": settings.supabase_anon_key, "Authorization": f"Bearer {token}"},
+    response = await _request(
+        "GET",
+        f"{_get_supabase_url()}/auth/v1/user",
+        headers={"apikey": _get_server_api_key(), "Authorization": f"Bearer {token}"},
     )
-    res.raise_for_status()
-    return res.json()["id"]
+    user = response.json()
+    user_id = user.get("id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Failed to validate user session.")
+    return user_id
 
 
 def _extract_total_count(content_range: Optional[str], fallback: int) -> int:
@@ -251,60 +308,39 @@ def _extract_total_count(content_range: Optional[str], fallback: int) -> int:
     return int(total) if total.isdigit() else fallback
 
 
-def _format_post_summary(row: dict) -> dict:
-    """목록 화면에 필요한 최소 필드만 응답으로 변환."""
-    profile = row.get("profiles") or {}
+def _format_post_summary(row: dict[str, Any]) -> dict[str, Any]:
     return {
-        "id": row["id"],
-        "post_number": row.get("post_number", 0),
-        "title": row["title"],
+        "id": row.get("id", ""),
+        "post_number": row.get("post_number", 0) or 0,
+        "title": row.get("title", ""),
         "content": "",
-        "category": row["category"],
-        "views": row.get("views", 0),
-        "created_at": row["created_at"],
-        "updated_at": row["updated_at"],
-        "author": {
-            "id": profile.get("id", ""),
-            "nickname": profile.get("nickname", "알 수 없음"),
-            "rank": profile.get("rank"),
-            "avatar_url": profile.get("avatar_url"),
-        },
+        "category": row.get("category", "general"),
+        "views": row.get("views", 0) or 0,
+        "created_at": row.get("created_at", ""),
+        "updated_at": row.get("updated_at", ""),
+        "author": _author_payload(row.get("profiles")),
     }
 
 
-def _format_post(row: dict) -> dict:
-    """PostgREST 응답을 API 응답 형식으로 변환."""
-    profile = row.get("profiles") or {}
+def _format_post(row: dict[str, Any]) -> dict[str, Any]:
     return {
-        "id": row["id"],
-        "post_number": row.get("post_number", 0),
-        "title": row["title"],
-        "content": row["content"],
-        "category": row["category"],
-        "views": row.get("views", 0),
-        "created_at": row["created_at"],
-        "updated_at": row["updated_at"],
-        "author": {
-            "id": profile.get("id", ""),
-            "nickname": profile.get("nickname", "알 수 없음"),
-            "rank": profile.get("rank"),
-            "avatar_url": profile.get("avatar_url"),
-        },
+        "id": row.get("id", ""),
+        "post_number": row.get("post_number", 0) or 0,
+        "title": row.get("title", ""),
+        "content": row.get("content", ""),
+        "category": row.get("category", "general"),
+        "views": row.get("views", 0) or 0,
+        "created_at": row.get("created_at", ""),
+        "updated_at": row.get("updated_at", ""),
+        "author": _author_payload(row.get("profiles")),
     }
 
 
-def _format_comment(row: dict) -> dict:
-    """댓글 PostgREST 응답 변환."""
-    profile = row.get("profiles") or {}
+def _format_comment(row: dict[str, Any]) -> dict[str, Any]:
     return {
-        "id": row["id"],
-        "post_id": row["post_id"],
-        "content": row["content"],
-        "created_at": row["created_at"],
-        "author": {
-            "id": profile.get("id", ""),
-            "nickname": profile.get("nickname", "알 수 없음"),
-            "rank": profile.get("rank"),
-            "avatar_url": profile.get("avatar_url"),
-        },
+        "id": row.get("id", ""),
+        "post_id": row.get("post_id", ""),
+        "content": row.get("content", ""),
+        "created_at": row.get("created_at", ""),
+        "author": _author_payload(row.get("profiles")),
     }

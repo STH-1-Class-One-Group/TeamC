@@ -1,6 +1,8 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Header
 from typing import Literal, Optional
-from app.schemas.community_schema import PostCreate, PostUpdate, CommentCreate
+
+from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Query
+
+from app.schemas.community_schema import CommentCreate, PostCreate, PostUpdate
 from app.services import community_service
 
 router = APIRouter()
@@ -19,9 +21,6 @@ def _require_token(authorization: Optional[str]) -> str:
     return token
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 목록
-# ────────────────────────────────────────────────────────────
 @router.get("/community/posts")
 async def list_posts(
     page: int = Query(1, ge=1),
@@ -30,115 +29,111 @@ async def list_posts(
     query: Optional[str] = Query(None),
     search_type: Literal["title", "title_content"] = Query("title"),
 ):
-    """게시글 목록 조회 (비로그인 허용)."""
-    return await community_service.get_posts(
-        page=page,
-        per_page=per_page,
-        category=category,
-        query=query,
-        search_type=search_type,
-    )
+    try:
+        return await community_service.get_posts(
+            page=page,
+            per_page=per_page,
+            category=category,
+            query=query,
+            search_type=search_type,
+        )
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 상세
-# ────────────────────────────────────────────────────────────
 @router.get("/community/posts/{post_id}")
 async def get_post(post_id: str, background_tasks: BackgroundTasks):
-    """게시글 상세 조회 + 조회수 증가 (비로그인 허용)."""
-    post = await community_service.get_post_detail(post_id)
-    if not post:
-        raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
-    background_tasks.add_task(community_service.increment_views, post_id)
-    return post
+    try:
+        post = await community_service.get_post_detail(post_id)
+        if not post:
+            raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
+        background_tasks.add_task(community_service.increment_views, post_id)
+        return post
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 작성
-# ────────────────────────────────────────────────────────────
 @router.post("/community/posts", status_code=201)
 async def create_post(
     body: PostCreate,
     authorization: Optional[str] = Header(None),
 ):
-    """게시글 작성 (로그인 필요)."""
     token = _require_token(authorization)
     try:
         return await community_service.create_post(body.model_dump(), token)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 수정
-# ────────────────────────────────────────────────────────────
 @router.put("/community/posts/{post_id}")
 async def update_post(
     post_id: str,
     body: PostUpdate,
     authorization: Optional[str] = Header(None),
 ):
-    """게시글 수정 (로그인 + 본인만, RLS 적용)."""
     token = _require_token(authorization)
     try:
         return await community_service.update_post(post_id, body.model_dump(), token)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 게시글 삭제
-# ────────────────────────────────────────────────────────────
 @router.delete("/community/posts/{post_id}", status_code=204)
 async def delete_post(
     post_id: str,
     authorization: Optional[str] = Header(None),
 ):
-    """게시글 삭제 (로그인 + 본인만, RLS 적용)."""
     token = _require_token(authorization)
     try:
         await community_service.delete_post(post_id, token)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 댓글 목록
-# ────────────────────────────────────────────────────────────
 @router.get("/community/posts/{post_id}/comments")
 async def list_comments(post_id: str):
-    """댓글 목록 조회 (비로그인 허용)."""
-    return await community_service.get_comments(post_id)
+    try:
+        return await community_service.get_comments(post_id)
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 댓글 작성
-# ────────────────────────────────────────────────────────────
 @router.post("/community/posts/{post_id}/comments", status_code=201)
 async def create_comment(
     post_id: str,
     body: CommentCreate,
     authorization: Optional[str] = Header(None),
 ):
-    """댓글 작성 (로그인 필요)."""
     token = _require_token(authorization)
     try:
         return await community_service.create_comment(post_id, body.content, token)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
-# ────────────────────────────────────────────────────────────
-# 댓글 삭제
-# ────────────────────────────────────────────────────────────
 @router.delete("/community/comments/{comment_id}", status_code=204)
 async def delete_comment(
     comment_id: str,
     authorization: Optional[str] = Header(None),
 ):
-    """댓글 삭제 (로그인 + 본인만, RLS 적용)."""
     token = _require_token(authorization)
     try:
         await community_service.delete_comment(comment_id, token)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
