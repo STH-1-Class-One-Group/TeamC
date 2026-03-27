@@ -1,11 +1,14 @@
+import asyncio
 import logging
 from typing import Any, Optional
 
 import httpx
 from fastapi import HTTPException
 from jose import JWTError, jwt
+from psycopg2.extras import RealDictCursor
 
 from app.core.config import settings
+from app.db.session import get_db_connection
 from app.services.news_fetcher import get_effective_supabase_url
 
 logger = logging.getLogger(__name__)
@@ -132,6 +135,32 @@ def _build_post_filters(
     return filters
 
 
+def _build_db_post_filters(
+    category: Optional[str],
+    query: Optional[str],
+    search_type: str,
+) -> tuple[str, list[Any]]:
+    clauses: list[str] = []
+    params: list[Any] = []
+
+    if category and category != "all":
+        clauses.append("posts.category = %s")
+        params.append(category)
+
+    keyword = (query or "").strip()
+    if keyword:
+        pattern = f"%{keyword}%"
+        if search_type == "title_content":
+            clauses.append("(posts.title ILIKE %s OR posts.content ILIKE %s)")
+            params.extend([pattern, pattern])
+        else:
+            clauses.append("posts.title ILIKE %s")
+            params.append(pattern)
+
+    where_clause = f"where {' and '.join(clauses)}" if clauses else ""
+    return where_clause, params
+
+
 def _normalize_profile(value: Any) -> dict[str, Any]:
     if isinstance(value, list):
         value = value[0] if value else {}
@@ -150,6 +179,175 @@ def _author_payload(profile: Any) -> dict[str, Any]:
     }
 
 
+def _map_db_post_row(row: dict[str, Any], include_content: bool) -> dict[str, Any]:
+    return {
+        "id": row.get("id", ""),
+        "post_number": row.get("post_number", 0) or 0,
+        "title": row.get("title", ""),
+        "content": row.get("content", "") if include_content else "",
+        "category": row.get("category", "general"),
+        "views": row.get("views", 0) or 0,
+        "created_at": row.get("created_at").isoformat() if row.get("created_at") else "",
+        "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else "",
+        "author": {
+            "id": row.get("author_id", ""),
+            "nickname": row.get("author_nickname", "알 수 없음"),
+            "rank": row.get("author_rank"),
+            "avatar_url": row.get("author_avatar_url"),
+        },
+    }
+
+
+def _map_db_comment_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": row.get("id", ""),
+        "post_id": row.get("post_id", ""),
+        "content": row.get("content", ""),
+        "created_at": row.get("created_at").isoformat() if row.get("created_at") else "",
+        "author": {
+            "id": row.get("author_id", ""),
+            "nickname": row.get("author_nickname", "알 수 없음"),
+            "rank": row.get("author_rank"),
+            "avatar_url": row.get("author_avatar_url"),
+        },
+    }
+
+
+def _fetch_posts_from_db(
+    page: int,
+    per_page: int,
+    category: Optional[str],
+    query: Optional[str],
+    search_type: str,
+) -> dict[str, Any]:
+    if not settings.database_url:
+        raise HTTPException(status_code=502, detail="Community service upstream request failed.")
+
+    where_clause, where_params = _build_db_post_filters(category, query, search_type)
+    offset = (page - 1) * per_page
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                f"""
+                select count(*) as total
+                from public.community_posts posts
+                {where_clause}
+                """,
+                tuple(where_params),
+            )
+            total_row = cursor.fetchone() or {"total": 0}
+
+            cursor.execute(
+                f"""
+                select
+                    posts.id,
+                    posts.post_number,
+                    posts.title,
+                    posts.category,
+                    posts.views,
+                    posts.created_at,
+                    posts.updated_at,
+                    profiles.id as author_id,
+                    profiles.nickname as author_nickname,
+                    profiles.rank as author_rank,
+                    profiles.avatar_url as author_avatar_url
+                from public.community_posts posts
+                join public.profiles profiles on profiles.id = posts.author_id
+                {where_clause}
+                order by posts.post_number desc
+                limit %s offset %s
+                """,
+                tuple([*where_params, per_page, offset]),
+            )
+            rows = cursor.fetchall()
+
+    return {
+        "posts": [_map_db_post_row(dict(row), include_content=False) for row in rows],
+        "total": int(total_row["total"]),
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+def _fetch_post_detail_from_db(post_id: str) -> Optional[dict[str, Any]]:
+    if not settings.database_url:
+        raise HTTPException(status_code=502, detail="Community service upstream request failed.")
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select
+                    posts.id,
+                    posts.post_number,
+                    posts.title,
+                    posts.content,
+                    posts.category,
+                    posts.views,
+                    posts.created_at,
+                    posts.updated_at,
+                    profiles.id as author_id,
+                    profiles.nickname as author_nickname,
+                    profiles.rank as author_rank,
+                    profiles.avatar_url as author_avatar_url
+                from public.community_posts posts
+                join public.profiles profiles on profiles.id = posts.author_id
+                where posts.id = %s
+                """,
+                (post_id,),
+            )
+            row = cursor.fetchone()
+
+    return _map_db_post_row(dict(row), include_content=True) if row else None
+
+
+def _fetch_comments_from_db(post_id: str) -> list[dict[str, Any]]:
+    if not settings.database_url:
+        raise HTTPException(status_code=502, detail="Community service upstream request failed.")
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                select
+                    comments.id,
+                    comments.post_id,
+                    comments.content,
+                    comments.created_at,
+                    profiles.id as author_id,
+                    profiles.nickname as author_nickname,
+                    profiles.rank as author_rank,
+                    profiles.avatar_url as author_avatar_url
+                from public.community_comments comments
+                join public.profiles profiles on profiles.id = comments.author_id
+                where comments.post_id = %s
+                order by comments.created_at asc
+                """,
+                (post_id,),
+            )
+            rows = cursor.fetchall()
+
+    return [_map_db_comment_row(dict(row)) for row in rows]
+
+
+def _increment_views_in_db(post_id: str) -> None:
+    if not settings.database_url:
+        return
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                update public.community_posts
+                set views = views + 1
+                where id = %s
+                """,
+                (post_id,),
+            )
+        conn.commit()
+
+
 async def get_posts(
     page: int,
     per_page: int,
@@ -165,45 +363,64 @@ async def get_posts(
     }
     params.update(_build_post_filters(category=category, query=query, search_type=search_type))
 
-    response = await _request(
-        "GET",
-        f"{_get_supabase_rest_url()}/community_posts",
-        headers={**_base_headers(), "Prefer": "count=planned"},
-        params=params,
-    )
-    rows = response.json()
-    total = _extract_total_count(response.headers.get("content-range"), fallback=len(rows))
-    return {
-        "posts": [_format_post_summary(row) for row in rows],
-        "total": total,
-        "page": page,
-        "per_page": per_page,
-    }
+    try:
+        response = await _request(
+            "GET",
+            f"{_get_supabase_rest_url()}/community_posts",
+            headers={**_base_headers(), "Prefer": "count=planned"},
+            params=params,
+        )
+        rows = response.json()
+        total = _extract_total_count(response.headers.get("content-range"), fallback=len(rows))
+        return {
+            "posts": [_format_post_summary(row) for row in rows],
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+        }
+    except HTTPException as error:
+        if error.status_code != 502:
+            raise
+        logger.warning("Falling back to direct DB for community post list.")
+        return await asyncio.to_thread(_fetch_posts_from_db, page, per_page, category, query, search_type)
 
 
 async def get_post_detail(post_id: str) -> Optional[dict[str, Any]]:
-    response = await _request(
-        "GET",
-        f"{_get_supabase_rest_url()}/community_posts",
-        headers=_base_headers(),
-        params={
-            "select": "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
-            "id": f"eq.{post_id}",
-        },
-    )
-    rows = response.json()
-    if not rows:
-        return None
-    return _format_post(rows[0])
+    try:
+        response = await _request(
+            "GET",
+            f"{_get_supabase_rest_url()}/community_posts",
+            headers=_base_headers(),
+            params={
+                "select": "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
+                "id": f"eq.{post_id}",
+            },
+        )
+        rows = response.json()
+        if not rows:
+            return None
+        return _format_post(rows[0])
+    except HTTPException as error:
+        if error.status_code != 502:
+            raise
+        logger.warning("Falling back to direct DB for community post detail.")
+        return await asyncio.to_thread(_fetch_post_detail_from_db, post_id)
 
 
 async def increment_views(post_id: str) -> None:
-    await _request(
-        "POST",
-        f"{_get_supabase_rest_url()}/rpc/increment_post_views",
-        headers=_base_headers(),
-        json={"p_post_id": post_id},
-    )
+    try:
+        await _request(
+            "POST",
+            f"{_get_supabase_rest_url()}/rpc/increment_post_views",
+            headers=_base_headers(),
+            json={"p_post_id": post_id},
+        )
+    except HTTPException as error:
+        if error.status_code != 502:
+            logger.warning("Increment views failed with non-retriable status: %s", error.detail)
+            return
+        logger.warning("Falling back to direct DB for community view increment.")
+        await asyncio.to_thread(_increment_views_in_db, post_id)
 
 
 async def create_post(data: dict[str, Any], token: str) -> dict[str, Any]:
@@ -245,17 +462,23 @@ async def delete_post(post_id: str, token: str) -> None:
 
 
 async def get_comments(post_id: str) -> list[dict[str, Any]]:
-    response = await _request(
-        "GET",
-        f"{_get_supabase_rest_url()}/community_comments",
-        headers=_base_headers(),
-        params={
-            "select": "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)",
-            "post_id": f"eq.{post_id}",
-            "order": "created_at.asc",
-        },
-    )
-    return [_format_comment(row) for row in response.json()]
+    try:
+        response = await _request(
+            "GET",
+            f"{_get_supabase_rest_url()}/community_comments",
+            headers=_base_headers(),
+            params={
+                "select": "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)",
+                "post_id": f"eq.{post_id}",
+                "order": "created_at.asc",
+            },
+        )
+        return [_format_comment(row) for row in response.json()]
+    except HTTPException as error:
+        if error.status_code != 502:
+            raise
+        logger.warning("Falling back to direct DB for community comments.")
+        return await asyncio.to_thread(_fetch_comments_from_db, post_id)
 
 
 async def create_comment(post_id: str, content: str, token: str) -> dict[str, Any]:
