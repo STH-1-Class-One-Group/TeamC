@@ -87,6 +87,8 @@ erDiagram
         string nickname "unique, 필수"
         string rank "계급 (선택)"
         string unit "소속부대 (선택)"
+        date enlistment_date "입대일 (선택)"
+        boolean profile_completed "프로필 설정 완료 여부"
         string avatar_url "Supabase Storage 프로필 이미지 경로"
         timestamptz created_at
         timestamptz updated_at
@@ -147,6 +149,8 @@ create table public.profiles (
   nickname   text not null unique,   -- 서비스 내 닉네임 (필수, 중복 불가)
   rank       text,                   -- 계급 (선택)
   unit       text,                   -- 소속부대 (선택)
+  enlistment_date date,             -- 입대일 (선택)
+  profile_completed boolean not null default false, -- 프로필 설정 완료 여부
   avatar_url text,                   -- Supabase Storage 프로필 이미지 경로
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -264,8 +268,8 @@ sequenceDiagram
     alt 신규 유저 (profiles 없음)
         Supabase-->>브라우저: 데이터 없음
         브라우저-->>사용자: 프로필 설정 모달 표시
-        사용자->>브라우저: 닉네임/계급/부대 입력
-        브라우저->>Supabase: profiles INSERT
+        사용자->>브라우저: 닉네임/계급/부대/입대일 입력
+        브라우저->>Supabase: profiles INSERT/UPDATE
         Supabase-->>브라우저: 프로필 생성 완료
         브라우저-->>사용자: 서비스 진입 ✅
     else 기존 유저 (profiles 있음)
@@ -279,7 +283,11 @@ sequenceDiagram
 ## 7. Supabase 설정 방법
 
 ### Step 1. SQL 실행
+신규 프로젝트:
 Supabase 대시보드 → **SQL Editor** → `backend/sql/community_schema.sql` 내용 전체 복붙 → **Run**
+
+기존 프로젝트(이미 `profiles` 테이블이 있는 경우):
+Supabase 대시보드 → **SQL Editor** → `backend/sql/profile_enlistment_date_patch.sql` 실행 → **Run**
 
 ### Step 2. 환경변수 추가
 

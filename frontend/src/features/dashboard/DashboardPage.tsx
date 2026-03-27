@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MealPopup, MealItem } from './components/MealPopup';
 import { fetchNewsBatch } from '../news/newsApi';
+import { Profile } from '../../components/common/ProfileSetupModal';
+import { calculateServiceTimeline } from '../../utils/serviceDates';
 
 interface MealData {
   dates: string;
@@ -65,9 +67,14 @@ const DEFAULT_MEAL_INFO = {
   dinner: 'Loading...',
 };
 
-export const DashboardPage: React.FC = () => {
+interface DashboardPageProps {
+  profile: Profile | null;
+}
+
+export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
   const navigate = useNavigate();
   const didInitRef = useRef(false);
+  const serviceTimeline = calculateServiceTimeline(profile?.enlistment_date);
 
   const [mealInfo, setMealInfo] = useState(DEFAULT_MEAL_INFO);
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
@@ -260,7 +267,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="bg-surface-container-low dark:bg-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
               <span className="material-symbols-outlined text-primary dark:text-blue-400 text-sm" translate="no">timer</span>
-              <span className="text-sm font-semibold text-on-surface dark:text-white">D-184</span>
+              <span className="text-sm font-semibold text-on-surface dark:text-white">{serviceTimeline.dDayLabel}</span>
             </div>
           </div>
 
@@ -268,22 +275,41 @@ export const DashboardPage: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 space-y-2">
                 <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">Enlistment</label>
-                <input className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm" type="text" defaultValue="2023. 05. 08" readOnly />
+                <input
+                  className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm"
+                  type="text"
+                  value={serviceTimeline.enlistmentLabel}
+                  readOnly
+                />
               </div>
               <div className="flex-1 space-y-2">
                 <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">Discharge</label>
-                <input className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm" type="text" defaultValue="2024. 11. 07" readOnly />
+                <input
+                  className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm"
+                  type="text"
+                  value={serviceTimeline.dischargeLabel}
+                  readOnly
+                />
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between items-end">
                 <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">Progress</span>
-                <span className="text-4xl font-extrabold text-primary dark:text-blue-400 tracking-tighter">68.4<span className="text-xl">%</span></span>
+                <span className="text-4xl font-extrabold text-primary dark:text-blue-400 tracking-tighter">
+                  {serviceTimeline.progressPercent.toFixed(1)}
+                  <span className="text-xl">%</span>
+                </span>
               </div>
               <div className="w-full h-3 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full signature-gradient rounded-full" style={{ width: '68.4%' }}></div>
+                <div
+                  className="h-full signature-gradient rounded-full"
+                  style={{ width: `${serviceTimeline.progressPercent.toFixed(1)}%` }}
+                ></div>
               </div>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400">
+                {serviceTimeline.helperText}
+              </p>
             </div>
           </div>
         </div>

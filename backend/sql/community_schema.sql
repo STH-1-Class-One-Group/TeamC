@@ -12,6 +12,7 @@ create table if not exists public.profiles (
   rank        text,                        -- 계급 (선택)
   unit        text,                        -- 소속부대 (선택)
   enlistment_date date,                    -- 입대일 (선택)
+  profile_completed boolean not null default false, -- 프로필 설정 완료 여부
   avatar_url  text,                        -- Supabase Storage 프로필 이미지 경로
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()

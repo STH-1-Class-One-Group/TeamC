@@ -66,6 +66,14 @@ const loadProfile = async (currentUser: User): Promise<Profile | null> => {
   return (data as Profile | null) ?? null;
 };
 
+const shouldRequireProfileSetup = (currentProfile: Profile | null) => {
+  if (!currentProfile) {
+    return true;
+  }
+
+  return !currentProfile.profile_completed;
+};
+
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
@@ -143,7 +151,7 @@ const App: React.FC = () => {
       }
 
       setProfile(nextProfile);
-      setShowProfileSetup(!nextProfile);
+      setShowProfileSetup(shouldRequireProfileSetup(nextProfile));
     };
 
     void syncProfile();
@@ -191,7 +199,7 @@ const App: React.FC = () => {
           <main className="flex-grow pt-32 pb-20 px-6 max-w-7xl mx-auto w-full">
             <Routes>
               <Route path="/" element={<ShopPage />} />
-              <Route path="/Dashboard" element={<DashboardPage />} />
+              <Route path="/Dashboard" element={<DashboardPage profile={profile ?? null} />} />
               <Route path="/Meal" element={<MealPage />} />
               <Route path="/News" element={<NewsPage />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -210,6 +218,7 @@ const App: React.FC = () => {
         {showProfileSetup && user && (
           <ProfileSetupModal
             user={user}
+            initialProfile={profile ?? null}
             onProfileCreated={(newProfile) => {
               setProfile(newProfile);
               setShowProfileSetup(false);

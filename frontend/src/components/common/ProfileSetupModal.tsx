@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../../api/supabaseClient';
 import { User } from '@supabase/supabase-js';
 import { getRankAvatarPath } from '../../utils/profileAvatar';
@@ -8,6 +8,8 @@ export interface Profile {
   nickname: string;
   rank: string | null;
   unit: string | null;
+  enlistment_date: string | null;
+  profile_completed: boolean;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
@@ -15,6 +17,7 @@ export interface Profile {
 
 interface ProfileSetupModalProps {
   user: User;
+  initialProfile?: Profile | null;
   onProfileCreated: (profile: Profile) => void;
   onSignOut: () => void;
 }
@@ -26,14 +29,40 @@ const RANKS = [
   '준장', '소장', '중장', '대장',
 ];
 
-export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onProfileCreated, onSignOut }) => {
-  const [nickname, setNickname] = useState('');
-  const [rank, setRank] = useState('');
-  const [unit, setUnit] = useState('');
+const getTodayInputValue = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
+  user,
+  initialProfile = null,
+  onProfileCreated,
+  onSignOut,
+}) => {
+  const [nickname, setNickname] = useState(initialProfile?.nickname ?? '');
+  const [rank, setRank] = useState(initialProfile?.rank ?? '');
+  const [unit, setUnit] = useState(initialProfile?.unit ?? '');
+  const [enlistmentDate, setEnlistmentDate] = useState(initialProfile?.enlistment_date ?? '');
   const [nicknameError, setNicknameError] = useState('');
+  const [enlistmentDateError, setEnlistmentDateError] = useState('');
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const todayInputValue = getTodayInputValue();
+
+  useEffect(() => {
+    setNickname(initialProfile?.nickname ?? '');
+    setRank(initialProfile?.rank ?? '');
+    setUnit(initialProfile?.unit ?? '');
+    setEnlistmentDate(initialProfile?.enlistment_date ?? '');
+    setNicknameError('');
+    setEnlistmentDateError('');
+    setError('');
+  }, [initialProfile]);
 
   const checkNicknameAvailability = async (value: string) => {
     if (!value.trim()) return;
@@ -45,7 +74,7 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onPr
       .eq('nickname', value.trim())
       .maybeSingle();
     setIsCheckingNickname(false);
-    if (data) {
+    if (data && data.id !== user.id) {
       setNicknameError('이미 사용 중인 닉네임입니다.');
     }
   };
@@ -56,18 +85,26 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onPr
       setNicknameError('닉네임을 입력해주세요.');
       return;
     }
+    if (enlistmentDate && enlistmentDate > todayInputValue) {
+      setEnlistmentDateError('입대일은 오늘 이후로 설정할 수 없습니다.');
+      return;
+    }
     if (nicknameError) return;
 
     setIsSubmitting(true);
     setError('');
     const { data, error: insertError } = await supabase
       .from('profiles')
-      .insert({
+      .upsert({
         id: user.id,
         nickname: nickname.trim(),
         rank: rank || null,
         unit: unit.trim() || null,
+        enlistment_date: enlistmentDate || null,
+        profile_completed: true,
         avatar_url: getRankAvatarPath(rank || null),
+      }, {
+        onConflict: 'id',
       })
       .select()
       .single();
@@ -139,6 +176,25 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onPr
             </select>
           </div>
 
+          <div>
+            <label className="text-sm font-semibold text-on-surface-variant dark:text-slate-400 block mb-1 ml-1">
+              입대일 <span className="text-slate-400 font-normal">(군 복무 중이라면 입력)</span>
+            </label>
+            <input
+              type="date"
+              value={enlistmentDate}
+              max={todayInputValue}
+              onChange={(e) => {
+                setEnlistmentDate(e.target.value);
+                setEnlistmentDateError('');
+              }}
+              className="w-full bg-surface-container-low dark:bg-slate-800 border-none focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface dark:text-white outline-none"
+            />
+            {enlistmentDateError && (
+              <p className="text-xs text-red-500 mt-1 ml-1">{enlistmentDateError}</p>
+            )}
+          </div>
+
           {/* 소속부대 */}
           <div>
             <label className="text-sm font-semibold text-on-surface-variant dark:text-slate-400 block mb-1 ml-1">
@@ -160,7 +216,7 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({ user, onPr
 
           <button
             type="submit"
-            disabled={isSubmitting || !!nicknameError || !nickname.trim()}
+            disabled={isSubmitting || !!nicknameError || !!enlistmentDateError || !nickname.trim()}
             className="w-full py-3 px-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {isSubmitting ? '저장 중...' : '시작하기'}
