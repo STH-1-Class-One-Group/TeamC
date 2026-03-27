@@ -4,11 +4,19 @@ import { TrainingCenter } from '../data/trainingCenters';
 interface TrainingCenterCardProps {
   center: TrainingCenter;
   onDetailClick?: (center: TrainingCenter) => void;
+  isHighlighted?: boolean;
 }
 
-export const TrainingCenterCard: React.FC<TrainingCenterCardProps> = ({ center, onDetailClick }) => {
+export const TrainingCenterCard: React.FC<TrainingCenterCardProps> = ({ center, onDetailClick, isHighlighted }) => {
   return (
-    <div className="bg-surface-container-lowest dark:bg-slate-900/50 p-5 rounded-xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group">
+    <div
+      data-center-id={center.id}
+      className={`p-5 rounded-xl border shadow-sm hover:shadow-md transition-all group ${
+        isHighlighted
+          ? 'bg-primary/5 dark:bg-blue-900/20 border-primary/30 dark:border-blue-500/30 ring-2 ring-primary/20 dark:ring-blue-500/20'
+          : 'bg-surface-container-lowest dark:bg-slate-900/50 border-outline-variant/10 dark:border-slate-800'
+      }`}
+    >
       <div className="flex justify-between items-start mb-4">
         <div>
           <h4 className="font-bold text-lg text-on-surface dark:text-white group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">

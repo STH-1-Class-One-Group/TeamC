@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TrainingCenter } from '../data/trainingCenters';
 import { TrainingCenterCard } from './TrainingCenterCard';
 
@@ -6,16 +6,27 @@ interface TrainingCenterListProps {
   centers: TrainingCenter[];
   isLoading: boolean;
   onDetailClick?: (center: TrainingCenter) => void;
+  highlightedCenterId?: string | null;
 }
 
-export const TrainingCenterList: React.FC<TrainingCenterListProps> = ({ centers, isLoading, onDetailClick }) => {
+export const TrainingCenterList: React.FC<TrainingCenterListProps> = ({ centers, isLoading, onDetailClick, highlightedCenterId }) => {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!highlightedCenterId || !listRef.current) return;
+    const el = listRef.current.querySelector(`[data-center-id="${highlightedCenterId}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlightedCenterId]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold tracking-tight text-on-surface dark:text-white">주변 훈련장 목록</h3>
         <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">총 {centers.length}개 결과</span>
       </div>
-      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+      <div ref={listRef} className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
         {isLoading ? (
           <div className="flex items-center justify-center py-12 text-on-surface-variant dark:text-slate-400">
             <span className="material-symbols-outlined animate-spin mr-2" translate="no">progress_activity</span>
@@ -28,7 +39,12 @@ export const TrainingCenterList: React.FC<TrainingCenterListProps> = ({ centers,
           </div>
         ) : (
           centers.map((center) => (
-            <TrainingCenterCard key={center.id} center={center} onDetailClick={onDetailClick} />
+            <TrainingCenterCard
+              key={center.id}
+              center={center}
+              onDetailClick={onDetailClick}
+              isHighlighted={highlightedCenterId === center.id}
+            />
           ))
         )}
       </div>

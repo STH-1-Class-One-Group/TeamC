@@ -24,6 +24,7 @@ export const ArmedReservePage: React.FC = () => {
   const [centers, setCenters] = useState<TrainingCenter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedCenter, setFocusedCenter] = useState<TrainingCenter | null>(null);
+  const [highlightedCenterId, setHighlightedCenterId] = useState<string | null>(null);
 
   const loadCenters = useCallback(async (sido: string) => {
     const filtered = RAW_TRAINING_CENTERS.filter((c) => c.sido === sido);
@@ -92,10 +93,10 @@ export const ArmedReservePage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-8">
-          <KakaoMap centers={centers} focusedCenter={focusedCenter} />
+          <KakaoMap centers={centers} focusedCenter={focusedCenter} onMarkerClick={(c) => setHighlightedCenterId(c.id)} />
         </div>
         <div className="lg:col-span-4">
-          <TrainingCenterList centers={centers} isLoading={isLoading} onDetailClick={setFocusedCenter} />
+          <TrainingCenterList centers={centers} isLoading={isLoading} onDetailClick={setFocusedCenter} highlightedCenterId={highlightedCenterId} />
         </div>
       </div>
     </div>

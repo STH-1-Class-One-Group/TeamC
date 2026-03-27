@@ -5,11 +5,12 @@ import { TrainingCenter } from '../data/trainingCenters';
 interface KakaoMapProps {
   centers: TrainingCenter[];
   focusedCenter?: TrainingCenter | null;
+  onMarkerClick?: (center: TrainingCenter) => void;
 }
 
 const KAKAO_MAP_KEY = process.env.REACT_APP_KAKAO_MAP_KEY || '';
 
-export const KakaoMap: React.FC<KakaoMapProps> = ({ centers, focusedCenter }) => {
+export const KakaoMap: React.FC<KakaoMapProps> = ({ centers, focusedCenter, onMarkerClick }) => {
   const [loading, error] = useKakaoLoader({
     appkey: KAKAO_MAP_KEY,
     libraries: ['services'],
@@ -101,6 +102,7 @@ export const KakaoMap: React.FC<KakaoMapProps> = ({ centers, focusedCenter }) =>
                 setInfoCenter(tc);
                 setMapCenter({ lat: tc.lat, lng: tc.lng });
                 setMapLevel(4);
+                onMarkerClick?.(tc);
               }}
             />
             <CustomOverlayMap position={{ lat: tc.lat, lng: tc.lng }} yAnchor={2.8}>
