@@ -124,6 +124,7 @@ export interface ProfileDisplayLike {
 }
 
 const toDateOnly = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 const parseIsoDate = (value: string) => {
   const [year, month, day] = value.split('-').map(Number);
@@ -307,10 +308,14 @@ const calculateTrackedServiceTimeline = (
   discharge.setDate(discharge.getDate() - 1);
 
   const today = toDateOnly(now);
-  const totalDays = diffInDays(discharge, enlistment) + 1;
-  const servedDays = today < enlistment ? 0 : Math.min(totalDays, diffInDays(today, enlistment) + 1);
   const remainingDays = today > discharge ? 0 : diffInDays(discharge, today);
-  const progressPercent = totalDays > 0 ? (servedDays / totalDays) * 100 : 0;
+  const serviceStart = startOfDay(enlistment).getTime();
+  const serviceEndExclusive = startOfDay(
+    new Date(discharge.getFullYear(), discharge.getMonth(), discharge.getDate() + 1)
+  ).getTime();
+  const totalMs = Math.max(0, serviceEndExclusive - serviceStart);
+  const servedMs = Math.min(Math.max(0, now.getTime() - serviceStart), totalMs);
+  const progressPercent = totalMs > 0 ? (servedMs / totalMs) * 100 : 0;
   const autoRankSupported = canAutoDisplayEnlistedRank(serviceTrack);
   const rankHelperText = autoRankSupported
     ? `${displayRankLabel} 기준 이미지가 자동 반영됩니다.`

@@ -74,6 +74,54 @@ interface DashboardPageProps {
 export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
   const navigate = useNavigate();
   const didInitRef = useRef(false);
+  const performanceOriginRef = useRef<number | null>(null);
+  const servicePanelRef = useRef<HTMLDivElement | null>(null);
+  const [liveNowMs, setLiveNowMs] = useState(() => {
+    const initialOrigin = Date.now() - performance.now();
+    performanceOriginRef.current = initialOrigin;
+    return initialOrigin + performance.now();
+  });
+  const [visualProgressPercent, setVisualProgressPercent] = useState(0);
+  const [isServicePanelVisible, setIsServicePanelVisible] = useState(false);
+
+  useEffect(() => {
+    const node = servicePanelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsServicePanelVisible(Boolean(entry?.isIntersecting));
+      },
+      {
+        threshold: 0.15,
+      }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (performanceOriginRef.current == null) {
+      performanceOriginRef.current = Date.now() - performance.now();
+    }
+
+    if (!isServicePanelVisible) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      if (performanceOriginRef.current != null) {
+        setLiveNowMs(performanceOriginRef.current + performance.now());
+      }
+    }, 70);
+
+    return () => window.clearInterval(intervalId);
+  }, [isServicePanelVisible]);
+
   const serviceTimeline = calculateServiceTimeline({
     userType: profile?.user_type,
     serviceTrack: profile?.service_track,
@@ -83,6 +131,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
     acquaintanceName: profile?.acquaintance_name,
     acquaintanceServiceTrack: profile?.acquaintance_service_track,
     acquaintanceEnlistmentDate: profile?.acquaintance_enlistment_date,
+    now: new Date(liveNowMs),
   });
 
   const [mealInfo, setMealInfo] = useState(DEFAULT_MEAL_INFO);
@@ -250,6 +299,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
     setIsPopupOpen(true);
   };
 
+  useEffect(() => {
+    setVisualProgressPercent(serviceTimeline.progressPercent);
+  }, [serviceTimeline.progressPercent]);
+
+  const liveProgressLabel = serviceTimeline.progressPercent.toFixed(10);
+
   return (
     <div className="space-y-16 w-full">
       <section className="relative">
@@ -268,7 +323,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-        <div className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex flex-col justify-between space-y-8 border border-transparent dark:border-slate-800 transition-all">
+        <div ref={servicePanelRef} className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex flex-col justify-between space-y-8 border border-transparent dark:border-slate-800 transition-all">
           <div className="flex justify-between items-start">
             <div>
               <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase mb-2 block">복무 현황</span>
@@ -334,15 +389,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
             <div className="space-y-3">
               <div className="flex justify-between items-end">
                 <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">진행률</span>
-                <span className="text-4xl font-extrabold text-primary dark:text-blue-400 tracking-tighter">
-                  {serviceTimeline.progressPercent.toFixed(1)}
-                  <span className="text-xl">%</span>
+                <span className="inline-flex min-w-[14ch] justify-end font-mono tabular-nums text-4xl font-extrabold text-primary dark:text-blue-400 tracking-tight">
+                  {liveProgressLabel}
+                  <span className="ml-1 text-4xl align-middle">%</span>
                 </span>
               </div>
               <div className="w-full h-3 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full signature-gradient rounded-full"
-                  style={{ width: `${serviceTimeline.progressPercent.toFixed(1)}%` }}
+                  className="h-full signature-gradient rounded-full transition-[width] duration-700 ease-out"
+                  style={{ width: `${visualProgressPercent}%` }}
                 ></div>
               </div>
               <p className="text-xs text-on-surface-variant dark:text-slate-400">
