@@ -18,11 +18,11 @@ interface HeaderProps {
 }
 
 const navItems = [
-  { to: '/', label: '?쇳븨' },
-  { to: '/Dashboard', label: '??쒕낫??' },
-  { to: '/armed-reseve', label: '?덈퉬援?' },
-  { to: '/recruitment', label: '紐⑥쭛?뺣낫' },
-  { to: '/Community', label: '而ㅻ??덊떚' },
+  { to: '/', label: '쇼핑' },
+  { to: '/Dashboard', label: '대시보드' },
+  { to: '/armed-reseve', label: '예비군' },
+  { to: '/recruitment', label: '모집정보' },
+  { to: '/Community', label: '커뮤니티' },
 ];
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
@@ -157,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             type="button"
             onClick={() => setIsNavDrawerOpen((prev) => !prev)}
             className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-            aria-label="硫붾돱 ?닿린"
+            aria-label="메뉴 열기"
             aria-expanded={isNavDrawerOpen}
           >
             <span className="material-symbols-outlined" translate="no">
@@ -169,14 +169,14 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
         <NavLink
           to="/"
           className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center lg:hidden"
-          aria-label="?덉쑝濡??대룞"
+          aria-label="홈으로 이동"
         >
           <span className="text-sm font-bold tracking-tight text-primary dark:text-blue-300 sm:text-base">
             Modern Sentinel
           </span>
         </NavLink>
 
-        <NavLink to="/" className="hidden shrink-0 items-center lg:flex" aria-label="?덉쑝濡??대룞">
+        <NavLink to="/" className="hidden shrink-0 items-center lg:flex" aria-label="홈으로 이동">
           <img src={brandLogoSrc} alt="TeamC service logo" className="h-12 w-auto object-contain" />
           <span className="sr-only">TeamC</span>
         </NavLink>
@@ -205,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
               type="button"
               className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
               onClick={openCoupons}
-              aria-label="荑좏룿 蹂닿린"
+              aria-label="쿠폰 보기"
             >
               <span className="material-symbols-outlined cursor-pointer text-slate-500 transition-all hover:text-blue-600 dark:text-slate-400">
                 confirmation_number
@@ -222,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                     setIsDropdownOpen((prev) => !prev);
                   }}
                   className="flex items-center justify-center rounded-full ring-2 ring-blue-500 transition-all hover:ring-blue-400"
-                  aria-label="?꾨줈??硫붾돱"
+                  aria-label="프로필 메뉴"
                 >
                   <ProfileAvatar
                     nickname={displayName}
@@ -235,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 {isDropdownOpen ? (
                   <div className="absolute right-0 top-11 z-50 w-48 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                     <div className="border-b border-slate-100 px-4 py-2 dark:border-slate-700">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">濡쒓렇?몃맖</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">로그인됨</p>
                       <p className="truncate text-sm font-semibold text-slate-800 dark:text-white">
                         {displayName}
                       </p>
@@ -251,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <span className="material-symbols-outlined text-[18px]">logout</span>
-                      濡쒓렇?꾩썐
+                      로그아웃
                     </button>
                   </div>
                 ) : null}
@@ -260,7 +260,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
               <button
                 onClick={openLoginModal}
                 className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
-                aria-label="濡쒓렇??"
+                aria-label="로그인"
               >
                 <span className="material-symbols-outlined cursor-pointer text-slate-500 transition-all hover:text-blue-600 dark:text-slate-400">
                   account_circle
@@ -273,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             type="button"
             onClick={() => setIsActionsMenuOpen((prev) => !prev)}
             className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden"
-            aria-label="?ㅼ젙 硫붾돱"
+            aria-label="설정 메뉴"
             aria-expanded={isActionsMenuOpen}
           >
             <span className="material-symbols-outlined text-slate-600 dark:text-slate-300" translate="no">
@@ -289,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             type="button"
             className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
             onClick={() => setIsNavDrawerOpen(false)}
-            aria-label="硫붾돱 ?ロ린"
+            aria-label="메뉴 닫기"
           />
           <aside className="relative z-10 flex h-full w-[min(84vw,20rem)] flex-col bg-white px-4 pb-6 pt-5 shadow-2xl dark:bg-slate-950 sm:px-5">
             <div className="mb-6 flex items-center justify-between">
@@ -300,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 type="button"
                 onClick={() => setIsNavDrawerOpen(false)}
                 className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-                aria-label="?ロ린"
+                aria-label="닫기"
               >
                 <span className="material-symbols-outlined" translate="no">
                   close
@@ -331,7 +331,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 onClick={user ? () => void runSignOut() : openLoginModal}
                 className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
-                {user ? '濡쒓렇?꾩썐' : '濡쒓렇??'}
+                {user ? '로그아웃' : '로그인'}
               </button>
             </div>
           </aside>
@@ -344,7 +344,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             type="button"
             className="absolute inset-0 bg-slate-950/20"
             onClick={() => setIsActionsMenuOpen(false)}
-            aria-label="?ㅼ젙 硫붾돱 ?ロ린"
+            aria-label="설정 메뉴 닫기"
           />
           <div
             ref={actionsMenuRef}
