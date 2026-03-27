@@ -1,4 +1,23 @@
+# Project-local planning / tooling
 .omc/
 community-plan.md
+
+# Personal / local agent settings
 /.claude/
 /yebigun_test.bin
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Temporary / backup files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Generated local assets that are not part of the app
+/frontend/public/Gemini_Generated_Image*.png
+/frontend/public/Whisk_*.png
