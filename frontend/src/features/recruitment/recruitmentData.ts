@@ -1,405 +1,381 @@
+export type RecruitmentStatus =
+  | '모집 예정'
+  | '접수 중'
+  | '접수 종료'
+  | '입영 진행'
+  | '입영 종료';
+
 export interface RecruitmentNotice {
   id: string;
-  title: string;
   branch: string;
   category: string;
-  deadline: string;
-  schedule: string;
-  summary: string;
-  highlight: string;
-  imageUrl: string;
+  title: string;
+  unit: string;
+  roundLabel: string;
+  specialty: string;
+  appliedCount: number | null;
+  selectedCount: number | null;
+  pressureGap: string;
+  supportRate: string;
+  applicationPeriodLabel: string;
+  enlistmentPeriodLabel: string;
+  entryDateLabel: string;
+  status: RecruitmentStatus;
   tags: string[];
 }
 
-export const recruitmentNotices: RecruitmentNotice[] = [
-  {
-    id: 'army-officer-2026-01',
-    title: '2026 육군 학사장교 1차 모집',
-    branch: '육군',
-    category: '장교',
-    deadline: '2026.04.12',
-    schedule: '서류 접수 03.28 - 04.12 / 면접 04.25',
-    summary: '전공 기반 직무 배치를 강화한 학사장교 모집 공고입니다.',
-    highlight: 'AI, 정보통신, 공병 계열 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 학사장교', '육군 장교', '학사장교', '육군 모집', '정보통신'],
-  },
-  {
-    id: 'army-nco-2026-02',
-    title: '2026 육군 전문부사관 공개 선발',
-    branch: '육군',
-    category: '부사관',
-    deadline: '2026.04.18',
-    schedule: '원서 접수 04.01 - 04.18 / 필기 04.27',
-    summary: '기술특기 중심의 육군 전문부사관 선발 일정입니다.',
-    highlight: '정비, 수송, 탄약 특기 선발 확대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 부사관', '전문부사관', '육군 전문기술병', '육군 모집', '정비'],
-  },
-  {
-    id: 'army-tech-2026-03',
-    title: '2026 육군 전문기술병 수시 선발',
-    branch: '육군',
-    category: '병',
-    deadline: '2026.04.22',
-    schedule: '지원서 접수 04.03 - 04.22 / 합격 발표 05.03',
-    summary: '드론 운용, 사이버 방호, 장비 정비 병과 중심 수시 모집입니다.',
-    highlight: '관련 자격증 보유자 가산점 부여',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 전문기술병', '육군 기술병', '육군 드론병', '육군 모집', '사이버'],
-  },
-  {
-    id: 'army-civil-2026-04',
-    title: '2026 육군 군무원 경력채용',
-    branch: '육군',
-    category: '군무원',
-    deadline: '2026.04.30',
-    schedule: '서류 접수 04.08 - 04.30 / 면접 05.14',
-    summary: '시설, 전산, 통신 분야 경력직 군무원 채용 공고입니다.',
-    highlight: '실무 경력 2년 이상 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 군무원', '육군 전산직', '육군 통신직', '육군 모집', '경력채용'],
-  },
-  {
-    id: 'army-reserve-2026-05',
-    title: '2026 육군 예비전력관리 요원 특별채용',
-    branch: '육군',
-    category: '특별채용',
-    deadline: '2026.05.04',
-    schedule: '지원서 접수 04.10 - 05.04 / 평가 05.17',
-    summary: '예비전력 운영 경험자를 대상으로 한 특별채용 전형입니다.',
-    highlight: '예비군 훈련 기획 경력자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 예비전력', '육군 특별채용', '육군 모집', '예비군', '운영기획'],
-  },
-  {
-    id: 'navy-officer-2026-06',
-    title: '2026 해군 학군장교 후보생 모집',
-    branch: '해군',
-    category: '장교',
-    deadline: '2026.04.15',
-    schedule: '접수 03.30 - 04.15 / 면접 04.29',
-    summary: '함정 운용과 정보통신 직무 중심의 해군 장교 모집입니다.',
-    highlight: '항해, 기관, 전산 직무 배치 예정',
-    imageUrl:
-      'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 장교', '학군장교', '항해', '해군 모집', '함정'],
-  },
-  {
-    id: 'navy-nco-2026-07',
-    title: '2026 해군 기술부사관 상시 선발',
-    branch: '해군',
-    category: '부사관',
-    deadline: '2026.04.20',
-    schedule: '접수 04.02 - 04.20 / 필기 04.28',
-    summary: '함정 정비와 전투체계 특기 중심 상시 선발입니다.',
-    highlight: '기술자격 보유 시 가산점',
-    imageUrl:
-      'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 부사관', '기술부사관', '함정정비', '해군 모집', '전투체계'],
-  },
-  {
-    id: 'marine-officer-2026-08',
-    title: '2026 해병대 학사장교 모집',
-    branch: '해병대',
-    category: '장교',
-    deadline: '2026.04.24',
-    schedule: '접수 04.04 - 04.24 / 체력검정 05.02',
-    summary: '상륙작전 지휘와 보병 병과 중심의 학사장교 공고입니다.',
-    highlight: '체력검정 비중 확대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해병대 장교', '해병대 학사장교', '상륙작전', '해병대 모집', '보병'],
-  },
-  {
-    id: 'airforce-pilot-2026-09',
-    title: '2026 공군 조종장학생 선발',
-    branch: '공군',
-    category: '장교',
-    deadline: '2026.04.28',
-    schedule: '접수 04.06 - 04.28 / 적성검사 05.09',
-    summary: '조종장학생과 항공통제 직무 지원자를 함께 모집합니다.',
-    highlight: '영어성적 제출 필수',
-    imageUrl:
-      'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 장교', '조종장학생', '항공통제', '공군 모집', '비행'],
-  },
-  {
-    id: 'airforce-nco-2026-10',
-    title: '2026 공군 항공정비 부사관 채용',
-    branch: '공군',
-    category: '부사관',
-    deadline: '2026.05.02',
-    schedule: '접수 04.11 - 05.02 / 필기 05.11',
-    summary: '항공정비와 군수 지원 병과를 중심으로 모집합니다.',
-    highlight: '항공정비 자격 보유자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 부사관', '항공정비', '군수지원', '공군 모집', '정비'],
-  },
-  {
-    id: 'army-rnd-2026-11',
-    title: '2026 육군 연구개발 부문 특별전형',
-    branch: '육군',
-    category: '특별전형',
-    deadline: '2026.05.06',
-    schedule: '접수 04.12 - 05.06 / 발표 05.20',
-    summary: '국방 AI와 무인체계 연구 직군을 위한 특별전형입니다.',
-    highlight: '석사 이상 연구 인력 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 연구개발', '육군 AI', '육군 특별전형', '무인체계', '육군 모집'],
-  },
-  {
-    id: 'navy-civil-2026-12',
-    title: '2026 해군 군무원 공개경쟁 채용',
-    branch: '해군',
-    category: '군무원',
-    deadline: '2026.05.08',
-    schedule: '접수 04.15 - 05.08 / 필기 05.22',
-    summary: '해양시설, 통신, 정보보호 직렬 군무원 채용입니다.',
-    highlight: '정보보호 직렬 선발 인원 확대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 군무원', '정보보호', '통신', '해군 모집', '공채'],
-  },
-  {
-    id: 'marine-nco-2026-13',
-    title: '2026 해병대 부사관 예비합격자 모집',
-    branch: '해병대',
-    category: '부사관',
-    deadline: '2026.05.10',
-    schedule: '접수 04.16 - 05.10 / 면접 05.23',
-    summary: '보병, 수색, 포병 직무 중심의 부사관 예비합격자 선발입니다.',
-    highlight: '수색 병과 지원자 체력검정 강화',
-    imageUrl:
-      'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해병대 부사관', '수색', '포병', '해병대 모집', '체력검정'],
-  },
-  {
-    id: 'airforce-cyber-2026-14',
-    title: '2026 공군 사이버 전문인력 특별모집',
-    branch: '공군',
-    category: '특별채용',
-    deadline: '2026.05.12',
-    schedule: '접수 04.18 - 05.12 / 실기 05.26',
-    summary: '사이버 방호와 위협 분석 인력을 특별모집합니다.',
-    highlight: '보안 자격증 제출 시 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 사이버', '공군 특별채용', '보안', '공군 모집', '위협분석'],
-  },
-  {
-    id: 'army-medical-2026-15',
-    title: '2026 육군 의무병 전문인력 선발',
-    branch: '육군',
-    category: '병',
-    deadline: '2026.05.14',
-    schedule: '접수 04.20 - 05.14 / 발표 05.28',
-    summary: '응급구조, 간호, 임상병리 전공자를 우대하는 의무병 모집입니다.',
-    highlight: '보건계열 자격증 소지자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 의무병', '육군 보건', '의무지원', '육군 모집', '간호'],
-  },
-  {
-    id: 'navy-it-2026-16',
-    title: '2026 해군 정보통신병 모집',
-    branch: '해군',
-    category: '병',
-    deadline: '2026.05.16',
-    schedule: '접수 04.22 - 05.16 / 발표 05.30',
-    summary: '통신 장비 운용과 네트워크 관리 병과 중심 모집입니다.',
-    highlight: '네트워크 관련 자격 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516321310764-8d1eb77f1b2b?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 정보통신병', '해군 네트워크', '통신병', '해군 모집', '장비운용'],
-  },
-  {
-    id: 'airforce-atc-2026-17',
-    title: '2026 공군 항공관제 군무원 채용',
-    branch: '공군',
-    category: '군무원',
-    deadline: '2026.05.18',
-    schedule: '접수 04.23 - 05.18 / 면접 06.01',
-    summary: '항공관제와 비행안전 지원 직렬 중심의 군무원 모집입니다.',
-    highlight: '관련 면허 보유자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 군무원', '항공관제', '비행안전', '공군 모집', '면허'],
-  },
-  {
-    id: 'marine-logistics-2026-18',
-    title: '2026 해병대 군수지원 병 모집',
-    branch: '해병대',
-    category: '병',
-    deadline: '2026.05.20',
-    schedule: '접수 04.24 - 05.20 / 발표 06.03',
-    summary: '수송과 보급 지원 중심의 군수지원 병 모집입니다.',
-    highlight: '운전 면허 소지자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해병대 병', '군수지원', '수송', '해병대 모집', '보급'],
-  },
-  {
-    id: 'army-engineer-2026-19',
-    title: '2026 육군 공병장교 단기복무 모집',
-    branch: '육군',
-    category: '장교',
-    deadline: '2026.05.22',
-    schedule: '접수 04.25 - 05.22 / 면접 06.05',
-    summary: '시설공사와 재난대응 경험자를 우대하는 공병장교 모집입니다.',
-    highlight: '건축, 토목 전공자 가산점',
-    imageUrl:
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 공병장교', '육군 장교', '공병', '육군 모집', '재난대응'],
-  },
-  {
-    id: 'navy-drone-2026-20',
-    title: '2026 해군 무인체계 운용요원 모집',
-    branch: '해군',
-    category: '특별전형',
-    deadline: '2026.05.24',
-    schedule: '접수 04.27 - 05.24 / 실기 06.07',
-    summary: '무인수상정과 정찰드론 운용 인력을 선발합니다.',
-    highlight: '드론 자격증 보유자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 무인체계', '해군 드론', '특별전형', '해군 모집', '정찰'],
-  },
-  {
-    id: 'airforce-space-2026-21',
-    title: '2026 공군 우주전력 분석관 모집',
-    branch: '공군',
-    category: '특별전형',
-    deadline: '2026.05.26',
-    schedule: '접수 04.29 - 05.26 / 발표 06.10',
-    summary: '위성정보와 우주상황 인식 분야 분석관 채용 공고입니다.',
-    highlight: '항공우주 전공자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 우주전력', '공군 특별전형', '위성정보', '공군 모집', '분석관'],
-  },
-  {
-    id: 'army-cyber-2026-22',
-    title: '2026 육군 사이버작전 부사관 모집',
-    branch: '육군',
-    category: '부사관',
-    deadline: '2026.05.28',
-    schedule: '접수 04.30 - 05.28 / 실기 06.11',
-    summary: '사이버 대응과 침해사고 분석 특기 중심의 부사관 선발입니다.',
-    highlight: '화이트해커 경진대회 수상 경력 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 사이버', '육군 부사관', '침해사고', '육군 모집', '정보보호'],
-  },
-  {
-    id: 'marine-signals-2026-23',
-    title: '2026 해병대 통신장비 운용병 모집',
-    branch: '해병대',
-    category: '병',
-    deadline: '2026.05.30',
-    schedule: '접수 05.01 - 05.30 / 발표 06.13',
-    summary: '통신장비 운용과 현장 정비 인력을 모집합니다.',
-    highlight: '무전통신 자격증 소지자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해병대 통신병', '통신장비', '해병대 모집', '운용병', '정비'],
-  },
-  {
-    id: 'navy-medical-2026-24',
-    title: '2026 해군 의무군무원 수시 채용',
-    branch: '해군',
-    category: '군무원',
-    deadline: '2026.06.02',
-    schedule: '접수 05.03 - 06.02 / 면접 06.16',
-    summary: '해군 병원과 의무대 근무 인력을 채용합니다.',
-    highlight: '임상경력 보유자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 군무원', '의무군무원', '해군 모집', '의료', '병원'],
-  },
-  {
-    id: 'airforce-data-2026-25',
-    title: '2026 공군 데이터분석 장교 모집',
-    branch: '공군',
-    category: '장교',
-    deadline: '2026.06.04',
-    schedule: '접수 05.05 - 06.04 / 면접 06.18',
-    summary: '작전 데이터 분석과 시뮬레이션 직무 중심 장교 모집입니다.',
-    highlight: '통계, 컴퓨터공학 전공 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 장교', '데이터분석', '시뮬레이션', '공군 모집', '작전분석'],
-  },
-  {
-    id: 'army-logistics-2026-26',
-    title: '2026 육군 군수지원 부사관 모집',
-    branch: '육군',
-    category: '부사관',
-    deadline: '2026.06.06',
-    schedule: '접수 05.07 - 06.06 / 필기 06.20',
-    summary: '물류, 보급, 수송 특기 중심의 군수지원 부사관 선발입니다.',
-    highlight: '물류관리 경력자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 군수지원', '육군 부사관', '보급', '육군 모집', '수송'],
-  },
-  {
-    id: 'navy-security-2026-27',
-    title: '2026 해군 기지방호 병 모집',
-    branch: '해군',
-    category: '병',
-    deadline: '2026.06.08',
-    schedule: '접수 05.09 - 06.08 / 발표 06.22',
-    summary: '기지 방호와 경계 지원 임무를 수행할 병 모집입니다.',
-    highlight: '체력검정 우수자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해군 병', '기지방호', '경계', '해군 모집', '방호'],
-  },
-  {
-    id: 'marine-amphibious-2026-28',
-    title: '2026 해병대 상륙장비 정비 부사관',
-    branch: '해병대',
-    category: '부사관',
-    deadline: '2026.06.10',
-    schedule: '접수 05.11 - 06.10 / 실기 06.24',
-    summary: '상륙돌격장갑차와 장비 정비 인력을 모집합니다.',
-    highlight: '기계정비 자격 보유자 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-    tags: ['해병대 부사관', '상륙장비', '정비', '해병대 모집', '기계'],
-  },
-  {
-    id: 'airforce-weather-2026-29',
-    title: '2026 공군 기상전문 군무원 모집',
-    branch: '공군',
-    category: '군무원',
-    deadline: '2026.06.12',
-    schedule: '접수 05.13 - 06.12 / 면접 06.26',
-    summary: '기상 분석과 항공기상 지원 직렬 군무원 모집입니다.',
-    highlight: '기상기사 자격증 우대',
-    imageUrl:
-      'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80',
-    tags: ['공군 군무원', '기상전문', '항공기상', '공군 모집', '기상기사'],
-  },
-  {
-    id: 'army-drone-2026-30',
-    title: '2026 육군 드론 운용장교 모집',
-    branch: '육군',
-    category: '장교',
-    deadline: '2026.06.14',
-    schedule: '접수 05.15 - 06.14 / 실기 06.28',
-    summary: '전술 드론 운용과 영상분석 임무를 맡을 장교 선발입니다.',
-    highlight: '드론 조종 자격 제출 권장',
-    imageUrl:
-      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',
-    tags: ['육군 드론병', '육군 장교', '드론 운용', '육군 모집', '영상분석'],
-  },
-];
+interface RecruitmentApiItem {
+  gunGbnm: string;
+  mojipGbnm: string;
+  mojipYy: string;
+  mojipTms: string;
+  gsteukgiCd: string;
+  gsteukgiNm: string;
+  iybudaeCdm: string;
+  seonbalPcnt: string;
+  jeopsuPcnt: string;
+  extremes: string;
+  rate: string;
+  jeopsuSjdtm: string;
+  jeopsuJrdtm: string;
+  iyyjsijakYm: string;
+  iyyjjongryoYm: string;
+  ipyeongDe: string;
+}
+
+const API_ENDPOINT = 'https://apis.data.go.kr/1300000/MJBGJWJeopSuHH4/list';
+const REQUEST_STEPS = [5, 10, 15, 20, 25, 30];
+const DATE_OFFSET_YEARS = 3;
+
+const rawDataServiceKey =
+  process.env.REACT_APP_DATA_SERVICE_KEY ||
+  process.env.REACT_DATA_SERVICE_KEY ||
+  '';
+
+export const hasRecruitmentServiceKey = Boolean(rawDataServiceKey);
+
+const readText = (parent: Element, tagName: keyof RecruitmentApiItem) =>
+  parent.querySelector(tagName)?.textContent?.trim() ?? '';
+
+const parseNumber = (value: string) => {
+  const normalized = value.replace(/[^\d.-]/g, '');
+
+  if (!normalized) {
+    return null;
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const padNumber = (value: number) => value.toString().padStart(2, '0');
+
+const addYearsToDateText = (value: string) => {
+  if (!/^\d{8}$/.test(value)) {
+    return '';
+  }
+
+  const year = Number(value.slice(0, 4)) + DATE_OFFSET_YEARS;
+  const month = value.slice(4, 6);
+  const day = value.slice(6, 8);
+
+  return `${year}${month}${day}`;
+};
+
+const addYearsToYearMonthText = (value: string) => {
+  if (!/^\d{6}$/.test(value)) {
+    return '';
+  }
+
+  const year = Number(value.slice(0, 4)) + DATE_OFFSET_YEARS;
+  const month = value.slice(4, 6);
+
+  return `${year}${month}`;
+};
+
+const formatDate = (value: string) => {
+  if (!/^\d{8}$/.test(value)) {
+    return value || '-';
+  }
+
+  return `${value.slice(0, 4)}.${value.slice(4, 6)}.${value.slice(6, 8)}`;
+};
+
+const formatYearMonth = (value: string) => {
+  if (!/^\d{6}$/.test(value)) {
+    return value || '-';
+  }
+
+  return `${value.slice(0, 4)}.${value.slice(4, 6)}`;
+};
+
+const parseDate = (value: string) => {
+  if (!/^\d{8}$/.test(value)) {
+    return null;
+  }
+
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(4, 6)) - 1;
+  const day = Number(value.slice(6, 8));
+
+  return new Date(year, month, day, 0, 0, 0, 0);
+};
+
+const parseYearMonthStart = (value: string) => {
+  if (!/^\d{6}$/.test(value)) {
+    return null;
+  }
+
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(4, 6)) - 1;
+
+  return new Date(year, month, 1, 0, 0, 0, 0);
+};
+
+const parseYearMonthEnd = (value: string) => {
+  if (!/^\d{6}$/.test(value)) {
+    return null;
+  }
+
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(4, 6));
+
+  return new Date(year, month, 0, 23, 59, 59, 999);
+};
+
+const getStatus = (item: RecruitmentApiItem): RecruitmentStatus => {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+
+  const receiptStart = parseDate(addYearsToDateText(item.jeopsuSjdtm));
+  const receiptEnd = parseDate(addYearsToDateText(item.jeopsuJrdtm));
+  const enlistmentStartFromMonth = parseYearMonthStart(addYearsToYearMonthText(item.iyyjsijakYm));
+  const enlistmentEnd = parseYearMonthEnd(addYearsToYearMonthText(item.iyyjjongryoYm));
+  const exactEntryDate = (() => {
+    if (/^\d{8}$/.test(item.ipyeongDe)) {
+      return parseDate(addYearsToDateText(item.ipyeongDe));
+    }
+
+    if (/^\d{6}$/.test(item.ipyeongDe)) {
+      return parseYearMonthStart(addYearsToYearMonthText(item.ipyeongDe));
+    }
+
+    return null;
+  })();
+  const enlistmentStart = exactEntryDate ?? enlistmentStartFromMonth;
+
+  if (enlistmentEnd && today > enlistmentEnd) {
+    return '입영 종료';
+  }
+
+  if (enlistmentStart && today >= enlistmentStart) {
+    return '입영 진행';
+  }
+
+  if (receiptEnd && today > receiptEnd) {
+    return '접수 종료';
+  }
+
+  if (receiptStart && receiptEnd && today >= receiptStart && today <= receiptEnd) {
+    return '접수 중';
+  }
+
+  return '모집 예정';
+};
+
+const getEntryDateLabel = (value: string) => {
+  if (/^\d{8}$/.test(value)) {
+    return formatDate(addYearsToDateText(value));
+  }
+
+  if (/^\d{6}$/.test(value)) {
+    return formatYearMonth(addYearsToYearMonthText(value));
+  }
+
+  return value && value !== '*' ? value : '미정';
+};
+
+const makePeriodLabel = (start: string, end: string, formatter: (value: string) => string) => {
+  const formattedStart = formatter(start);
+  const formattedEnd = formatter(end);
+
+  if (formattedStart === '-' && formattedEnd === '-') {
+    return '미정';
+  }
+
+  return `${formattedStart} - ${formattedEnd}`;
+};
+
+const normalizeItem = (item: RecruitmentApiItem): RecruitmentNotice => {
+  const branch = item.gunGbnm || '미분류';
+  const category = item.mojipGbnm || '미분류';
+  const specialty = item.gsteukgiNm || '특기 미정';
+  const unit = item.iybudaeCdm || '입영 부대 미정';
+  const roundLabel = `${item.mojipYy || '-'}년 ${item.mojipTms || '-'}회차`;
+  const selectedCount = parseNumber(item.seonbalPcnt);
+  const appliedCount = parseNumber(item.jeopsuPcnt);
+  const supportRate = item.rate ? `${item.rate}:1` : '집계 중';
+  const pressureGap = item.extremes || '집계 중';
+
+  return {
+    id: [
+      item.mojipYy,
+      item.mojipTms,
+      item.gsteukgiCd,
+      item.gunGbnm,
+      item.iybudaeCdm,
+    ]
+      .filter(Boolean)
+      .join('-'),
+    branch,
+    category,
+    title: `${branch} ${specialty}`,
+    unit,
+    roundLabel,
+    specialty,
+    appliedCount,
+    selectedCount,
+    pressureGap,
+    supportRate,
+    applicationPeriodLabel: makePeriodLabel(
+      addYearsToDateText(item.jeopsuSjdtm),
+      addYearsToDateText(item.jeopsuJrdtm),
+      formatDate
+    ),
+    enlistmentPeriodLabel: makePeriodLabel(
+      addYearsToYearMonthText(item.iyyjsijakYm),
+      addYearsToYearMonthText(item.iyyjjongryoYm),
+      formatYearMonth
+    ),
+    entryDateLabel: getEntryDateLabel(item.ipyeongDe),
+    status: getStatus(item),
+    tags: [
+      branch,
+      category,
+      specialty,
+      unit,
+      `${branch} ${category}`,
+      `${branch} ${specialty}`,
+      `${unit} ${specialty}`,
+    ].filter(Boolean),
+  };
+};
+
+const parseRecruitmentXml = (xmlText: string) => {
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlText, 'application/xml');
+
+  if (xml.querySelector('parsererror')) {
+    throw new Error('모병 모집 API 응답을 해석하지 못했습니다.');
+  }
+
+  const resultCode = xml.querySelector('resultCode')?.textContent?.trim();
+  const resultMessage = xml.querySelector('resultMsg')?.textContent?.trim();
+
+  if (resultCode && resultCode !== '00') {
+    throw new Error(resultMessage || '모병 모집 API 요청에 실패했습니다.');
+  }
+
+  return Array.from(xml.querySelectorAll('item')).map((item) =>
+    normalizeItem({
+      gunGbnm: readText(item, 'gunGbnm'),
+      mojipGbnm: readText(item, 'mojipGbnm'),
+      mojipYy: readText(item, 'mojipYy'),
+      mojipTms: readText(item, 'mojipTms'),
+      gsteukgiCd: readText(item, 'gsteukgiCd'),
+      gsteukgiNm: readText(item, 'gsteukgiNm'),
+      iybudaeCdm: readText(item, 'iybudaeCdm'),
+      seonbalPcnt: readText(item, 'seonbalPcnt'),
+      jeopsuPcnt: readText(item, 'jeopsuPcnt'),
+      extremes: readText(item, 'extremes'),
+      rate: readText(item, 'rate'),
+      jeopsuSjdtm: readText(item, 'jeopsuSjdtm'),
+      jeopsuJrdtm: readText(item, 'jeopsuJrdtm'),
+      iyyjsijakYm: readText(item, 'iyyjsijakYm'),
+      iyyjjongryoYm: readText(item, 'iyyjjongryoYm'),
+      ipyeongDe: readText(item, 'ipyeongDe'),
+    })
+  );
+};
+
+const dedupeRecruitmentNotices = (items: RecruitmentNotice[]) => {
+  const seen = new Set<string>();
+  const deduped: RecruitmentNotice[] = [];
+
+  items.forEach((item) => {
+    if (!item.id || seen.has(item.id)) {
+      return;
+    }
+
+    seen.add(item.id);
+    deduped.push(item);
+  });
+
+  return deduped;
+};
+
+export const fetchRecruitmentNotices = async (signal?: AbortSignal) => {
+  if (!rawDataServiceKey) {
+    throw new Error(
+      'REACT_APP_DATA_SERVICE_KEY 환경변수가 없습니다. react-scripts에서는 REACT_APP_ 접두사가 필요합니다.'
+    );
+  }
+
+  let lastSuccessfulItems: RecruitmentNotice[] = [];
+
+  for (const step of REQUEST_STEPS) {
+    const params = new URLSearchParams({
+      serviceKey: rawDataServiceKey,
+      pageNo: '1',
+      numOfRows: String(step),
+    });
+
+    const response = await fetch(`${API_ENDPOINT}?${params.toString()}`, {
+      method: 'GET',
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`모병 모집 API 요청이 실패했습니다. (${response.status})`);
+    }
+
+    const xmlText = await response.text();
+    const parsedItems = parseRecruitmentXml(xmlText);
+
+    if (parsedItems.length > 0) {
+      lastSuccessfulItems = parsedItems;
+    }
+  }
+
+  return dedupeRecruitmentNotices(lastSuccessfulItems).slice(0, 30);
+};
+
+export const getSuggestionList = (notices: RecruitmentNotice[], query: string) => {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const matchingNotices = notices.filter((notice) =>
+    [notice.title, notice.category, notice.branch, notice.specialty, notice.unit, ...notice.tags].some(
+      (term) => term.toLowerCase().includes(normalizedQuery)
+    )
+  );
+
+  const seen = new Set<string>();
+  const suggestions: string[] = [];
+
+  matchingNotices.forEach((notice) => {
+    notice.tags.forEach((tag) => {
+      if (!tag.toLowerCase().includes(normalizedQuery) || seen.has(tag)) {
+        return;
+      }
+
+      seen.add(tag);
+      suggestions.push(tag);
+    });
+  });
+
+  return suggestions.slice(0, 5);
+};

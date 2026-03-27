@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { RecruitmentNotice, recruitmentNotices } from './recruitmentData';
+import {
+  fetchRecruitmentNotices,
+  getSuggestionList,
+  hasRecruitmentServiceKey,
+  RecruitmentNotice,
+} from './recruitmentData';
 
 const itemsPerPage = 8;
 
@@ -9,98 +14,121 @@ const processSteps = [
     id: 'apply',
     icon: 'edit_square',
     title: '지원서 접수',
-    description: '희망 군별 공고를 선택하고 온라인으로 지원서를 제출합니다.',
+    description: '공고 확인 후 지원서를 제출하고 모집 조건을 검토합니다.',
   },
   {
     id: 'review',
     icon: 'fact_check',
-    title: '서류 및 적성 평가',
-    description: '제출 서류 검토와 필기, 적성검사 일정을 진행합니다.',
+    title: '접수 현황 확인',
+    description: '지원율과 과부족 인원을 기준으로 경쟁 상황을 빠르게 파악합니다.',
   },
   {
-    id: 'interview',
-    icon: 'groups',
-    title: '면접 및 체력 검정',
-    description: '직무 적합성과 군별 기준에 맞는 면접 및 체력평가를 받습니다.',
+    id: 'enlistment',
+    icon: 'calendar_month',
+    title: '입영 일정 확인',
+    description: '입영 시작월, 종료월, 입영년월값을 기준으로 일정 상태를 구분합니다.',
   },
   {
-    id: 'result',
+    id: 'status',
     icon: 'military_tech',
-    title: '최종 합격 발표',
-    description: '합격자 안내와 입영, 교육 일정이 순차적으로 공지됩니다.',
+    title: '모집 상태 반영',
+    description: '접수 종료, 입영 진행, 입영 종료 여부를 현재 날짜 기준으로 표시합니다.',
   },
 ];
 
-const branchStyles: Record<string, string> = {
-  육군: 'bg-blue-600 text-white',
-  해군: 'bg-cyan-600 text-white',
-  공군: 'bg-indigo-600 text-white',
-  해병대: 'bg-rose-600 text-white',
+const statusStyles: Record<RecruitmentNotice['status'], string> = {
+  '모집 예정': 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+  '접수 중': 'bg-blue-600 text-white dark:bg-blue-500 dark:text-white',
+  '접수 종료': 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+  '입영 진행': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
+  '입영 종료': 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300',
 };
+
+const branchStyles: Record<string, string> = {
+  육군: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+  해군: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300',
+  공군: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300',
+  해병대: 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
+};
+
+const getDefaultBranchStyle = () =>
+  'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
 
 const getSearchableTerms = (notice: RecruitmentNotice) => [
   notice.title,
   notice.branch,
   notice.category,
-  notice.highlight,
-  notice.summary,
+  notice.specialty,
+  notice.unit,
+  notice.roundLabel,
+  notice.supportRate,
+  notice.status,
   ...notice.tags,
 ];
-
-const getSuggestionPool = () => {
-  const seen = new Set<string>();
-  const suggestions: string[] = [];
-
-  recruitmentNotices.forEach((notice) => {
-    notice.tags.forEach((tag) => {
-      if (seen.has(tag)) {
-        return;
-      }
-
-      seen.add(tag);
-      suggestions.push(tag);
-    });
-  });
-
-  return suggestions;
-};
-
-const suggestionPool = getSuggestionPool();
 
 export const RecruitmentPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSuggestion, setSelectedSuggestion] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [notices, setNotices] = useState<RecruitmentNotice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadRecruitmentNotices = async () => {
+      if (!hasRecruitmentServiceKey) {
+        setErrorMessage(
+          '모병 모집 API 키가 없습니다. frontend 환경변수에 REACT_APP_DATA_SERVICE_KEY를 설정해 주세요.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setErrorMessage('');
+
+        const nextNotices = await fetchRecruitmentNotices(controller.signal);
+        setNotices(nextNotices);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        const message =
+          error instanceof Error ? error.message : '모병 모집 데이터를 불러오지 못했습니다.';
+        setErrorMessage(message);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadRecruitmentNotices();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const suggestions = useMemo(() => {
-    if (!normalizedQuery) {
-      return [];
-    }
-
-    return suggestionPool
-      .filter((item) => item.toLowerCase().includes(normalizedQuery))
-      .slice(0, 5);
-  }, [normalizedQuery]);
+  const suggestions = useMemo(() => getSuggestionList(notices, searchQuery), [notices, searchQuery]);
 
   const filteredNotices = useMemo(() => {
-    if (selectedSuggestion) {
-      const normalizedSuggestion = selectedSuggestion.toLowerCase();
+    const activeQuery = (selectedSuggestion || searchQuery).trim().toLowerCase();
 
-      return recruitmentNotices.filter((notice) =>
-        getSearchableTerms(notice).some((term) => term.toLowerCase().includes(normalizedSuggestion))
-      );
+    if (!activeQuery) {
+      return notices;
     }
 
-    if (!normalizedQuery) {
-      return recruitmentNotices;
-    }
-
-    return recruitmentNotices.filter((notice) =>
-      getSearchableTerms(notice).some((term) => term.toLowerCase().includes(normalizedQuery))
+    return notices.filter((notice) =>
+      getSearchableTerms(notice).some((term) => term.toLowerCase().includes(activeQuery))
     );
-  }, [normalizedQuery, selectedSuggestion]);
+  }, [notices, searchQuery, selectedSuggestion]);
 
   const totalPages = Math.max(1, Math.ceil(filteredNotices.length / itemsPerPage));
   const visibleNotices = filteredNotices.slice(
@@ -128,11 +156,11 @@ export const RecruitmentPage: React.FC = () => {
               Recruitment
             </p>
             <h1 className="text-4xl font-black tracking-tight text-slate-950 lg:text-6xl dark:text-white">
-              인재 채용
+              모병 모집
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 lg:text-lg dark:text-slate-300">
-              군별 모집 공고를 한 곳에서 비교하고, 관심 직무를 바로 좁혀볼 수 있도록 정리한
-              채용 페이지입니다. 검색어로 관련 전형을 찾고, 선택한 조건에 맞는 공고만 빠르게
+              병무청 공공데이터를 기준으로 모집 공고를 불러오고, 군구분과 군사특기 중심으로
+              정리한 페이지입니다. 접수 기간, 지원율, 과부족, 입영 진행 상태를 한 화면에서
               확인할 수 있습니다.
             </p>
           </div>
@@ -148,7 +176,7 @@ export const RecruitmentPage: React.FC = () => {
                 </h2>
               </div>
               <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
-                총 30건
+                총 {notices.length}건
               </span>
             </div>
 
@@ -167,7 +195,7 @@ export const RecruitmentPage: React.FC = () => {
                     setSearchQuery(event.target.value);
                     setSelectedSuggestion('');
                   }}
-                  placeholder="예: 육군, 공군, 군무원, 드론"
+                  placeholder="예: 육군, 전문기술병, 공병, 해병대"
                   className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
                 />
               </div>
@@ -218,7 +246,7 @@ export const RecruitmentPage: React.FC = () => {
                   선택 필터
                 </p>
                 <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
-                  {selectedSuggestion || '전체 보기'}
+                  {selectedSuggestion || (normalizedQuery ? searchQuery : '전체 보기')}
                 </p>
               </div>
             </div>
@@ -239,103 +267,162 @@ export const RecruitmentPage: React.FC = () => {
           <div className="text-sm text-slate-500 dark:text-slate-400">
             {selectedSuggestion
               ? `${selectedSuggestion} 관련 공고를 보여주고 있습니다.`
-              : '군별, 직무별 공고를 페이지 단위로 탐색할 수 있습니다.'}
+              : '군구분코드명과 군사특기명을 기준으로 공고를 탐색할 수 있습니다.'}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {visibleNotices.map((notice) => (
-            <article
-              key={notice.id}
-              className="group overflow-hidden rounded-[26px] border border-slate-100 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(37,99,235,0.12)] dark:border-slate-800 dark:bg-slate-900"
-            >
-              <div className="relative aspect-[5/4] overflow-hidden">
-                <img
-                  src={notice.imageUrl}
-                  alt={notice.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent" />
-                <div className="absolute left-4 top-4 flex items-center gap-2">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${branchStyles[notice.branch]}`}
-                  >
-                    {notice.branch}
-                  </span>
-                  <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 backdrop-blur dark:bg-slate-950/80 dark:text-slate-200">
-                    {notice.category}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex min-h-[260px] flex-col p-5">
-                <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                  <span>마감 {notice.deadline}</span>
-                  <span>{notice.schedule.split('/')[0].trim()}</span>
-                </div>
-                <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  {notice.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  {notice.summary}
-                </p>
-                <div className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-300">
-                  {notice.highlight}
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {notice.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="mt-auto inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-600 dark:bg-white dark:text-slate-950 dark:hover:bg-blue-300"
-                >
-                  자세히 보기
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {visibleNotices.length === 0 ? (
+        {isLoading ? (
           <div className="rounded-3xl border border-dashed border-slate-300 px-6 py-16 text-center text-sm font-medium text-slate-500 dark:border-slate-700 dark:text-slate-400">
-            일치하는 모집 공고가 없습니다. 다른 검색어를 입력하거나 제안을 선택해 보세요.
+            모병 모집 데이터를 불러오는 중입니다.
           </div>
         ) : null}
 
-        {filteredNotices.length > 0 ? (
-          <div className="mt-12 flex items-center justify-center gap-6">
-            <button
-              type="button"
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <span className="material-symbols-outlined" translate="no">
-                chevron_left
-              </span>
-            </button>
-            <div className="text-sm font-bold tracking-[0.24em] text-slate-700 dark:text-slate-200">
-              {currentPage} / {totalPages}
-            </div>
-            <button
-              type="button"
-              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <span className="material-symbols-outlined" translate="no">
-                chevron_right
-              </span>
-            </button>
+        {!isLoading && errorMessage ? (
+          <div className="rounded-3xl border border-dashed border-rose-200 bg-rose-50 px-6 py-16 text-center text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
+            {errorMessage}
           </div>
+        ) : null}
+
+        {!isLoading && !errorMessage ? (
+          <>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+              {visibleNotices.map((notice) => (
+                <article
+                  key={notice.id}
+                  className="flex min-h-[370px] flex-col rounded-[26px] border border-slate-100 bg-slate-50 p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(37,99,235,0.12)] dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-wrap gap-2">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          branchStyles[notice.branch] || getDefaultBranchStyle()
+                        }`}
+                      >
+                        {notice.branch}
+                      </span>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                        {notice.category}
+                      </span>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusStyles[notice.status]}`}>
+                      {notice.status}
+                    </span>
+                  </div>
+
+                  <div className="mt-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                      {notice.roundLabel}
+                    </p>
+                    <h3 className="mt-2 text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                      {notice.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                      입영 부대: {notice.unit}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                      군사특기: {notice.specialty}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl bg-white px-4 py-3 dark:bg-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        지원율
+                      </p>
+                      <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                        {notice.supportRate}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl bg-white px-4 py-3 dark:bg-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        과부족
+                      </p>
+                      <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                        {notice.pressureGap}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 space-y-3 rounded-2xl bg-white px-4 py-4 text-sm dark:bg-slate-800">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="font-semibold text-slate-500 dark:text-slate-400">접수 인원</span>
+                      <span className="text-right font-bold text-slate-900 dark:text-white">
+                        {notice.appliedCount ?? '-'} / {notice.selectedCount ?? '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="font-semibold text-slate-500 dark:text-slate-400">모집 기간</span>
+                      <span className="text-right font-medium text-slate-900 dark:text-white">
+                        {notice.applicationPeriodLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="font-semibold text-slate-500 dark:text-slate-400">입영 기간</span>
+                      <span className="text-right font-medium text-slate-900 dark:text-white">
+                        {notice.enlistmentPeriodLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="font-semibold text-slate-500 dark:text-slate-400">입영년월값</span>
+                      <span className="text-right font-medium text-slate-900 dark:text-white">
+                        {notice.entryDateLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {notice.tags.slice(0, 3).map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setSelectedSuggestion(tag);
+                          setSearchQuery(tag);
+                        }}
+                        className="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition-colors hover:bg-blue-100 hover:text-blue-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {visibleNotices.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-slate-300 px-6 py-16 text-center text-sm font-medium text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                일치하는 모집 공고가 없습니다. 다른 검색어를 입력하거나 제안을 선택해 보세요.
+              </div>
+            ) : null}
+
+            {filteredNotices.length > 0 ? (
+              <div className="mt-12 flex items-center justify-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <span className="material-symbols-outlined" translate="no">
+                    chevron_left
+                  </span>
+                </button>
+                <div className="text-sm font-bold tracking-[0.24em] text-slate-700 dark:text-slate-200">
+                  {currentPage} / {totalPages}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <span className="material-symbols-outlined" translate="no">
+                    chevron_right
+                  </span>
+                </button>
+              </div>
+            ) : null}
+          </>
         ) : null}
       </section>
 
@@ -346,12 +433,12 @@ export const RecruitmentPage: React.FC = () => {
               Process
             </p>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-              선발 절차 안내
+              데이터 반영 기준
             </h2>
           </div>
           <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            군별 전형은 세부 일정이 다르지만, 대부분 지원서 접수부터 최종 합격 발표까지 비슷한
-            흐름으로 진행됩니다.
+            공공데이터 원본 날짜는 현재 시점과 차이가 커서, 페이지에서는 요구사항에 맞게 3년을 더한
+            일정으로 표시하고 상태를 계산합니다.
           </p>
         </div>
 
