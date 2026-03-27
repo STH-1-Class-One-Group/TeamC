@@ -1,11 +1,30 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query, Request, Response
+from pydantic import BaseModel
 
+from app.services.news_bookmarks import (
+    create_news_bookmark,
+    delete_news_bookmark,
+    list_news_bookmarks,
+)
 from app.services.news_fetcher import debug_defense_news, get_defense_news
 
 router = APIRouter()
+
+
+class BookmarkNewsPayload(BaseModel):
+    id: Optional[str] = None
+    title: str
+    link: str
+    pubDate: Optional[str] = ""
+    thumbnail: Optional[str] = ""
+
+
+class BookmarkCreateRequest(BaseModel):
+    news_id: Optional[str] = None
+    news: Optional[BookmarkNewsPayload] = None
 
 
 @router.get("/news", response_model=List[Dict])
@@ -34,6 +53,34 @@ async def fetch_defense_news_debug(
         limit=limit,
         start=start,
         force_refresh=force_refresh,
+        user_authorization=request.headers.get("Authorization"),
+    )
+
+
+@router.get("/news/bookmarks", response_model=List[Dict[str, Any]])
+async def fetch_news_bookmarks(request: Request):
+    return await list_news_bookmarks(request.headers.get("Authorization"))
+
+
+@router.post("/news/bookmarks", response_model=Dict[str, Any])
+async def save_news_bookmark(request: Request, payload: BookmarkCreateRequest):
+    return await create_news_bookmark(
+        news_id=payload.news_id,
+        news=(
+            payload.news.model_dump()
+            if payload.news and hasattr(payload.news, "model_dump")
+            else payload.news.dict()
+            if payload.news
+            else None
+        ),
+        user_authorization=request.headers.get("Authorization"),
+    )
+
+
+@router.delete("/news/bookmarks/{news_id}", response_model=Dict[str, bool])
+async def remove_news_bookmark(request: Request, news_id: str):
+    return await delete_news_bookmark(
+        news_id=news_id,
         user_authorization=request.headers.get("Authorization"),
     )
 
