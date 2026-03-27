@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
             }
           >
-            Shopping
+            쇼핑
           </NavLink>
           <NavLink
             to="/Dashboard"
@@ -102,13 +102,13 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
             }
           >
-            Dashboard
+            대시보드
           </NavLink>
           <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
-            Armed Reserve
+            동원훈련
           </a>
           <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
-            Recruitment
+            모집정보
           </a>
           <NavLink
             to="/Community"
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight"
             }
           >
-            Community
+            커뮤니티
           </NavLink>
         </div>
 

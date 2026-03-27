@@ -16,9 +16,9 @@ export interface SearchBarProps {
 }
 
 const DEFAULT_PLACEHOLDERS: Record<SearchType, string> = {
-  food: 'Search products or nutrition info',
-  news: 'Search news by title or date',
-  recruitment: 'Search recruitment information',
+  food: '상품명 또는 영양 정보 검색',
+  news: '뉴스 제목 또는 날짜로 검색',
+  recruitment: '채용 정보 검색',
 };
 
 const getFoodImageUrl = (imageUrl: string) => {
@@ -157,7 +157,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <div className="text-sm font-bold text-on-surface dark:text-white mb-1">{item.name}</div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-extrabold text-primary dark:text-blue-400">
-                {typeof item.price === 'number' ? `${item.price.toLocaleString()} won` : ''}
+                {typeof item.price === 'number' ? `${item.price.toLocaleString()}원` : ''}
               </span>
               <span className="text-[10px] text-on-surface-variant dark:text-slate-400 bg-surface-container-low dark:bg-slate-700 px-1.5 py-0.5 rounded">
                 {item.calories} kcal
@@ -207,7 +207,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             handleSelect(results[0]);
           }
         }}
-        aria-label="Submit search"
+        aria-label="검색 실행"
       >
         <span className="material-symbols-outlined text-[20px]" translate="no">arrow_forward</span>
       </button>
@@ -215,7 +215,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {showDropdown && query.trim() ? (
         <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-800 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] border border-slate-100 dark:border-slate-700 overflow-hidden z-50">
           {loading ? (
-            <div className="p-4 text-center text-sm text-slate-500">Searching...</div>
+            <div className="p-4 text-center text-sm text-slate-500">검색 중...</div>
           ) : results.length > 0 ? (
             <ul>
               {results.map((item, index) => (
@@ -229,7 +229,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-center text-sm text-slate-500">No results found.</div>
+            <div className="p-4 text-center text-sm text-slate-500">결과가 없습니다.</div>
           )}
         </div>
       ) : null}
