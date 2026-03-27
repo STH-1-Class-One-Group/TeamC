@@ -17,6 +17,15 @@ type OAuthProvider = 'google' | 'kakao' | 'naver';
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
+  const getRedirectTo = () => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const { origin, pathname, search } = window.location;
+    return `${origin}${pathname}${search}`;
+  };
+
   const handleLogin = async (provider: OAuthProvider) => {
     if (!hasSupabaseConfig) {
       alert(getSupabaseConfigErrorMessage());
@@ -26,14 +35,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider as Parameters<typeof supabase.auth.signInWithOAuth>[0]['provider'],
-        options:
-          provider === 'google'
+        options: {
+          redirectTo: getRedirectTo(),
+          ...(provider === 'google'
             ? {
                 queryParams: {
                   prompt: 'select_account',
                 },
               }
-            : undefined,
+            : {}),
+        },
       });
 
       if (error) {
