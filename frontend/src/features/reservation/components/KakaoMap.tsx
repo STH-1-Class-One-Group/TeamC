@@ -6,11 +6,17 @@ interface KakaoMapProps {
   centers: TrainingCenter[];
   focusedCenter?: TrainingCenter | null;
   onMarkerClick?: (center: TrainingCenter) => void;
+  emptyMessage?: string;
 }
 
 const KAKAO_MAP_KEY = process.env.REACT_APP_KAKAO_MAP_KEY?.trim() || '';
 
-export const KakaoMap: React.FC<KakaoMapProps> = ({ centers, focusedCenter, onMarkerClick }) => {
+export const KakaoMap: React.FC<KakaoMapProps> = ({
+  centers,
+  focusedCenter,
+  onMarkerClick,
+  emptyMessage,
+}) => {
   const [loading, error] = useKakaoLoader({
     appkey: KAKAO_MAP_KEY,
   });
@@ -213,6 +219,11 @@ export const KakaoMap: React.FC<KakaoMapProps> = ({ centers, focusedCenter, onMa
           </CustomOverlayMap>
         )}
       </Map>
+      {validCenters.length === 0 && emptyMessage && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/90 dark:bg-slate-900/90 text-xs font-medium text-on-surface-variant dark:text-slate-300 shadow-md border border-outline-variant/20 dark:border-slate-700 pointer-events-none">
+          {emptyMessage}
+        </div>
+      )}
     </div>
   );
 };

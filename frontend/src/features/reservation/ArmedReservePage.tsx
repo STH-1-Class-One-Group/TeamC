@@ -17,6 +17,25 @@ const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number): nu
 };
 
 const SIDO_LIST = Array.from(new Set(TRAINING_CENTERS.map((center) => center.sido))).sort();
+const SIDO_LABELS: Record<string, string> = {
+  '강원특별자치도': '강원',
+  '경기도': '경기',
+  '경상남도': '경남',
+  '경상북도': '경북',
+  '광주광역시': '광주',
+  '대구광역시': '대구',
+  '대전광역시': '대전',
+  '부산광역시': '부산',
+  '서울특별시': '서울',
+  '세종특별자치시': '세종',
+  '울산광역시': '울산',
+  '인천광역시': '인천',
+  '전라남도': '전남',
+  '전북특별자치도': '전북',
+  '제주특별자치도': '제주',
+  '충청남도': '충남',
+  '충청북도': '충북',
+};
 
 const getZonesForSido = (sido: string) =>
   Array.from(
@@ -27,16 +46,33 @@ const getZonesForSido = (sido: string) =>
     )
   ).sort();
 
+const matchesTrainingCenterSearch = (center: TrainingCenter, query: string) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  const aliases = center.aliases.join(' ').toLowerCase();
+  const zones = center.zones.join(' ').toLowerCase();
+  return (
+    center.name.toLowerCase().includes(normalizedQuery) ||
+    aliases.includes(normalizedQuery) ||
+    center.address.toLowerCase().includes(normalizedQuery) ||
+    zones.includes(normalizedQuery)
+  );
+};
+
 export const ArmedReservePage: React.FC = () => {
-  const [selectedSido, setSelectedSido] = useState(SIDO_LIST[0] || '');
+  const [selectedSido, setSelectedSido] = useState('');
   const [selectedZone, setSelectedZone] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [focusedCenter, setFocusedCenter] = useState<TrainingCenter | null>(null);
   const [highlightedCenterId, setHighlightedCenterId] = useState<string | null>(null);
   const [modalCenter, setModalCenter] = useState<TrainingCenter | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
 
-  const zones = useMemo(() => getZonesForSido(selectedSido), [selectedSido]);
+  const zones = useMemo(() => (selectedSido ? getZonesForSido(selectedSido) : []), [selectedSido]);
 
   useEffect(() => {
     if (selectedZone && !zones.includes(selectedZone)) {
@@ -67,6 +103,10 @@ export const ArmedReservePage: React.FC = () => {
   }, []);
 
   const filteredCenters = useMemo(() => {
+    if (!selectedSido) {
+      return [];
+    }
+
     const bySido = TRAINING_CENTERS.filter((center) => center.sido === selectedSido);
 
     if (!selectedZone) {
@@ -76,18 +116,32 @@ export const ArmedReservePage: React.FC = () => {
     return bySido.filter((center) => center.zones.includes(selectedZone));
   }, [selectedSido, selectedZone]);
 
-  const sortedCenters = useMemo(() => {
-    if (!userLocation) {
+  const visibleCenters = useMemo(() => {
+    if (!searchQuery.trim()) {
       return filteredCenters;
     }
 
-    return filteredCenters
+    return TRAINING_CENTERS.filter((center) => matchesTrainingCenterSearch(center, searchQuery));
+  }, [filteredCenters, searchQuery]);
+
+  const sortedCenters = useMemo(() => {
+    if (!userLocation) {
+      return visibleCenters;
+    }
+
+    return visibleCenters
       .map((center) => ({
         ...center,
         distance: haversineKm(userLocation.lat, userLocation.lng, center.lat, center.lng),
       }))
       .sort((left, right) => (left.distance ?? Infinity) - (right.distance ?? Infinity));
-  }, [filteredCenters, userLocation]);
+  }, [visibleCenters, userLocation]);
+
+  const emptyStateMessage = searchQuery.trim()
+    ? '검색 결과가 없습니다.'
+    : !selectedSido
+      ? '시/도를 먼저 선택해주세요.'
+      : '해당 지역에 훈련장이 없습니다.';
 
   return (
     <div className="space-y-12 w-full">
@@ -101,7 +155,7 @@ export const ArmedReservePage: React.FC = () => {
               내 주변 훈련소 정보와 예약을 한눈에 관리하세요.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
             <button
               onClick={requestUserLocation}
               disabled={locationLoading}
@@ -129,11 +183,12 @@ export const ArmedReservePage: React.FC = () => {
               id="sido-select"
               value={selectedSido}
               onChange={(event) => setSelectedSido(event.target.value)}
-              className="bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-on-surface dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              className="w-28 md:w-32 bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             >
+              <option value="">시/도 선택</option>
               {SIDO_LIST.map((sido) => (
                 <option key={sido} value={sido}>
-                  {sido}
+                  {SIDO_LABELS[sido] ?? sido}
                 </option>
               ))}
             </select>
@@ -141,9 +196,10 @@ export const ArmedReservePage: React.FC = () => {
               id="zone-select"
               value={selectedZone}
               onChange={(event) => setSelectedZone(event.target.value)}
-              className="bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-on-surface dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              disabled={!selectedSido}
+              className="w-36 md:w-44 bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="">전체 구/군</option>
+              <option value="">{selectedSido ? '전체 구/군' : '구/군 선택'}</option>
               {zones.map((zone) => (
                 <option key={zone} value={zone}>
                   {zone}
@@ -160,12 +216,20 @@ export const ArmedReservePage: React.FC = () => {
             centers={sortedCenters}
             focusedCenter={focusedCenter}
             onMarkerClick={(center) => setHighlightedCenterId(center.id)}
+            emptyMessage={searchQuery.trim()
+              ? '검색 결과로 표시할 훈련장이 없습니다.'
+              : !selectedSido
+                ? '시/도를 선택하면 훈련장 위치를 지도에서 볼 수 있습니다.'
+                : '선택한 지역에 표시할 훈련장이 없습니다.'}
           />
         </div>
         <div className="lg:col-span-4">
           <TrainingCenterList
             centers={sortedCenters}
             isLoading={false}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+            emptyStateMessage={emptyStateMessage}
             onPreviewClick={(center) => {
               setFocusedCenter(center);
               setHighlightedCenterId(center.id);
