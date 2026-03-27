@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { KakaoMap } from './components/KakaoMap';
 import { TrainingCenterList } from './components/TrainingCenterList';
+import { TrainingCenterModal } from './components/TrainingCenterModal';
 import { TrainingCenter, RAW_TRAINING_CENTERS } from './data/trainingCenters';
 
 const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
@@ -39,6 +40,7 @@ export const ArmedReservePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedCenter, setFocusedCenter] = useState<TrainingCenter | null>(null);
   const [highlightedCenterId, setHighlightedCenterId] = useState<string | null>(null);
+  const [modalCenter, setModalCenter] = useState<TrainingCenter | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
 
@@ -167,9 +169,21 @@ export const ArmedReservePage: React.FC = () => {
           <KakaoMap centers={sortedCenters} focusedCenter={focusedCenter} onMarkerClick={(c) => setHighlightedCenterId(c.id)} />
         </div>
         <div className="lg:col-span-4">
-          <TrainingCenterList centers={sortedCenters} isLoading={isLoading} onDetailClick={setFocusedCenter} highlightedCenterId={highlightedCenterId} />
+          <TrainingCenterList
+            centers={sortedCenters}
+            isLoading={isLoading}
+            onDetailClick={(c) => {
+              setFocusedCenter(c);
+              setModalCenter(c);
+            }}
+            highlightedCenterId={highlightedCenterId}
+          />
         </div>
       </div>
+
+      {modalCenter && (
+        <TrainingCenterModal center={modalCenter} onClose={() => setModalCenter(null)} />
+      )}
     </div>
   );
 };
