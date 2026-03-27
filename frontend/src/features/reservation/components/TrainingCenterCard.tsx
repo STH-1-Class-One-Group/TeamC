@@ -29,6 +29,11 @@ export const TrainingCenterCard: React.FC<TrainingCenterCardProps> = ({ center, 
             <span className="text-xs text-on-surface-variant dark:text-slate-400 font-medium">
               {center.zone}
             </span>
+            {center.distance != null && (
+              <span className="text-xs text-primary dark:text-blue-400 font-bold">
+                {center.distance < 1 ? `${Math.round(center.distance * 1000)}m` : `${center.distance.toFixed(1)}km`}
+              </span>
+            )}
           </div>
         </div>
       </div>

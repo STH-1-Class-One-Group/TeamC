@@ -1,7 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { KakaoMap } from './components/KakaoMap';
 import { TrainingCenterList } from './components/TrainingCenterList';
 import { TrainingCenter, RAW_TRAINING_CENTERS } from './data/trainingCenters';
+
+const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
 
 const SIDO_LIST = Array.from(new Set(RAW_TRAINING_CENTERS.map((c) => c.sido))).sort();
 
@@ -30,6 +39,31 @@ export const ArmedReservePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedCenter, setFocusedCenter] = useState<TrainingCenter | null>(null);
   const [highlightedCenterId, setHighlightedCenterId] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const requestUserLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationLoading(false);
+      },
+      () => setLocationLoading(false),
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
+
+  const sortedCenters = useMemo(() => {
+    if (!userLocation) return centers;
+    return centers
+      .map((c) => ({
+        ...c,
+        distance: c.lat !== 0 ? haversineKm(userLocation.lat, userLocation.lng, c.lat, c.lng) : undefined,
+      }))
+      .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+  }, [centers, userLocation]);
 
   useEffect(() => {
     const zoneList = getZonesForSido(selectedSido);
@@ -86,6 +120,20 @@ export const ArmedReservePage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={requestUserLocation}
+              disabled={locationLoading}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors ${
+                userLocation
+                  ? 'bg-primary/10 dark:bg-blue-900/30 text-primary dark:text-blue-400 border border-primary/30 dark:border-blue-500/30'
+                  : 'bg-surface-container-high dark:bg-slate-800 text-on-surface dark:text-slate-200 border border-outline-variant/30 dark:border-slate-700 hover:bg-surface-dim dark:hover:bg-slate-700'
+              }`}
+            >
+              <span className={`material-symbols-outlined text-lg ${locationLoading ? 'animate-spin' : ''}`} translate="no">
+                {locationLoading ? 'progress_activity' : 'my_location'}
+              </span>
+              {userLocation ? '내 위치 기준' : '내 위치'}
+            </button>
             <label htmlFor="sido-select" className="text-sm font-medium text-on-surface-variant dark:text-slate-400 whitespace-nowrap">
               지역 선택
             </label>
@@ -116,10 +164,10 @@ export const ArmedReservePage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-8">
-          <KakaoMap centers={centers} focusedCenter={focusedCenter} onMarkerClick={(c) => setHighlightedCenterId(c.id)} />
+          <KakaoMap centers={sortedCenters} focusedCenter={focusedCenter} onMarkerClick={(c) => setHighlightedCenterId(c.id)} />
         </div>
         <div className="lg:col-span-4">
-          <TrainingCenterList centers={centers} isLoading={isLoading} onDetailClick={setFocusedCenter} highlightedCenterId={highlightedCenterId} />
+          <TrainingCenterList centers={sortedCenters} isLoading={isLoading} onDetailClick={setFocusedCenter} highlightedCenterId={highlightedCenterId} />
         </div>
       </div>
     </div>

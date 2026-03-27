@@ -11,6 +11,7 @@ export interface TrainingCenter {
   lat: number;
   lng: number;
   markerLabel: string;
+  distance?: number; // km from user's location
 }
 
 // Raw data from yebigun1.mil.kr (286 centers)
