@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../api/supabaseClient';
 
 interface LoginModalProps {
@@ -70,8 +71,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="mt-8 text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          로그인 시 Modern Sentinel의 <a href="#" className="underline hover:text-primary">이용약관</a> 및 <br/>
-          <a href="#" className="underline hover:text-primary">개인정보처리방침</a>에 동의하게 됩니다.
+          로그인 시 Modern Sentinel의{' '}
+          <Link to="/terms" onClick={onClose} className="underline hover:text-primary">
+            이용약관
+          </Link>
+          {' '}및 <br />
+          <Link to="/privacy" onClick={onClose} className="underline hover:text-primary">
+            개인정보처리방침
+          </Link>
+          에 동의하게 됩니다.
         </div>
       </div>
     </div>

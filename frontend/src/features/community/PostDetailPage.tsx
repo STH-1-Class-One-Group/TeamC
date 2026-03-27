@@ -13,6 +13,17 @@ interface PostDetailPageProps {
 }
 
 const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const VIEW_TRACK_TTL_MS = 3000;
+const recentViewRequests = new Map<string, number>();
+
+const shouldSkipViewTracking = (postId: string) => {
+  const lastRequestedAt = recentViewRequests.get(postId);
+  if (!lastRequestedAt) {
+    return false;
+  }
+
+  return Date.now() - lastRequestedAt < VIEW_TRACK_TTL_MS;
+};
 
 export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile }) => {
   const { postId } = useParams<{ postId: string }>();
@@ -23,10 +34,66 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
 
   useEffect(() => {
     if (!postId) return;
-    fetch(`${apiUrl}/api/v1/community/posts/${postId}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setPost(data))
-      .finally(() => setIsLoading(false));
+    const controller = new AbortController();
+    let isActive = true;
+
+    const loadPost = async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await fetch(`${apiUrl}/api/v1/community/posts/${postId}`, {
+          signal: controller.signal,
+        });
+
+        const data = res.ok ? await res.json() : null;
+        if (!isActive) {
+          return;
+        }
+
+        setPost(data);
+
+        if (!data || shouldSkipViewTracking(postId)) {
+          return;
+        }
+
+        recentViewRequests.set(postId, Date.now());
+
+        const incrementRes = await fetch(`${apiUrl}/api/v1/community/posts/${postId}/views`, {
+          method: 'POST',
+          signal: controller.signal,
+        });
+
+        if (!incrementRes.ok) {
+          recentViewRequests.delete(postId);
+          return;
+        }
+
+        if (isActive) {
+          setPost((currentPost) => (
+            currentPost
+              ? { ...currentPost, views: currentPost.views + 1 }
+              : currentPost
+          ));
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        console.error(error);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadPost();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
   }, [postId]);
 
   const isOwner = user && post && user.id === post.author.id;

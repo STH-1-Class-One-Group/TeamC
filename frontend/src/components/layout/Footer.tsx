@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   return (
@@ -8,24 +9,24 @@ export const Footer: React.FC = () => {
           © 2024 Modern Sentinel Military Services. All rights reserved.
         </div>
         <div className="flex gap-8">
-          <a
+          <Link
             className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs"
-            href="#"
+            to="/terms"
           >
             Terms of Service
-          </a>
-          <a
+          </Link>
+          <Link
             className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs"
-            href="#"
+            to="/privacy"
           >
             Privacy Policy
-          </a>
-          <a
+          </Link>
+          <Link
             className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-opacity opacity-80 hover:opacity-100 text-xs"
-            href="#"
+            to="/support"
           >
             Support
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

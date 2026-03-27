@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Header
+from fastapi import APIRouter, HTTPException, Query, Header
 from typing import Literal, Optional
 from app.schemas.community_schema import PostCreate, PostUpdate, CommentCreate
 from app.services import community_service
@@ -44,13 +44,21 @@ async def list_posts(
 # 게시글 상세
 # ────────────────────────────────────────────────────────────
 @router.get("/community/posts/{post_id}")
-async def get_post(post_id: str, background_tasks: BackgroundTasks):
-    """게시글 상세 조회 + 조회수 증가 (비로그인 허용)."""
+async def get_post(post_id: str):
+    """게시글 상세 조회 (비로그인 허용)."""
     post = await community_service.get_post_detail(post_id)
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
-    background_tasks.add_task(community_service.increment_views, post_id)
     return post
+
+
+@router.post("/community/posts/{post_id}/views", status_code=204)
+async def increment_post_views(post_id: str):
+    """게시글 조회수 증가."""
+    post = await community_service.get_post_detail(post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
+    await community_service.increment_views(post_id)
 
 
 # ────────────────────────────────────────────────────────────

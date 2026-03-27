@@ -15,6 +15,9 @@ import { CommunityPage } from './features/community/CommunityPage';
 import { PostDetailPage } from './features/community/PostDetailPage';
 import { PostWritePage } from './features/community/PostWritePage';
 import PaymentSuccess from './features/cart/components/PaymentSuccess';
+import { TermsOfServicePage } from './features/legal/TermsOfServicePage';
+import { PrivacyPolicyPage } from './features/legal/PrivacyPolicyPage';
+import { SupportPage } from './features/legal/SupportPage';
 
 type StorageEntry = {
   key: string;
@@ -196,6 +199,9 @@ const App: React.FC = () => {
               <Route path="/Community/write" element={<PostWritePage user={user} profile={profile ?? null} />} />
               <Route path="/Community/:postId" element={<PostDetailPage user={user} profile={profile ?? null} />} />
               <Route path="/Community/:postId/edit" element={<PostWritePage user={user} profile={profile ?? null} />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/support" element={<SupportPage />} />
             </Routes>
           </main>
           <Footer />
