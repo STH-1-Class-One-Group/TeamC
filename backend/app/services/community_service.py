@@ -179,6 +179,32 @@ def _author_payload(profile: Any) -> dict[str, Any]:
     }
 
 
+async def _fetch_profiles_map(author_ids: list[str]) -> dict[str, dict[str, Any]]:
+    normalized_ids = sorted({author_id for author_id in author_ids if author_id})
+    if not normalized_ids:
+        return {}
+
+    try:
+        response = await _request(
+            "GET",
+            f"{_get_supabase_rest_url()}/profiles",
+            headers=_base_headers(),
+            params={
+                "select": "id,nickname,rank,avatar_url",
+                "id": f"in.({','.join(normalized_ids)})",
+            },
+        )
+        rows = response.json()
+        return {
+            row.get("id", ""): row
+            for row in rows
+            if isinstance(row, dict) and row.get("id")
+        }
+    except HTTPException as error:
+        logger.warning("Community profile fetch failed, continuing without profile metadata: %s", error.detail)
+        return {author_id: {"id": author_id} for author_id in normalized_ids}
+
+
 def _map_db_post_row(row: dict[str, Any], include_content: bool) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
@@ -253,7 +279,7 @@ def _fetch_posts_from_db(
                     profiles.rank as author_rank,
                     profiles.avatar_url as author_avatar_url
                 from public.community_posts posts
-                join public.profiles profiles on profiles.id = posts.author_id
+                left join public.profiles profiles on profiles.id = posts.author_id
                 {where_clause}
                 order by posts.post_number desc
                 limit %s offset %s
@@ -292,7 +318,7 @@ def _fetch_post_detail_from_db(post_id: str) -> Optional[dict[str, Any]]:
                     profiles.rank as author_rank,
                     profiles.avatar_url as author_avatar_url
                 from public.community_posts posts
-                join public.profiles profiles on profiles.id = posts.author_id
+                left join public.profiles profiles on profiles.id = posts.author_id
                 where posts.id = %s
                 """,
                 (post_id,),
@@ -320,7 +346,7 @@ def _fetch_comments_from_db(post_id: str) -> list[dict[str, Any]]:
                     profiles.rank as author_rank,
                     profiles.avatar_url as author_avatar_url
                 from public.community_comments comments
-                join public.profiles profiles on profiles.id = comments.author_id
+                left join public.profiles profiles on profiles.id = comments.author_id
                 where comments.post_id = %s
                 order by comments.created_at asc
                 """,
@@ -356,7 +382,7 @@ async def get_posts(
     search_type: str,
 ) -> dict[str, Any]:
     params = {
-        "select": "id,post_number,title,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
+        "select": "id,post_number,title,category,views,created_at,updated_at,author_id",
         "order": "post_number.desc",
         "limit": str(per_page),
         "offset": str((page - 1) * per_page),
@@ -371,9 +397,10 @@ async def get_posts(
             params=params,
         )
         rows = response.json()
+        profiles_map = await _fetch_profiles_map([row.get("author_id", "") for row in rows])
         total = _extract_total_count(response.headers.get("content-range"), fallback=len(rows))
         return {
-            "posts": [_format_post_summary(row) for row in rows],
+            "posts": [_format_post_summary(row, profiles_map) for row in rows],
             "total": total,
             "page": page,
             "per_page": per_page,
@@ -392,14 +419,15 @@ async def get_post_detail(post_id: str) -> Optional[dict[str, Any]]:
             f"{_get_supabase_rest_url()}/community_posts",
             headers=_base_headers(),
             params={
-                "select": "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)",
+                "select": "id,post_number,title,content,category,views,created_at,updated_at,author_id",
                 "id": f"eq.{post_id}",
             },
         )
         rows = response.json()
         if not rows:
             return None
-        return _format_post(rows[0])
+        profiles_map = await _fetch_profiles_map([rows[0].get("author_id", "")])
+        return _format_post(rows[0], profiles_map)
     except HTTPException as error:
         if error.status_code != 502:
             raise
@@ -468,12 +496,14 @@ async def get_comments(post_id: str) -> list[dict[str, Any]]:
             f"{_get_supabase_rest_url()}/community_comments",
             headers=_base_headers(),
             params={
-                "select": "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)",
+                "select": "id,post_id,content,created_at,author_id",
                 "post_id": f"eq.{post_id}",
                 "order": "created_at.asc",
             },
         )
-        return [_format_comment(row) for row in response.json()]
+        rows = response.json()
+        profiles_map = await _fetch_profiles_map([row.get("author_id", "") for row in rows])
+        return [_format_comment(row, profiles_map) for row in rows]
     except HTTPException as error:
         if error.status_code != 502:
             raise
@@ -531,7 +561,26 @@ def _extract_total_count(content_range: Optional[str], fallback: int) -> int:
     return int(total) if total.isdigit() else fallback
 
 
-def _format_post_summary(row: dict[str, Any]) -> dict[str, Any]:
+def _resolve_author_profile(
+    row: dict[str, Any],
+    profiles_map: Optional[dict[str, dict[str, Any]]] = None,
+) -> Any:
+    embedded_profile = row.get("profiles")
+    if embedded_profile:
+        return embedded_profile
+
+    if profiles_map:
+        author_id = row.get("author_id", "")
+        if author_id:
+            return profiles_map.get(author_id, {"id": author_id})
+
+    return {"id": row.get("author_id", "")}
+
+
+def _format_post_summary(
+    row: dict[str, Any],
+    profiles_map: Optional[dict[str, dict[str, Any]]] = None,
+) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
         "post_number": row.get("post_number", 0) or 0,
@@ -541,11 +590,14 @@ def _format_post_summary(row: dict[str, Any]) -> dict[str, Any]:
         "views": row.get("views", 0) or 0,
         "created_at": row.get("created_at", ""),
         "updated_at": row.get("updated_at", ""),
-        "author": _author_payload(row.get("profiles")),
+        "author": _author_payload(_resolve_author_profile(row, profiles_map)),
     }
 
 
-def _format_post(row: dict[str, Any]) -> dict[str, Any]:
+def _format_post(
+    row: dict[str, Any],
+    profiles_map: Optional[dict[str, dict[str, Any]]] = None,
+) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
         "post_number": row.get("post_number", 0) or 0,
@@ -555,15 +607,18 @@ def _format_post(row: dict[str, Any]) -> dict[str, Any]:
         "views": row.get("views", 0) or 0,
         "created_at": row.get("created_at", ""),
         "updated_at": row.get("updated_at", ""),
-        "author": _author_payload(row.get("profiles")),
+        "author": _author_payload(_resolve_author_profile(row, profiles_map)),
     }
 
 
-def _format_comment(row: dict[str, Any]) -> dict[str, Any]:
+def _format_comment(
+    row: dict[str, Any],
+    profiles_map: Optional[dict[str, dict[str, Any]]] = None,
+) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
         "post_id": row.get("post_id", ""),
         "content": row.get("content", ""),
         "created_at": row.get("created_at", ""),
-        "author": _author_payload(row.get("profiles")),
+        "author": _author_payload(_resolve_author_profile(row, profiles_map)),
     }
