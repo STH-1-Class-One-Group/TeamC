@@ -19,6 +19,7 @@
 - 프로필에서 현역병 자동 계급, 일반인 지인 1명 진행률, 간부 유형별 계급/직급 분기 반영
 - 마이페이지에 회원탈퇴 위험 구역과 확인 모달 추가
 - 대시보드 전역 계산기 진행률을 실시간(now 기반) 표시로 조정 중
+- 신규 회원 프로필 저장 직후 가입 완료 메시지 모달 추가
 - 푸터 정책 페이지(`Terms / Privacy / Support`) 추가
 - 정책/고객지원 페이지를 실제 서비스 문서처럼 정리
 - 헤더 로고/파비콘 브랜딩 교체
@@ -124,6 +125,19 @@
 - `frontend/src/features/legal/TermsOfServicePage.tsx`
 - `frontend/src/features/legal/PrivacyPolicyPage.tsx`
 - `frontend/src/features/legal/SupportPage.tsx`
+
+### 회원가입 완료 메시지 모달 추가
+
+- 신규 회원이 프로필 설정을 저장해 가입 흐름이 끝나면 확인 모달을 1회 노출
+- 메시지는 아래 2줄로 표시
+  - `Thank you for your hard work.`
+  - `당신의 노고에 감사합니다.`
+- 기존 회원이 마이페이지에서 프로필을 수정하는 경우에는 노출하지 않음
+
+관련 파일:
+
+- `frontend/src/components/common/SignupCompletionModal.tsx`
+- `frontend/src/App.tsx`
 
 ### 브랜딩 자산 교체
 
