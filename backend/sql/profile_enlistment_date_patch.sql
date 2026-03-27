@@ -25,6 +25,21 @@ alter table public.profiles
 comment on column public.profiles.service_track is '현역군인(병)의 복무 유형';
 
 alter table public.profiles
+  add column if not exists acquaintance_name text;
+
+comment on column public.profiles.acquaintance_name is '일반인 회원이 등록한 지인 이름 (선택)';
+
+alter table public.profiles
+  add column if not exists acquaintance_service_track text;
+
+comment on column public.profiles.acquaintance_service_track is '일반인 회원이 등록한 지인 복무 유형 (army_active, air_force_active)';
+
+alter table public.profiles
+  add column if not exists acquaintance_enlistment_date date;
+
+comment on column public.profiles.acquaintance_enlistment_date is '일반인 회원이 등록한 지인 입대일 (선택)';
+
+alter table public.profiles
   add column if not exists profile_completed boolean not null default false;
 
 comment on column public.profiles.profile_completed is '프로필 설정 완료 여부';

@@ -1,8 +1,12 @@
 import { supabase } from '../api/supabaseClient';
+import { getDisplayRank } from './serviceDates';
 
 export interface AvatarProfileLike {
   avatar_url?: string | null;
   rank?: string | null;
+  user_type?: string | null;
+  service_track?: string | null;
+  enlistment_date?: string | null;
 }
 
 export const PROFILE_IMAGE_BUCKET = 'profile-images';
@@ -42,8 +46,15 @@ export const getRankAvatarPath = (rank?: string | null): string => {
 };
 
 export const getProfileAvatarPath = (profile?: AvatarProfileLike | null): string => {
-  if (profile?.rank?.trim()) {
-    return getRankAvatarPath(profile.rank);
+  const displayRank = getDisplayRank({
+    userType: profile?.user_type,
+    serviceTrack: profile?.service_track,
+    enlistmentDate: profile?.enlistment_date,
+    rank: profile?.rank,
+  });
+
+  if (displayRank) {
+    return getRankAvatarPath(displayRank);
   }
 
   const avatarPath = normalizeAvatarPath(profile?.avatar_url);
@@ -52,7 +63,7 @@ export const getProfileAvatarPath = (profile?: AvatarProfileLike | null): string
     return avatarPath;
   }
 
-  return getRankAvatarPath(profile?.rank);
+  return DEFAULT_PROFILE_AVATAR_PATH;
 };
 
 export const getStorageAvatarUrl = (path: string): string =>

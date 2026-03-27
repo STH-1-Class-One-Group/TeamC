@@ -74,12 +74,16 @@ interface DashboardPageProps {
 export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
   const navigate = useNavigate();
   const didInitRef = useRef(false);
-  const serviceTimeline = calculateServiceTimeline(
-    profile?.user_type,
-    profile?.service_track,
-    profile?.enlistment_date,
-    profile?.cadre_category
-  );
+  const serviceTimeline = calculateServiceTimeline({
+    userType: profile?.user_type,
+    serviceTrack: profile?.service_track,
+    enlistmentDate: profile?.enlistment_date,
+    cadreCategory: profile?.cadre_category,
+    rank: profile?.rank,
+    acquaintanceName: profile?.acquaintance_name,
+    acquaintanceServiceTrack: profile?.acquaintance_service_track,
+    acquaintanceEnlistmentDate: profile?.acquaintance_enlistment_date,
+  });
 
   const [mealInfo, setMealInfo] = useState(DEFAULT_MEAL_INFO);
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
@@ -269,6 +273,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
             <div>
               <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase mb-2 block">복무 현황</span>
               <h2 className="text-2xl font-bold text-on-surface dark:text-white">전역 계산기</h2>
+              <p className="mt-2 text-sm text-on-surface-variant dark:text-slate-400">{serviceTimeline.subjectLabel}</p>
             </div>
             <div className="bg-surface-container-low dark:bg-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
               <span className="material-symbols-outlined text-primary dark:text-blue-400 text-sm" translate="no">timer</span>
@@ -288,6 +293,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
                 <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary dark:bg-blue-500/10 dark:text-blue-300">
                   {serviceTimeline.serviceDurationLabel}
                 </span>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-outline-variant/15 bg-surface-container-low/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant dark:text-slate-400">
+                현재 계급/직급
+              </p>
+              <div className="mt-1 flex items-end justify-between gap-3">
+                <p className="text-sm font-semibold text-on-surface dark:text-white">
+                  {serviceTimeline.displayRankLabel}
+                </p>
+                {serviceTimeline.usesAcquaintance && (
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-300">
+                    지인 기준
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-4">

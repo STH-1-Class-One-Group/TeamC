@@ -1,6 +1,20 @@
+import { getCadreRankOptions } from '../../utils/serviceDates';
 import { Profile, ProfileFormValues } from './types';
 
-type ValidationErrors = Partial<Record<'nickname' | 'userType' | 'cadreCategory' | 'rank' | 'serviceTrack' | 'enlistmentDate', string>>;
+type ValidationErrors = Partial<
+  Record<
+    | 'nickname'
+    | 'userType'
+    | 'cadreCategory'
+    | 'rank'
+    | 'serviceTrack'
+    | 'enlistmentDate'
+    | 'acquaintanceName'
+    | 'acquaintanceServiceTrack'
+    | 'acquaintanceEnlistmentDate',
+    string
+  >
+>;
 
 abstract class ProfileMode {
   abstract readonly type: string;
@@ -20,6 +34,15 @@ abstract class ProfileMode {
 
     if (values.enlistmentDate && values.enlistmentDate > todayInputValue) {
       return { enlistmentDate: '입대일은 오늘 이후로 설정할 수 없습니다.' };
+    }
+
+    if (
+      values.acquaintanceEnlistmentDate &&
+      values.acquaintanceEnlistmentDate > todayInputValue
+    ) {
+      return {
+        acquaintanceEnlistmentDate: '지인 입대일은 오늘 이후로 설정할 수 없습니다.',
+      };
     }
 
     return {};
@@ -43,6 +66,36 @@ class CivilianMode extends ProfileMode {
       serviceTrack: '',
     };
   }
+
+  override validate(values: ProfileFormValues, todayInputValue: string): ValidationErrors {
+    const baseErrors = super.validate(values, todayInputValue);
+    if (Object.keys(baseErrors).length > 0) {
+      return baseErrors;
+    }
+
+    const hasAnyAcquaintance =
+      Boolean(values.acquaintanceName.trim()) ||
+      Boolean(values.acquaintanceServiceTrack) ||
+      Boolean(values.acquaintanceEnlistmentDate);
+
+    if (!hasAnyAcquaintance) {
+      return {};
+    }
+
+    if (!values.acquaintanceName.trim()) {
+      return { acquaintanceName: '지인 이름을 입력해주세요.' };
+    }
+
+    if (!values.acquaintanceServiceTrack) {
+      return { acquaintanceServiceTrack: '지인의 복무 유형을 선택해주세요.' };
+    }
+
+    if (!values.acquaintanceEnlistmentDate) {
+      return { acquaintanceEnlistmentDate: '지인의 입대일을 입력해주세요.' };
+    }
+
+    return {};
+  }
 }
 
 class ActiveEnlistedMode extends ProfileMode {
@@ -53,6 +106,9 @@ class ActiveEnlistedMode extends ProfileMode {
       ...values,
       cadreCategory: '',
       rank: '',
+      acquaintanceName: '',
+      acquaintanceServiceTrack: '',
+      acquaintanceEnlistmentDate: '',
     };
   }
 
@@ -74,11 +130,7 @@ class ActiveEnlistedMode extends ProfileMode {
   }
 
   override isProfileComplete(profile: Profile | null): boolean {
-    return Boolean(
-      super.isProfileComplete(profile) &&
-      profile?.service_track &&
-      profile?.enlistment_date
-    );
+    return Boolean(super.isProfileComplete(profile) && profile?.service_track && profile?.enlistment_date);
   }
 }
 
@@ -89,6 +141,9 @@ class ActiveCadreMode extends ProfileMode {
     return {
       ...values,
       serviceTrack: '',
+      acquaintanceName: '',
+      acquaintanceServiceTrack: '',
+      acquaintanceEnlistmentDate: '',
     };
   }
 
@@ -103,7 +158,12 @@ class ActiveCadreMode extends ProfileMode {
     }
 
     if (!values.rank.trim()) {
-      return { rank: '계급 또는 직급을 입력해주세요.' };
+      return { rank: '계급 또는 직급을 선택해주세요.' };
+    }
+
+    const rankOptions: string[] = getCadreRankOptions(values.cadreCategory);
+    if (!rankOptions.includes(values.rank.trim())) {
+      return { rank: '선택한 간부 유형에 맞는 계급/직급을 선택해주세요.' };
     }
 
     if (!values.enlistmentDate) {
@@ -116,9 +176,9 @@ class ActiveCadreMode extends ProfileMode {
   override isProfileComplete(profile: Profile | null): boolean {
     return Boolean(
       super.isProfileComplete(profile) &&
-      profile?.cadre_category &&
-      profile?.rank &&
-      profile?.enlistment_date
+        profile?.cadre_category &&
+        profile?.rank &&
+        profile?.enlistment_date
     );
   }
 }

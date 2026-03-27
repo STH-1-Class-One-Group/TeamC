@@ -6,6 +6,7 @@ import { ProfileAvatar } from '../common/ProfileAvatar';
 import { MyCouponModal } from '../common/MyCouponModal';
 import { CartIcon } from '../../features/cart/components/CartIcon';
 import { Profile } from '../../features/profile/types';
+import { getCadreCategoryLabel, getProfileDisplayRank, isCadreUser } from '../../utils/serviceDates';
 
 const brandLogoSrc = `${process.env.PUBLIC_URL}/logo.png`;
 
@@ -67,6 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
     || (user?.user_metadata?.full_name as string)
     || user?.email
     || '사용자';
+  const displayRank = getProfileDisplayRank(profile);
 
   return (
     <>
@@ -161,8 +163,11 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
               >
                 <ProfileAvatar
                   nickname={displayName}
-                  rank={profile?.rank}
+                  rank={displayRank}
                   avatar_url={profile?.avatar_url}
+                  user_type={profile?.user_type}
+                  service_track={profile?.service_track}
+                  enlistment_date={profile?.enlistment_date}
                   containerClassName="w-9 h-9 rounded-full overflow-hidden"
                 />
               </button>
@@ -174,8 +179,14 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                     <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
                       {displayName}
                     </p>
-                    {profile?.rank && (
-                      <p className="text-xs text-primary mt-0.5">{profile.rank}{profile.unit ? ` · ${profile.unit}` : ''}</p>
+                    {displayRank && (
+                      <p className="text-xs text-primary mt-0.5">
+                        {displayRank}
+                        {isCadreUser(profile?.user_type) && profile?.cadre_category
+                          ? ` · ${getCadreCategoryLabel(profile.cadre_category)}`
+                          : ''}
+                        {profile?.unit ? ` · ${profile.unit}` : ''}
+                      </p>
                     )}
                   </div>
                   <NavLink

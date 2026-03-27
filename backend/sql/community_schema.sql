@@ -11,8 +11,8 @@ create table if not exists public.profiles (
   nickname    text not null unique,
   user_type   text check (user_type in ('civilian', 'active_enlisted', 'active_cadre')),
   cadre_category text check (cadre_category in ('officer', 'nco', 'civilian_staff')),
-  rank        text,                        -- 계급 (선택)
-  unit        text,                        -- 소속부대 (선택)
+  rank        text,                        -- 현역간부 계급/직급 (선택)
+  unit        text,                        -- 소속부대/기관 (선택)
   enlistment_date date,                    -- 입대일 (선택)
   service_track text check (
     service_track in (
@@ -23,6 +23,14 @@ create table if not exists public.profiles (
       'industrial_service_supplementary'
     )
   ),
+  acquaintance_name text,                  -- 일반인 회원이 등록한 지인 이름 (선택)
+  acquaintance_service_track text check (
+    acquaintance_service_track in (
+      'army_active',
+      'air_force_active'
+    )
+  ),
+  acquaintance_enlistment_date date,      -- 일반인 회원이 등록한 지인 입대일 (선택)
   profile_completed boolean not null default false, -- 프로필 설정 완료 여부
   avatar_url  text,                        -- Supabase Storage 프로필 이미지 경로
   created_at  timestamptz not null default now(),
