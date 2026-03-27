@@ -1,6 +1,7 @@
 # 팀 공유 문서: 프로필/회원 유형/대시보드 작업 정리
 
 작성일: 2026-03-27  
+최종 업데이트: 2026-03-28  
 대상: 프론트엔드/백엔드 팀원 전체  
 범위: 회원가입 프로필, 마이페이지, 회원 유형 분기, 대시보드 복무 계산, 대시보드 한글화, 후속 공통 작업(정책 페이지/브랜딩/커뮤니티 조회수 및 추천 기능)
 
@@ -40,6 +41,10 @@
 - `f3a57a6` `fix: localize dashboard copy to korean`
   - 대시보드/식단 팝업 영어 문구를 한국어로 변경
 
+- `a0c8eb7` `fix: update footer brand copy`
+  - 푸터 저작권 문구를 템플릿 기본값에서 실제 서비스명 `짬밥요리사`로 교체
+  - 연도는 하드코딩 대신 `new Date().getFullYear()` 기준으로 자동 반영
+
 ## 3. 후속 공통 작업 반영 사항
 
 이번 문서는 원래 프로필/대시보드 중심으로 정리했지만, 같은 작업 흐름 안에서 아래 공통 변경도 같이 반영했습니다.
@@ -60,6 +65,7 @@
 - 푸터의 더미 링크를 실제 라우트로 교체
 - `/terms`, `/privacy`, `/support` 페이지 추가
 - 로그인 모달의 이용약관/개인정보처리방침 링크도 실제 페이지로 연결
+- 푸터 저작권 표기를 `© {currentYear} 짬밥요리사`로 정리해 템플릿 기본 문구 제거
 
 관련 파일:
 
@@ -376,13 +382,16 @@ DB 구조:
 
 ## 10. 현재 워킹트리 상태
 
-이 문서 작성 시점 기준으로, 아래는 아직 커밋되지 않은 작업입니다.
+현재 확인된 미커밋 상태는 아래와 같습니다.
 
-- `frontend/src/App.tsx`
-- `frontend/src/components/layout/Header.tsx`
-- `frontend/public/Gemini_Generated_Image_m48tqbm48tqbm48t 1.png`
-- `frontend/public/Whisk_a4132e013c3d79981b846046fbe4a897dr 1.png`
-- `frontend/src/features/reservation/` (전체 신규)
+- 수정 중: `frontend/src/features/reservation/ArmedReservePage.tsx`
+- 수정 중: `frontend/src/features/reservation/components/KakaoMap.tsx`
+- 미추적: `.claude/`
+- 미추적: `backend/sql/supabase_best_practices_patch.sql`
+- 미추적: `backend/sql/supabase_best_practices_preflight.sql`
+- 미추적: `frontend/public/Gemini_Generated_Image_m48tqbm48tqbm48t 1.png`
+- 미추적: `frontend/public/Whisk_a4132e013c3d79981b846046fbe4a897dr 1.png`
+- 미추적: `yebigun_test.bin`
 
 ## 11. 팀원 액션 아이템
 
@@ -396,3 +405,31 @@ DB 구조:
 - 예비군 페이지 사용 시 `.env`에 `REACT_APP_KAKAO_MAP_KEY` 설정 + 카카오 디벨로퍼스 플랫폼/카카오맵 사용 설정 필요
 - `npm install` 재실행 필요 (`react-kakao-maps-sdk`, `kakao.maps.d.ts` 추가됨)
 - 북마크 기능 구현 후 예비군 페이지에 연동 필요
+- `npm install` 재실행 필요 (`react-helmet-async` 추가됨)
+
+## 12. SEO 적용 사항 (2026-03-28)
+
+### 변경 파일
+| 파일 | 내용 |
+|------|------|
+| `frontend/public/index.html` | `lang="ko"`, meta description/keywords(군인·방산·예비군), OG/Twitter 카드, canonical URL, Naver 검색 등록 placeholder |
+| `frontend/public/manifest.json` | 앱명 `Modern Sentinel`, 테마 색상 `#0061a5` |
+| `frontend/public/robots.txt` | sitemap 연결, `/payment-success` disallow |
+| `frontend/public/sitemap.xml` | 전체 공개 라우트 9개 등록 (우선순위 포함) |
+| `frontend/src/index.tsx` | `HelmetProvider` 래핑 |
+
+### 페이지별 Helmet 메타 태그
+| 페이지 | title | 타겟 키워드 |
+|--------|-------|-------------|
+| Shop (메인) | Modern Sentinel — 군인을 위한 스마트 플랫폼 | 군인, 방산, 국방 |
+| ArmedReserve | 예비군 훈련장 찾기 | 예비군, 훈련장 |
+| News | 방산 뉴스 | 방산, 국방 뉴스 |
+| Meal | 군 급식 정보 | 군 급식, 군인 식단 |
+| Community | 군인 커뮤니티 | 군인 커뮤니티 |
+
+### 팀원 참고
+- 새 페이지 추가 시 `<Helmet>`으로 title/description 설정 필요 (`react-helmet-async` 사용)
+- `sitemap.xml`에 새 라우트 추가 필요
+- 배포 도메인 확정 후 `index.html`의 `og:image` URL과 `canonical` URL 업데이트 필요
+- 네이버 서치어드바이저 등록 시 `naver-site-verification` meta 값 채워야 함
+- 구글 서치콘솔 등록도 별도 진행 필요
