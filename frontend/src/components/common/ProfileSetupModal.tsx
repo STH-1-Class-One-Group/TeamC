@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../api/supabaseClient';
 import { User } from '@supabase/supabase-js';
-import { getRankAvatarPath } from '../../utils/profileAvatar';
-
-export interface Profile {
-  id: string;
-  nickname: string;
-  rank: string | null;
-  unit: string | null;
-  enlistment_date: string | null;
-  profile_completed: boolean;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { Profile, ProfileFormValues } from '../../features/profile/types';
+import {
+  getTodayInputValue,
+  isNicknameAvailable,
+  PROFILE_RANKS,
+  saveProfile,
+} from '../../features/profile/profileFormUtils';
 
 interface ProfileSetupModalProps {
   user: User;
@@ -22,31 +15,18 @@ interface ProfileSetupModalProps {
   onSignOut: () => void;
 }
 
-const RANKS = [
-  '이병', '일병', '상병', '병장',
-  '하사', '중사', '상사', '원사', '준위',
-  '소위', '중위', '대위', '소령', '중령', '대령',
-  '준장', '소장', '중장', '대장',
-];
-
-const getTodayInputValue = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
   user,
   initialProfile = null,
   onProfileCreated,
   onSignOut,
 }) => {
-  const [nickname, setNickname] = useState(initialProfile?.nickname ?? '');
-  const [rank, setRank] = useState(initialProfile?.rank ?? '');
-  const [unit, setUnit] = useState(initialProfile?.unit ?? '');
-  const [enlistmentDate, setEnlistmentDate] = useState(initialProfile?.enlistment_date ?? '');
+  const [form, setForm] = useState<ProfileFormValues>({
+    nickname: initialProfile?.nickname ?? '',
+    rank: initialProfile?.rank ?? '',
+    unit: initialProfile?.unit ?? '',
+    enlistmentDate: initialProfile?.enlistment_date ?? '',
+  });
   const [nicknameError, setNicknameError] = useState('');
   const [enlistmentDateError, setEnlistmentDateError] = useState('');
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
@@ -55,10 +35,12 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
   const todayInputValue = getTodayInputValue();
 
   useEffect(() => {
-    setNickname(initialProfile?.nickname ?? '');
-    setRank(initialProfile?.rank ?? '');
-    setUnit(initialProfile?.unit ?? '');
-    setEnlistmentDate(initialProfile?.enlistment_date ?? '');
+    setForm({
+      nickname: initialProfile?.nickname ?? '',
+      rank: initialProfile?.rank ?? '',
+      unit: initialProfile?.unit ?? '',
+      enlistmentDate: initialProfile?.enlistment_date ?? '',
+    });
     setNicknameError('');
     setEnlistmentDateError('');
     setError('');
@@ -68,24 +50,20 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
     if (!value.trim()) return;
     setIsCheckingNickname(true);
     setNicknameError('');
-    const { data } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('nickname', value.trim())
-      .maybeSingle();
+    const available = await isNicknameAvailable(value, user.id);
     setIsCheckingNickname(false);
-    if (data && data.id !== user.id) {
+    if (!available) {
       setNicknameError('이미 사용 중인 닉네임입니다.');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname.trim()) {
+    if (!form.nickname.trim()) {
       setNicknameError('닉네임을 입력해주세요.');
       return;
     }
-    if (enlistmentDate && enlistmentDate > todayInputValue) {
+    if (form.enlistmentDate && form.enlistmentDate > todayInputValue) {
       setEnlistmentDateError('입대일은 오늘 이후로 설정할 수 없습니다.');
       return;
     }
@@ -93,21 +71,7 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
 
     setIsSubmitting(true);
     setError('');
-    const { data, error: insertError } = await supabase
-      .from('profiles')
-      .upsert({
-        id: user.id,
-        nickname: nickname.trim(),
-        rank: rank || null,
-        unit: unit.trim() || null,
-        enlistment_date: enlistmentDate || null,
-        profile_completed: true,
-        avatar_url: getRankAvatarPath(rank || null),
-      }, {
-        onConflict: 'id',
-      })
-      .select()
-      .single();
+    const { data, error: insertError } = await saveProfile(user.id, form);
 
     setIsSubmitting(false);
     if (insertError) {
@@ -141,12 +105,12 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
             </label>
             <input
               type="text"
-              value={nickname}
+              value={form.nickname}
               onChange={(e) => {
-                setNickname(e.target.value);
+                setForm((current) => ({ ...current, nickname: e.target.value }));
                 setNicknameError('');
               }}
-              onBlur={() => checkNicknameAvailability(nickname)}
+              onBlur={() => checkNicknameAvailability(form.nickname)}
               placeholder="사용할 닉네임을 입력하세요"
               maxLength={20}
               className="w-full bg-surface-container-low dark:bg-slate-800 border-none focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface dark:text-white placeholder-slate-400 outline-none"
@@ -165,12 +129,12 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
               계급 <span className="text-slate-400 font-normal">(선택)</span>
             </label>
             <select
-              value={rank}
-              onChange={(e) => setRank(e.target.value)}
+              value={form.rank}
+              onChange={(e) => setForm((current) => ({ ...current, rank: e.target.value }))}
               className="w-full bg-surface-container-low dark:bg-slate-800 border-none focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface dark:text-white outline-none appearance-none"
             >
               <option value="">선택 안함</option>
-              {RANKS.map((r) => (
+              {PROFILE_RANKS.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
@@ -182,10 +146,10 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
             </label>
             <input
               type="date"
-              value={enlistmentDate}
+              value={form.enlistmentDate}
               max={todayInputValue}
               onChange={(e) => {
-                setEnlistmentDate(e.target.value);
+                setForm((current) => ({ ...current, enlistmentDate: e.target.value }));
                 setEnlistmentDateError('');
               }}
               className="w-full bg-surface-container-low dark:bg-slate-800 border-none focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface dark:text-white outline-none"
@@ -202,8 +166,8 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
             </label>
             <input
               type="text"
-              value={unit}
-              onChange={(e) => setUnit(e.target.value)}
+              value={form.unit}
+              onChange={(e) => setForm((current) => ({ ...current, unit: e.target.value }))}
               placeholder="예: 육군 제00사단"
               maxLength={50}
               className="w-full bg-surface-container-low dark:bg-slate-800 border-none focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface dark:text-white placeholder-slate-400 outline-none"
@@ -216,7 +180,7 @@ export const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
 
           <button
             type="submit"
-            disabled={isSubmitting || !!nicknameError || !!enlistmentDateError || !nickname.trim()}
+            disabled={isSubmitting || !!nicknameError || !!enlistmentDateError || !form.nickname.trim()}
             className="w-full py-3 px-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {isSubmitting ? '저장 중...' : '시작하기'}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
-import { Profile } from '../../components/common/ProfileSetupModal';
+import { Profile } from '../profile/types';
 import { supabase } from '../../api/supabaseClient';
 
 interface PostWritePageProps {

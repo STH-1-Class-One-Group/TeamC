@@ -5,7 +5,7 @@ import { LoginModal } from '../common/LoginModal';
 import { ProfileAvatar } from '../common/ProfileAvatar';
 import { MyCouponModal } from '../common/MyCouponModal';
 import { CartIcon } from '../../features/cart/components/CartIcon';
-import { Profile } from '../common/ProfileSetupModal';
+import { Profile } from '../../features/profile/types';
 
 const brandLogoSrc = `${process.env.PUBLIC_URL}/logo.png`;
 
@@ -104,12 +104,12 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
           >
             Dashboard
           </NavLink>
-          <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
+          <button type="button" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight">
             Armed Reserve
-          </a>
-          <a className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight" href="#">
+          </button>
+          <button type="button" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-['Inter'] text-sm tracking-tight">
             Recruitment
-          </a>
+          </button>
           <NavLink
             to="/Community"
             className={({ isActive }) =>
@@ -171,6 +171,14 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                       <p className="text-xs text-primary mt-0.5">{profile.rank}{profile.unit ? ` · ${profile.unit}` : ''}</p>
                     )}
                   </div>
+                  <NavLink
+                    to="/MyPage"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/60"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">badge</span>
+                    마이페이지
+                  </NavLink>
                   <button
                     onClick={handleSignOut}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"

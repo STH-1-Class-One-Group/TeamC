@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
-import { Profile } from '../../components/common/ProfileSetupModal';
+import { Profile } from '../profile/types';
 import { CATEGORIES, Post, PostListResponse, formatBoardDate } from './types';
 
 interface CommunityPageProps {

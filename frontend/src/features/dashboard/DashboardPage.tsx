@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MealPopup, MealItem } from './components/MealPopup';
 import { fetchNewsBatch } from '../news/newsApi';
-import { Profile } from '../../components/common/ProfileSetupModal';
+import { Profile } from '../profile/types';
 import { calculateServiceTimeline } from '../../utils/serviceDates';
 
 interface MealData {

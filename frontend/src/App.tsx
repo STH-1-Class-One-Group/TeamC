@@ -10,7 +10,7 @@ import { ShopPage } from './features/shop/ShopPage';
 import { CartProvider } from './features/cart/context/CartContext';
 import { CartModal } from './features/cart/components/CartModal';
 import { supabase } from './api/supabaseClient';
-import { ProfileSetupModal, Profile } from './components/common/ProfileSetupModal';
+import { ProfileSetupModal } from './components/common/ProfileSetupModal';
 import { CommunityPage } from './features/community/CommunityPage';
 import { PostDetailPage } from './features/community/PostDetailPage';
 import { PostWritePage } from './features/community/PostWritePage';
@@ -18,6 +18,8 @@ import PaymentSuccess from './features/cart/components/PaymentSuccess';
 import { TermsOfServicePage } from './features/legal/TermsOfServicePage';
 import { PrivacyPolicyPage } from './features/legal/PrivacyPolicyPage';
 import { SupportPage } from './features/legal/SupportPage';
+import { MyPage } from './features/profile/MyPage';
+import { Profile } from './features/profile/types';
 
 type StorageEntry = {
   key: string;
@@ -202,6 +204,17 @@ const App: React.FC = () => {
               <Route path="/Dashboard" element={<DashboardPage profile={profile ?? null} />} />
               <Route path="/Meal" element={<MealPage />} />
               <Route path="/News" element={<NewsPage />} />
+              <Route
+                path="/MyPage"
+                element={
+                  <MyPage
+                    user={user}
+                    profile={profile ?? null}
+                    isProfileLoading={profile === undefined}
+                    onProfileUpdated={setProfile}
+                  />
+                }
+              />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/Community" element={<CommunityPage user={user} profile={profile ?? null} />} />
               <Route path="/Community/write" element={<PostWritePage user={user} profile={profile ?? null} />} />

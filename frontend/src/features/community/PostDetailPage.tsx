@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 import { ProfileAvatar } from '../../components/common/ProfileAvatar';
-import { Profile } from '../../components/common/ProfileSetupModal';
+import { Profile } from '../profile/types';
 import { CommentSection } from './components/CommentSection';
 import { Post, CATEGORIES, formatRelativeTime } from './types';
 import { supabase } from '../../api/supabaseClient';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ProfileAvatar } from '../../../components/common/ProfileAvatar';
 import { Comment, formatRelativeTime } from '../types';
-import { Profile } from '../../../components/common/ProfileSetupModal';
+import { Profile } from '../../profile/types';
 import { supabase } from '../../../api/supabaseClient';
 
 interface CommentSectionProps {
