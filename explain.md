@@ -242,3 +242,7 @@ installHook.js:1 [DashboardPage] news fetch failed: TypeError: Failed to fetch
 
 23-1. 다른 데이터들은 정상적으로 받아와, 그런데 커뮤니티 글들은 제대로 불러와지지 않아 이 버그 해결좀 해주면 돼 Error: 게시글을 불러오지 못했습니다.
     at CommunityPage.tsx:86:15 GET https://three-idiot.onrender.com/api/v1/community/posts?page=1&per_page=30 502 (Bad Gateway)
+
+
+23-2. 다른 데이터들은 정상적으로 잘 받아오는데(모병 모집의 경우, 가끔은 안불러와지기도 해) 로그인 시도를 하자 마자, 모든 환경 변수의 값들이 제대로 가져와지지 않는 문제가 발생했어 상품 로드 오류: Supabase 브라우저 설정이 없습니다. REACT_APP_SUPABASE_URL과 REACT_APP_SUPABASE_ANON_KEY를 설정해 주세요.(군대 음식) API 서버에 연결할 수 없어 식단 데이터를 불러오지 못했습니다. 백엔드 서버(http://localhost:8000)가 실행 중인지 확인해 주세요.(군대 식단) API 서버에 연결할 수 없어 뉴스를 불러오지 못했습니다. 백엔드 서버(http://localhost:8000)가 실행 중인지 확인해 주세요.(군대 뉴스) 모병 모집 API 키가 없습니다. frontend 환경변수에 REACT_APP_DATA_SERVICE_KEY를 설정해 주세요.(모병 모집) Failed to fetch(커뮤니티)
+
