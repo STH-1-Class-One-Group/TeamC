@@ -5,6 +5,9 @@ import { TrainingCenter, RAW_TRAINING_CENTERS } from './data/trainingCenters';
 
 const SIDO_LIST = Array.from(new Set(RAW_TRAINING_CENTERS.map((c) => c.sido))).sort();
 
+const getZonesForSido = (sido: string) =>
+  Array.from(new Set(RAW_TRAINING_CENTERS.filter((c) => c.sido === sido).map((c) => c.zone))).sort();
+
 const geocodeCenter = (
   geocoder: kakao.maps.services.Geocoder,
   raw: Omit<TrainingCenter, 'lat' | 'lng'>,
@@ -21,13 +24,22 @@ const geocodeCenter = (
 
 export const ArmedReservePage: React.FC = () => {
   const [selectedSido, setSelectedSido] = useState(SIDO_LIST[0] || '');
+  const [selectedZone, setSelectedZone] = useState('');
+  const [zones, setZones] = useState<string[]>([]);
   const [centers, setCenters] = useState<TrainingCenter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedCenter, setFocusedCenter] = useState<TrainingCenter | null>(null);
   const [highlightedCenterId, setHighlightedCenterId] = useState<string | null>(null);
 
-  const loadCenters = useCallback(async (sido: string) => {
-    const filtered = RAW_TRAINING_CENTERS.filter((c) => c.sido === sido);
+  useEffect(() => {
+    const zoneList = getZonesForSido(selectedSido);
+    setZones(zoneList);
+    setSelectedZone('');
+  }, [selectedSido]);
+
+  const loadCenters = useCallback(async (sido: string, zone: string) => {
+    let filtered = RAW_TRAINING_CENTERS.filter((c) => c.sido === sido);
+    if (zone) filtered = filtered.filter((c) => c.zone === zone);
 
     if (typeof kakao === 'undefined' || !kakao.maps?.services) {
       setCenters(filtered.map((c) => ({ ...c, lat: 0, lng: 0 })));
@@ -52,14 +64,14 @@ export const ArmedReservePage: React.FC = () => {
 
     const tryLoad = () => {
       if (typeof kakao !== 'undefined' && kakao.maps?.services) {
-        loadCenters(selectedSido);
+        loadCenters(selectedSido, selectedZone);
       } else {
         const timer = window.setTimeout(tryLoad, 300);
         return () => window.clearTimeout(timer);
       }
     };
     tryLoad();
-  }, [selectedSido, loadCenters]);
+  }, [selectedSido, selectedZone, loadCenters]);
 
   return (
     <div className="space-y-12 w-full">
@@ -85,6 +97,17 @@ export const ArmedReservePage: React.FC = () => {
             >
               {SIDO_LIST.map((sido) => (
                 <option key={sido} value={sido}>{sido}</option>
+              ))}
+            </select>
+            <select
+              id="zone-select"
+              value={selectedZone}
+              onChange={(e) => setSelectedZone(e.target.value)}
+              className="bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-on-surface dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+            >
+              <option value="">전체 구/군</option>
+              {zones.map((zone) => (
+                <option key={zone} value={zone}>{zone}</option>
               ))}
             </select>
           </div>
