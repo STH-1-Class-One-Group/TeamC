@@ -31,6 +31,7 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
   useEffect(() => {
     if (!postId) return;
@@ -41,8 +42,15 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
       setIsLoading(true);
 
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = user ? session?.access_token : null;
+        const headers: HeadersInit = token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
+
         const res = await fetch(`${apiUrl}/api/v1/community/posts/${postId}`, {
           signal: controller.signal,
+          headers,
         });
 
         const data = res.ok ? await res.json() : null;
@@ -94,7 +102,7 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
       isActive = false;
       controller.abort();
     };
-  }, [postId]);
+  }, [postId, user]);
 
   const isOwner = user && post && user.id === post.author.id;
   const categoryLabel = post ? (CATEGORIES[post.category] || post.category) : '';
@@ -116,6 +124,59 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
       if (res.ok) navigate('/Community');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleVote = async (voteType: 'up' | 'down') => {
+    if (!postId) {
+      return;
+    }
+
+    if (!user) {
+      alert('추천/비추천은 로그인 후 이용할 수 있습니다.');
+      return;
+    }
+
+    setIsVoting(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        alert('로그인 세션을 확인할 수 없습니다. 다시 로그인해 주세요.');
+        return;
+      }
+
+      const res = await fetch(`${apiUrl}/api/v1/community/posts/${postId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ vote_type: voteType }),
+      });
+
+      if (!res.ok) {
+        throw new Error('추천 상태를 변경하지 못했습니다.');
+      }
+
+      const data = await res.json();
+      setPost((currentPost) => (
+        currentPost
+          ? {
+              ...currentPost,
+              upvotes: data.upvotes,
+              downvotes: data.downvotes,
+              viewer_vote: data.viewer_vote,
+            }
+          : currentPost
+      ));
+    } catch (error) {
+      console.error(error);
+      alert('추천 상태를 변경하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -210,6 +271,36 @@ export const PostDetailPage: React.FC<PostDetailPageProps> = ({ user, profile })
         <div className="p-8 md:p-12">
           <div className="whitespace-pre-wrap text-on-surface dark:text-slate-200 leading-relaxed text-base">
             {post.content}
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-outline-variant/15 pt-8 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => handleVote('up')}
+              disabled={isVoting}
+              className={`flex min-w-[132px] items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition-colors ${
+                post.viewer_vote === 'up'
+                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-500/10 dark:text-blue-200'
+                  : 'border-outline-variant/30 bg-surface-container-low text-on-surface dark:border-slate-700 dark:bg-slate-700 dark:text-white'
+              } ${isVoting ? 'cursor-not-allowed opacity-60' : 'hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-300'}`}
+            >
+              <span className="material-symbols-outlined text-[18px]">thumb_up</span>
+              추천 {post.upvotes}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleVote('down')}
+              disabled={isVoting}
+              className={`flex min-w-[132px] items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition-colors ${
+                post.viewer_vote === 'down'
+                  ? 'border-red-500 bg-red-50 text-red-600 dark:border-red-400 dark:bg-red-500/10 dark:text-red-200'
+                  : 'border-outline-variant/30 bg-surface-container-low text-on-surface dark:border-slate-700 dark:bg-slate-700 dark:text-white'
+              } ${isVoting ? 'cursor-not-allowed opacity-60' : 'hover:border-red-400 hover:text-red-500 dark:hover:text-red-300'}`}
+            >
+              <span className="material-symbols-outlined text-[18px]">thumb_down</span>
+              비추천 {post.downvotes}
+            </button>
           </div>
         </div>
       </article>

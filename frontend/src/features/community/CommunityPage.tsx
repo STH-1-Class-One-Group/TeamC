@@ -271,17 +271,29 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                         {post.post_number}
                       </td>
                       <td className="px-4 py-4">
-                        <button
-                          onClick={() => navigate(`/Community/${post.id}`)}
-                          className="flex items-center gap-3 w-full text-left"
-                        >
-                          <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                            {categoryLabel}
-                          </span>
-                          <span className="truncate text-sm md:text-base font-medium text-on-surface dark:text-white hover:text-primary transition-colors">
-                            {post.title}
-                          </span>
-                        </button>
+                        <div className="space-y-2">
+                          <button
+                            onClick={() => navigate(`/Community/${post.id}`)}
+                            className="flex items-center gap-3 w-full text-left"
+                          >
+                            <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                              {categoryLabel}
+                            </span>
+                            <span className="truncate text-sm md:text-base font-medium text-on-surface dark:text-white hover:text-primary transition-colors">
+                              {post.title}
+                            </span>
+                          </button>
+                          <div className="flex items-center gap-4 pl-[52px] text-xs text-on-surface-variant dark:text-slate-400">
+                            <span className="flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">thumb_up</span>
+                              {post.upvotes}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">thumb_down</span>
+                              {post.downvotes}
+                            </span>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-4 py-4 text-center text-sm text-on-surface dark:text-white">
                         {authorLabel}

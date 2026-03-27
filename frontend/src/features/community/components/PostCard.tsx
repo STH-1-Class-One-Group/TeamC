@@ -33,6 +33,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
             <span className="material-symbols-outlined text-[16px]">visibility</span>
             {post.views}
           </span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">thumb_up</span>
+            {post.upvotes}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">thumb_down</span>
+            {post.downvotes}
+          </span>
         </div>
       </div>
 

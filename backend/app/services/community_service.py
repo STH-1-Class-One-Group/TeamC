@@ -75,7 +75,7 @@ async def get_posts(
 ) -> dict:
     """게시글 목록 조회 (author 프로필 JOIN, 페이지네이션)."""
     offset = (page - 1) * per_page
-    select = "id,post_number,title,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)"
+    select = "id,post_number,title,category,views,upvotes,downvotes,created_at,updated_at,author:profiles!community_posts_author_id_fkey(id,nickname,rank,avatar_url)"
     params = {
         "select": select,
         "order": "post_number.desc",
@@ -100,9 +100,9 @@ async def get_posts(
     return {"posts": posts, "total": total, "page": page, "per_page": per_page}
 
 
-async def get_post_detail(post_id: str) -> Optional[dict]:
+async def get_post_detail(post_id: str, token: Optional[str] = None) -> Optional[dict]:
     """게시글 상세 조회."""
-    select = "id,post_number,title,content,category,views,created_at,updated_at,profiles(id,nickname,rank,avatar_url)"
+    select = "id,post_number,title,content,category,views,upvotes,downvotes,created_at,updated_at,author:profiles!community_posts_author_id_fkey(id,nickname,rank,avatar_url)"
     client = _get_http_client()
     res = await client.get(
         f"{SUPABASE_REST}/community_posts",
@@ -113,7 +113,8 @@ async def get_post_detail(post_id: str) -> Optional[dict]:
     rows = res.json()
     if not rows:
         return None
-    return _format_post(rows[0])
+    viewer_vote = await get_post_vote(post_id, token) if token else None
+    return _format_post(rows[0], viewer_vote=viewer_vote)
 
 
 async def increment_views(post_id: str) -> None:
@@ -124,6 +125,51 @@ async def increment_views(post_id: str) -> None:
         headers=_base_headers(),
         json={"p_post_id": post_id},
     )
+
+
+async def get_post_vote(post_id: str, token: str) -> Optional[str]:
+    """현재 사용자의 게시글 투표 상태 조회."""
+    user_id = await _get_user_id(token)
+    client = _get_http_client()
+    res = await client.get(
+        f"{SUPABASE_REST}/community_post_votes",
+        headers=_base_headers(token),
+        params={
+            "select": "vote_type",
+            "post_id": f"eq.{post_id}",
+            "user_id": f"eq.{user_id}",
+            "limit": "1",
+        },
+    )
+    res.raise_for_status()
+    rows = res.json()
+    if not rows:
+        return None
+    return rows[0].get("vote_type")
+
+
+async def set_post_vote(post_id: str, vote_type: str, token: str) -> dict:
+    """게시글 추천/비추천 토글."""
+    client = _get_http_client()
+    res = await client.post(
+        f"{settings.supabase_url}/rest/v1/rpc/set_post_vote",
+        headers=_base_headers(token),
+        json={
+            "p_post_id": post_id,
+            "p_vote_type": vote_type,
+        },
+    )
+    res.raise_for_status()
+
+    payload = res.json()
+    if isinstance(payload, list):
+        payload = payload[0] if payload else {}
+
+    return {
+        "upvotes": payload.get("upvotes", 0),
+        "downvotes": payload.get("downvotes", 0),
+        "viewer_vote": payload.get("viewer_vote"),
+    }
 
 
 async def create_post(data: dict, token: str) -> dict:
@@ -180,7 +226,7 @@ async def delete_post(post_id: str, token: str) -> None:
 
 async def get_comments(post_id: str) -> list:
     """댓글 목록 조회 (author 프로필 JOIN)."""
-    select = "id,post_id,content,created_at,profiles(id,nickname,rank,avatar_url)"
+    select = "id,post_id,content,created_at,author:profiles!community_comments_author_id_fkey(id,nickname,rank,avatar_url)"
     client = _get_http_client()
     res = await client.get(
         f"{SUPABASE_REST}/community_comments",
@@ -254,7 +300,7 @@ def _extract_total_count(content_range: Optional[str], fallback: int) -> int:
 
 def _format_post_summary(row: dict) -> dict:
     """목록 화면에 필요한 최소 필드만 응답으로 변환."""
-    profile = row.get("profiles") or {}
+    profile = row.get("author") or {}
     return {
         "id": row["id"],
         "post_number": row.get("post_number", 0),
@@ -262,6 +308,9 @@ def _format_post_summary(row: dict) -> dict:
         "content": "",
         "category": row["category"],
         "views": row.get("views", 0),
+        "upvotes": row.get("upvotes", 0),
+        "downvotes": row.get("downvotes", 0),
+        "viewer_vote": None,
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
         "author": {
@@ -273,9 +322,9 @@ def _format_post_summary(row: dict) -> dict:
     }
 
 
-def _format_post(row: dict) -> dict:
+def _format_post(row: dict, viewer_vote: Optional[str] = None) -> dict:
     """PostgREST 응답을 API 응답 형식으로 변환."""
-    profile = row.get("profiles") or {}
+    profile = row.get("author") or {}
     return {
         "id": row["id"],
         "post_number": row.get("post_number", 0),
@@ -283,6 +332,9 @@ def _format_post(row: dict) -> dict:
         "content": row["content"],
         "category": row["category"],
         "views": row.get("views", 0),
+        "upvotes": row.get("upvotes", 0),
+        "downvotes": row.get("downvotes", 0),
+        "viewer_vote": viewer_vote,
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
         "author": {
@@ -296,7 +348,7 @@ def _format_post(row: dict) -> dict:
 
 def _format_comment(row: dict) -> dict:
     """댓글 PostgREST 응답 변환."""
-    profile = row.get("profiles") or {}
+    profile = row.get("author") or {}
     return {
         "id": row["id"],
         "post_id": row["post_id"],

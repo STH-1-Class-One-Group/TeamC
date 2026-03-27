@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query, Header
 from typing import Literal, Optional
-from app.schemas.community_schema import PostCreate, PostUpdate, CommentCreate
+from app.schemas.community_schema import PostCreate, PostUpdate, CommentCreate, PostVoteRequest
 from app.services import community_service
 
 router = APIRouter()
@@ -44,9 +44,12 @@ async def list_posts(
 # 게시글 상세
 # ────────────────────────────────────────────────────────────
 @router.get("/community/posts/{post_id}")
-async def get_post(post_id: str):
+async def get_post(
+    post_id: str,
+    authorization: Optional[str] = Header(None),
+):
     """게시글 상세 조회 (비로그인 허용)."""
-    post = await community_service.get_post_detail(post_id)
+    post = await community_service.get_post_detail(post_id, _extract_token(authorization))
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
     return post
@@ -59,6 +62,20 @@ async def increment_post_views(post_id: str):
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
     await community_service.increment_views(post_id)
+
+
+@router.post("/community/posts/{post_id}/vote")
+async def vote_post(
+    post_id: str,
+    body: PostVoteRequest,
+    authorization: Optional[str] = Header(None),
+):
+    """게시글 추천/비추천 토글."""
+    token = _require_token(authorization)
+    try:
+        return await community_service.set_post_vote(post_id, body.vote_type, token)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # ────────────────────────────────────────────────────────────

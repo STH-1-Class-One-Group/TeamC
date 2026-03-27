@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Literal
 
 
 class AuthorInfo(BaseModel):
@@ -28,6 +28,9 @@ class PostResponse(BaseModel):
     content: str
     category: str
     views: int
+    upvotes: int
+    downvotes: int
+    viewer_vote: Optional[Literal["up", "down"]] = None
     created_at: str
     updated_at: str
     author: AuthorInfo
@@ -50,3 +53,13 @@ class CommentResponse(BaseModel):
     content: str
     created_at: str
     author: AuthorInfo
+
+
+class PostVoteRequest(BaseModel):
+    vote_type: Literal["up", "down"]
+
+
+class PostVoteResponse(BaseModel):
+    upvotes: int
+    downvotes: int
+    viewer_vote: Optional[Literal["up", "down"]] = None
