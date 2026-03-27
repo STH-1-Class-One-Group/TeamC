@@ -47,24 +47,24 @@ const getTodayDisplayString = () => {
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
   const dayName = days[today.getDay()];
   return `${year}-${month}-${day}(${dayName})`;
 };
 
 const FALLBACK_MEALS = (todayDisplay: string): MealData[] => [
-  { dates: todayDisplay, brst: 'Rice', brst_cal: '374.13kcal', lnch: 'Rice', lnch_cal: '374.13kcal', dnr: 'Rice', dnr_cal: '374.13kcal', sum_cal: '2961.19kcal' },
-  { dates: todayDisplay, brst: 'Tuna pepper salad', brst_cal: '148.73kcal', lnch: 'Vegetable soup', lnch_cal: '41.88kcal', dnr: 'Sweet pumpkin', dnr_cal: '451.14kcal', sum_cal: '2961.19kcal' },
-  { dates: todayDisplay, brst: 'Seasoned greens', brst_cal: '111.5kcal', lnch: 'Stir-fried anchovy', lnch_cal: '102.06kcal', dnr: 'Beef radish soup', dnr_cal: '164.58kcal', sum_cal: '2961.19kcal' },
-  { dates: todayDisplay, brst: 'Steamed egg', brst_cal: '106kcal', lnch: 'Stir-fried pork', lnch_cal: '482.33kcal', dnr: 'Pickles', dnr_cal: '37.98kcal', sum_cal: '2961.19kcal' },
-  { dates: todayDisplay, brst: 'Kimchi', brst_cal: '13.8kcal', lnch: 'Kimchi', lnch_cal: '13.8kcal', dnr: 'Flavored milk', dnr_cal: '165kcal', sum_cal: '2961.19kcal' },
-  { dates: todayDisplay, brst: '', brst_cal: '', lnch: '', lnch_cal: '', dnr: 'Kimchi', dnr_cal: '0kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '밥', brst_cal: '374.13kcal', lnch: '밥', lnch_cal: '374.13kcal', dnr: '밥', dnr_cal: '374.13kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '참치 고추장무침', brst_cal: '148.73kcal', lnch: '채소 수프', lnch_cal: '41.88kcal', dnr: '단호박찜', dnr_cal: '451.14kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '나물무침', brst_cal: '111.5kcal', lnch: '멸치볶음', lnch_cal: '102.06kcal', dnr: '소고기무국', dnr_cal: '164.58kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '계란찜', brst_cal: '106kcal', lnch: '돼지불고기', lnch_cal: '482.33kcal', dnr: '장아찌', dnr_cal: '37.98kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '김치', brst_cal: '13.8kcal', lnch: '김치', lnch_cal: '13.8kcal', dnr: '가공유', dnr_cal: '165kcal', sum_cal: '2961.19kcal' },
+  { dates: todayDisplay, brst: '', brst_cal: '', lnch: '', lnch_cal: '', dnr: '김치', dnr_cal: '0kcal', sum_cal: '2961.19kcal' },
 ];
 
 const DEFAULT_MEAL_INFO = {
-  breakfast: 'Loading...',
-  lunch: 'Loading...',
-  dinner: 'Loading...',
+  breakfast: '불러오는 중...',
+  lunch: '불러오는 중...',
+  dinner: '불러오는 중...',
 };
 
 interface DashboardPageProps {
@@ -174,9 +174,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
 
       const adjustedTotalCalories = Math.round((sumCalBase + zeroCalCount * 53) * 100) / 100;
       setMealInfo({
-        breakfast: breakfastItems.length > 0 ? breakfastItems.map((entry) => entry.name).join(', ') : 'No menu',
-        lunch: lunchItems.length > 0 ? lunchItems.map((entry) => entry.name).join(', ') : 'No menu',
-        dinner: dinnerItems.length > 0 ? dinnerItems.map((entry) => entry.name).join(', ') : 'No menu',
+        breakfast: breakfastItems.length > 0 ? breakfastItems.map((entry) => entry.name).join(', ') : '식단 정보 없음',
+        lunch: lunchItems.length > 0 ? lunchItems.map((entry) => entry.name).join(', ') : '식단 정보 없음',
+        dinner: dinnerItems.length > 0 ? dinnerItems.map((entry) => entry.name).join(', ') : '식단 정보 없음',
       });
       setFullMealData({
         breakfastItems,
@@ -251,13 +251,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
       <section className="relative">
         <div className="max-w-3xl">
           <h1 className="text-[3.5rem] font-extrabold tracking-tighter leading-tight text-on-surface dark:text-white mb-6">
-            Military Life
+            군 생활
             <br />
-            <span className="text-primary dark:text-blue-400">Integrated Briefing.</span>
+            <span className="text-primary dark:text-blue-400">통합 브리핑.</span>
           </h1>
           <p className="text-on-surface-variant dark:text-slate-400 text-lg leading-relaxed max-w-3xl flex flex-col">
-            <span>Schedules, meals, and defense news are surfaced from one dashboard.</span>
-            <span>Loaded items appear as soon as they arrive.</span>
+            <span>일정, 식단, 국방 뉴스를 하나의 대시보드에서 빠르게 확인할 수 있습니다.</span>
+            <span>데이터가 도착하는 순서대로 화면에 바로 반영됩니다.</span>
           </p>
         </div>
         <div className="absolute -top-10 -right-20 w-96 h-96 signature-gradient opacity-10 rounded-full blur-[100px] -z-10"></div>
@@ -267,8 +267,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
         <div className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] flex flex-col justify-between space-y-8 border border-transparent dark:border-slate-800 transition-all">
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase mb-2 block">Personnel Status</span>
-              <h2 className="text-2xl font-bold text-on-surface dark:text-white">Discharge Calculator</h2>
+              <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase mb-2 block">복무 현황</span>
+              <h2 className="text-2xl font-bold text-on-surface dark:text-white">전역 계산기</h2>
             </div>
             <div className="bg-surface-container-low dark:bg-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
               <span className="material-symbols-outlined text-primary dark:text-blue-400 text-sm" translate="no">timer</span>
@@ -279,7 +279,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
           <div className="space-y-6">
             <div className="rounded-2xl border border-outline-variant/15 bg-surface-container-low/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/80">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant dark:text-slate-400">
-                Service Track
+                복무 구분
               </p>
               <div className="mt-1 flex items-end justify-between gap-3">
                 <p className="text-sm font-semibold text-on-surface dark:text-white">
@@ -292,7 +292,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
             </div>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 space-y-2">
-                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">Enlistment</label>
+                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">입대일/임용일</label>
                 <input
                   className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm"
                   type="text"
@@ -301,7 +301,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">Discharge</label>
+                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">전역일</label>
                 <input
                   className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm"
                   type="text"
@@ -313,7 +313,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
 
             <div className="space-y-3">
               <div className="flex justify-between items-end">
-                <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">Progress</span>
+                <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">진행률</span>
                 <span className="text-4xl font-extrabold text-primary dark:text-blue-400 tracking-tighter">
                   {serviceTimeline.progressPercent.toFixed(1)}
                   <span className="text-xl">%</span>
@@ -335,23 +335,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
         <div className="md:col-span-4 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] border border-transparent dark:border-slate-800 transition-all">
           <div className="flex items-center gap-3 mb-8">
             <span className="material-symbols-outlined text-primary dark:text-blue-400 bg-primary-fixed dark:bg-blue-900/40 p-2 rounded-lg" translate="no">military_tech</span>
-            <h2 className="text-xl font-bold text-on-surface dark:text-white">Reservist Status</h2>
+            <h2 className="text-xl font-bold text-on-surface dark:text-white">예비군 현황</h2>
           </div>
           <div className="space-y-6">
             <div>
-              <p className="text-xs text-on-surface-variant dark:text-slate-400 mb-1">Current grade</p>
-              <p className="text-xl font-bold dark:text-white">Reserve 1st class</p>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400 mb-1">현재 단계</p>
+              <p className="text-xl font-bold dark:text-white">예비군 1년차</p>
             </div>
             <div className="p-4 bg-surface-container-low dark:bg-slate-800 rounded-lg space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm font-bold dark:text-white">Mobilization training</p>
+                  <p className="text-sm font-bold dark:text-white">동원훈련</p>
                   <p className="text-xs text-on-surface-variant dark:text-slate-400">2024. 09. 12 - 09. 14</p>
                 </div>
-                <span className="bg-tertiary-container dark:bg-slate-700 text-on-tertiary-container dark:text-slate-200 px-2 py-1 rounded text-[10px] font-bold">Pending</span>
+                <span className="bg-tertiary-container dark:bg-slate-700 text-on-tertiary-container dark:text-slate-200 px-2 py-1 rounded text-[10px] font-bold">예정</span>
               </div>
               <div className="border-t border-outline-variant/15 dark:border-slate-700 pt-3">
-                <p className="text-xs text-on-surface-variant dark:text-slate-400">Location: Paju reserve training unit</p>
+                <p className="text-xs text-on-surface-variant dark:text-slate-400">장소: 파주 예비군 훈련장</p>
               </div>
             </div>
           </div>
@@ -359,30 +359,30 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
 
         <div className="md:col-span-4 bg-surface-container-low dark:bg-slate-900/50 p-8 rounded-xl flex flex-col border border-transparent dark:border-slate-800 transition-all">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-on-surface dark:text-white">Today's Meals</h2>
+            <h2 className="text-xl font-bold text-on-surface dark:text-white">오늘의 식단</h2>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center justify-between cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('Breakfast', fullMealData.breakfastItems)}>
+            <div className="flex items-center justify-between cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('조식', fullMealData.breakfastItems)}>
               <div className="flex items-center gap-4">
-                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">Breakfast</span>
+                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">조식</span>
                 <p className="text-sm text-on-surface dark:text-slate-200 break-all group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">{mealInfo.breakfast}</p>
               </div>
               <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
                 <span className="material-symbols-outlined text-lg" translate="no">chevron_right</span>
               </button>
             </div>
-            <div className="flex items-center justify-between py-3 border-y border-outline-variant/15 dark:border-slate-800 cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('Lunch', fullMealData.lunchItems)}>
+            <div className="flex items-center justify-between py-3 border-y border-outline-variant/15 dark:border-slate-800 cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('중식', fullMealData.lunchItems)}>
               <div className="flex items-center gap-4">
-                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">Lunch</span>
+                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">중식</span>
                 <p className="text-sm text-on-surface dark:text-slate-200 break-all group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">{mealInfo.lunch}</p>
               </div>
               <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
                 <span className="material-symbols-outlined text-lg" translate="no">chevron_right</span>
               </button>
             </div>
-            <div className="flex items-center justify-between cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('Dinner', fullMealData.dinnerItems)}>
+            <div className="flex items-center justify-between cursor-pointer group hover:bg-surface-variant/30 p-2 rounded-lg transition-colors -mx-2" onClick={() => handleMealClick('석식', fullMealData.dinnerItems)}>
               <div className="flex items-center gap-4">
-                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">Dinner</span>
+                <span className="text-xs font-bold text-primary dark:text-blue-400 w-16">석식</span>
                 <p className="text-sm text-on-surface dark:text-slate-200 break-all group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">{mealInfo.dinner}</p>
               </div>
               <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
@@ -391,15 +391,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
             </div>
           </div>
           <button onClick={() => navigate('/Meal')} className="mt-auto pt-6 text-sm font-bold text-primary dark:text-blue-400 flex items-center gap-1 hover:gap-2 transition-all">
-            View full meals <span className="material-symbols-outlined text-sm" translate="no">arrow_forward</span>
+            전체 식단 보기 <span className="material-symbols-outlined text-sm" translate="no">arrow_forward</span>
           </button>
         </div>
 
         <div className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-900/50 p-8 rounded-xl shadow-[0_12px_40px_rgba(27,28,28,0.06)] border border-transparent dark:border-slate-800 transition-all">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-on-surface dark:text-white">Defense News</h2>
+            <h2 className="text-xl font-bold text-on-surface dark:text-white">국방 뉴스</h2>
             <button onClick={() => navigate('/News')} className="text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-400">
-              View all
+              전체보기
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -429,9 +429,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
                 </div>
               ))
             ) : isNewsLoading ? (
-              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">Loading news...</div>
+              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">뉴스를 불러오는 중입니다...</div>
             ) : (
-              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">No defense news available.</div>
+              <div className="col-span-2 text-center py-10 text-on-surface-variant dark:text-slate-400">표시할 국방 뉴스가 없습니다.</div>
             )}
           </div>
         </div>
