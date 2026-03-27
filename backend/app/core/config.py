@@ -8,6 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BACKEND_ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
 
 
+def normalize_origin(value: str) -> str:
+    return value.strip().rstrip("/")
+
+
 class Settings(BaseSettings):
     database_url: str = ""
     secret_key: str = ""
@@ -49,13 +53,17 @@ class Settings(BaseSettings):
         defaults = [
             "http://localhost:3000",
             "http://127.0.0.1:3000",
+            "https://teamc-defense-industry.pages.dev",
         ]
+        normalized_defaults = [normalize_origin(origin) for origin in defaults]
         extra_origins = [
-            origin.strip()
+            normalize_origin(origin)
             for origin in self.backend_cors_origins.split(",")
             if origin.strip()
         ]
-        return defaults + [origin for origin in extra_origins if origin not in defaults]
+        return normalized_defaults + [
+            origin for origin in extra_origins if origin and origin not in normalized_defaults
+        ]
 
 
 settings = Settings()
