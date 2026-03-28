@@ -5,7 +5,12 @@ export type KakaoMapFailureReason =
   | 'script_load_failed'
   | 'domain_not_allowed_or_network_blocked';
 
-const getLocationContext = () => {
+export type KakaoMapLocationContext = {
+  origin: string;
+  pathname: string;
+};
+
+export const getKakaoMapLocationContext = (): KakaoMapLocationContext => {
   if (typeof window === 'undefined') {
     return {
       origin: 'unknown',
@@ -42,13 +47,14 @@ export const reportKakaoMapFailure = (
   error?: ErrorEvent
 ) => {
   const reason = classifyKakaoMapFailure(appKey, error);
-  const location = getLocationContext();
+  const location = getKakaoMapLocationContext();
 
   console.error(`[${componentName}] Kakao map loader failed`, {
     reason,
     keyPresent: Boolean(appKey),
     origin: location.origin,
     pathname: location.pathname,
+    environment: isProductionBuild ? 'production' : 'development',
     errorType: error?.type ?? 'unknown',
   });
 
@@ -72,29 +78,39 @@ export const getKakaoMapFallbackCopy = (reason: KakaoMapFailureReason) => {
     case 'domain_not_allowed_or_network_blocked':
     default:
       return {
-        title: 'Map service is unavailable in this environment.',
+        title: isProductionBuild
+          ? 'Map service is unavailable for this deployed domain.'
+          : 'Map service is unavailable in this environment.',
         description:
           'Check the Kakao JavaScript key, allowed domains, and current network access.',
       };
   }
 };
 
-export const getKakaoMapModalMessage = (
-  reason: KakaoMapFailureReason
-) => getKakaoMapFallbackCopy(reason).title;
-
 export const getKakaoMapSupportHint = (reason: KakaoMapFailureReason) => {
-  if (isProductionBuild) {
-    return undefined;
-  }
-
   switch (reason) {
     case 'missing_key':
-      return 'Development hint: define REACT_APP_KAKAO_MAP_KEY and rebuild.';
+      return isProductionBuild
+        ? 'Deployment hint: provide REACT_APP_KAKAO_MAP_KEY to the production build.'
+        : 'Development hint: define REACT_APP_KAKAO_MAP_KEY and rebuild.';
     case 'script_load_failed':
-      return 'Development hint: confirm the Kakao script can be requested from this browser session.';
+      return isProductionBuild
+        ? 'Deployment hint: verify the Kakao Maps SDK script is reachable from the deployed site.'
+        : 'Development hint: confirm the Kakao script can be requested from this browser session.';
     case 'domain_not_allowed_or_network_blocked':
     default:
-      return 'Development hint: confirm the current origin is allowlisted in Kakao Developers.';
+      return isProductionBuild
+        ? 'Deployment hint: allowlist the current deployed origin in Kakao Developers Platform settings.'
+        : 'Development hint: confirm the current origin is allowlisted in Kakao Developers.';
   }
+};
+
+export const getKakaoMapFailureDetails = (reason: KakaoMapFailureReason) => {
+  const location = getKakaoMapLocationContext();
+
+  if (reason !== 'domain_not_allowed_or_network_blocked') {
+    return null;
+  }
+
+  return `Current origin: ${location.origin}`;
 };

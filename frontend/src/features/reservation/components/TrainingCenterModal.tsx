@@ -4,7 +4,8 @@ import { clientEnv } from '../../../config/clientEnv';
 import { TrainingCenter } from '../data/trainingCenters';
 import {
   classifyKakaoMapFailure,
-  getKakaoMapModalMessage,
+  getKakaoMapFailureDetails,
+  getKakaoMapFallbackCopy,
   getKakaoMapSupportHint,
   reportKakaoMapFailure,
 } from './kakaoMapDiagnostics';
@@ -19,7 +20,8 @@ const KAKAO_MAP_KEY = clientEnv.kakaoMapKey;
 const ModalMapFallback: React.FC<{
   message: string;
   supportHint?: string;
-}> = ({ message, supportHint }) => (
+  details?: string | null;
+}> = ({ message, supportHint, details }) => (
   <div className="rounded-xl bg-surface-container-low dark:bg-slate-800 aspect-[16/9] flex items-center justify-center border border-outline-variant/10 dark:border-slate-700">
     <div className="text-center text-on-surface-variant dark:text-slate-400 px-6">
       <span
@@ -29,6 +31,9 @@ const ModalMapFallback: React.FC<{
         map
       </span>
       <p className="text-sm">{message}</p>
+      {details ? (
+        <p className="text-[11px] opacity-50 mt-2">{details}</p>
+      ) : null}
       {supportHint ? (
         <p className="text-[11px] opacity-50 mt-2">{supportHint}</p>
       ) : null}
@@ -44,7 +49,9 @@ const TrainingCenterMap: React.FC<{
     appkey: KAKAO_MAP_KEY,
   });
   const failureReason = classifyKakaoMapFailure(KAKAO_MAP_KEY, error);
+  const fallbackCopy = getKakaoMapFallbackCopy(failureReason);
   const supportHint = getKakaoMapSupportHint(failureReason);
+  const failureDetails = getKakaoMapFailureDetails(failureReason);
 
   useEffect(() => {
     if (!error) {
@@ -63,8 +70,9 @@ const TrainingCenterMap: React.FC<{
   if (error) {
     return (
       <ModalMapFallback
-        message={getKakaoMapModalMessage(failureReason)}
+        message={fallbackCopy.title}
         supportHint={supportHint}
+        details={failureDetails}
       />
     );
   }
@@ -158,7 +166,7 @@ export const TrainingCenterModal: React.FC<TrainingCenterModalProps> = ({
             <TrainingCenterMap center={center} hasCoords={hasCoords} />
           ) : (
             <ModalMapFallback
-              message={getKakaoMapModalMessage('missing_key')}
+              message={getKakaoMapFallbackCopy('missing_key').title}
               supportHint={getKakaoMapSupportHint('missing_key')}
             />
           )}

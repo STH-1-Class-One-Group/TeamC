@@ -9,6 +9,7 @@ import { clientEnv } from '../../../config/clientEnv';
 import { TrainingCenter } from '../data/trainingCenters';
 import {
   classifyKakaoMapFailure,
+  getKakaoMapFailureDetails,
   getKakaoMapFallbackCopy,
   getKakaoMapSupportHint,
   reportKakaoMapFailure,
@@ -27,7 +28,8 @@ const MapFallback: React.FC<{
   title: string;
   description?: string;
   supportHint?: string;
-}> = ({ title, description, supportHint }) => (
+  details?: string | null;
+}> = ({ title, description, supportHint, details }) => (
   <div className="relative rounded-xl overflow-hidden bg-surface-container-low dark:bg-slate-800 shadow-sm aspect-[16/9] border border-outline-variant/10 dark:border-slate-700">
     <div className="flex flex-col items-center justify-center h-full text-on-surface-variant dark:text-slate-400 gap-3 px-6 text-center">
       <span
@@ -38,6 +40,7 @@ const MapFallback: React.FC<{
       </span>
       <p className="text-sm font-medium">{title}</p>
       {description ? <p className="text-xs opacity-60">{description}</p> : null}
+      {details ? <p className="text-[11px] opacity-50">{details}</p> : null}
       {supportHint ? (
         <p className="text-[11px] opacity-50">{supportHint}</p>
       ) : null}
@@ -127,6 +130,7 @@ const KakaoMapCanvas: React.FC<KakaoMapProps> = ({
   const failureReason = classifyKakaoMapFailure(KAKAO_MAP_KEY, error);
   const fallbackCopy = getKakaoMapFallbackCopy(failureReason);
   const supportHint = getKakaoMapSupportHint(failureReason);
+  const failureDetails = getKakaoMapFailureDetails(failureReason);
 
   useEffect(() => {
     if (!error) {
@@ -142,6 +146,7 @@ const KakaoMapCanvas: React.FC<KakaoMapProps> = ({
         title={fallbackCopy.title}
         description={fallbackCopy.description}
         supportHint={supportHint}
+        details={failureDetails}
       />
     );
   }
@@ -274,6 +279,7 @@ export const KakaoMap: React.FC<KakaoMapProps> = (props) => {
         title={fallbackCopy.title}
         description={fallbackCopy.description}
         supportHint={supportHint}
+        details={getKakaoMapFailureDetails('missing_key')}
       />
     );
   }
