@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 
@@ -8,7 +9,7 @@ import {
   getApiRuntimeErrorMessage,
   isNetworkFetchError,
 } from '../../api/apiBaseUrl';
-import { Profile } from '../../components/common/ProfileSetupModal';
+import { Profile } from '../profile/types';
 import { Post, PostListResponse, formatBoardDate } from './types';
 
 interface CommunityPageProps {
@@ -181,6 +182,13 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>군인 커뮤니티 | Modern Sentinel</title>
+        <meta name="description" content="군 생활, 방산, 예비군 관련 정보를 나누는 커뮤니티입니다." />
+        <meta property="og:title" content="군인 커뮤니티 | Modern Sentinel" />
+        <meta property="og:description" content="군 생활, 방산, 예비군 관련 정보를 나누는 커뮤니티입니다." />
+      </Helmet>
+
       <section className="mb-10 sm:mb-12">
         <h1 className="mb-4 text-4xl font-extrabold tracking-tighter text-on-surface dark:text-white sm:text-5xl md:text-6xl">
           커뮤니티
@@ -198,7 +206,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                 <button
                   key={tab.key}
                   onClick={() => handleCategoryChange(tab.key)}
-                  className={`px-5 py-2 border text-sm font-semibold transition-colors ${
+                  className={`border px-5 py-2 text-sm font-semibold transition-colors ${
                     selectedCategory === tab.key
                       ? 'border-primary bg-primary text-white'
                       : 'border-outline-variant/40 bg-surface-container-lowest text-on-surface hover:border-primary/60 dark:bg-slate-800 dark:text-white'
@@ -225,7 +233,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                 </select>
               </label>
 
-              {user && profile && (
+              {user && profile ? (
                 <button
                   onClick={() => navigate('/Community/write')}
                   className="flex items-center gap-2 bg-primary px-5 py-2.5 font-semibold text-white transition-colors hover:bg-primary/90"
@@ -233,26 +241,26 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                   <span className="material-symbols-outlined text-[18px]">edit</span>
                   글쓰기
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
 
           <div className="text-sm text-on-surface-variant dark:text-slate-400">
             총 <span className="font-semibold text-on-surface dark:text-white">{total.toLocaleString()}</span>건
-            {searchKeyword && (
+            {searchKeyword ? (
               <span className="ml-2">
                 검색어: <span className="font-semibold text-on-surface dark:text-white">{searchKeyword}</span>
               </span>
-            )}
-            {isRefreshing && <span className="ml-2 text-primary">목록을 새로 불러오는 중입니다.</span>}
+            ) : null}
+            {isRefreshing ? <span className="ml-2 text-primary">목록을 새로 불러오는 중입니다.</span> : null}
           </div>
         </div>
 
-        {error && posts.length > 0 && (
+        {error && posts.length > 0 ? (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
             {error}
           </div>
-        )}
+        ) : null}
 
         <div className="space-y-3 md:hidden">
           {isLoading && posts.length === 0 ? (
@@ -295,6 +303,8 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                   <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-on-surface-variant dark:text-slate-400">
                     <span>{authorLabel}</span>
                     <span>조회수 {post.views}</span>
+                    <span>추천 {post.upvotes}</span>
+                    <span>비추천 {post.downvotes}</span>
                     <span>No. {post.post_number}</span>
                   </div>
                 </button>
@@ -349,17 +359,29 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
                         {post.post_number}
                       </td>
                       <td className="px-4 py-4">
-                        <button
-                          onClick={() => navigate(`/Community/${post.id}`)}
-                          className="flex w-full items-center gap-3 text-left"
-                        >
-                          <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                            {categoryLabel}
-                          </span>
-                          <span className="truncate text-sm font-medium text-on-surface transition-colors hover:text-primary dark:text-white md:text-base">
-                            {post.title}
-                          </span>
-                        </button>
+                        <div className="space-y-2">
+                          <button
+                            onClick={() => navigate(`/Community/${post.id}`)}
+                            className="flex w-full items-center gap-3 text-left"
+                          >
+                            <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                              {categoryLabel}
+                            </span>
+                            <span className="truncate text-sm font-medium text-on-surface transition-colors hover:text-primary dark:text-white md:text-base">
+                              {post.title}
+                            </span>
+                          </button>
+                          <div className="flex items-center gap-4 pl-[52px] text-xs text-on-surface-variant dark:text-slate-400">
+                            <span className="flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">thumb_up</span>
+                              {post.upvotes}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">thumb_down</span>
+                              {post.downvotes}
+                            </span>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-4 py-4 text-center text-sm text-on-surface dark:text-white">
                         {authorLabel}
@@ -378,7 +400,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
           </table>
         </div>
 
-        {totalPages > 1 && (
+        {totalPages > 1 ? (
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
@@ -411,7 +433,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({ user, profile }) =
               다음
             </button>
           </div>
-        )}
+        ) : null}
 
         <form
           onSubmit={handleSearchSubmit}

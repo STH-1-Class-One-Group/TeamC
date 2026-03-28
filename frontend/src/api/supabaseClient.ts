@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // .env 파일에 설정된 Supabase 환경 변수들을 가져옵니다.
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
+const supabaseUrl = (process.env.REACT_APP_SUPABASE_URL || '').trim();
+const supabaseAnonKey = (process.env.REACT_APP_SUPABASE_ANON_KEY || '').trim();
 
 // 환경 변수가 제대로 설정되었는지 확인하는 플래그
 export const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);

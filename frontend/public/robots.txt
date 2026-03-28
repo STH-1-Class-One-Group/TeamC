@@ -1,3 +1,5 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /payment-success
+
+Sitemap: https://modernsentinel.kr/sitemap.xml

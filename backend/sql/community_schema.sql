@@ -9,8 +9,29 @@
 create table if not exists public.profiles (
   id          uuid primary key references auth.users(id) on delete cascade,
   nickname    text not null unique,
-  rank        text,                        -- 계급 (선택)
-  unit        text,                        -- 소속부대 (선택)
+  user_type   text check (user_type in ('civilian', 'active_enlisted', 'active_cadre')),
+  cadre_category text check (cadre_category in ('officer', 'nco', 'civilian_staff')),
+  rank        text,                        -- 현역간부 계급/직급 (선택)
+  unit        text,                        -- 소속부대/기관 (선택)
+  enlistment_date date,                    -- 입대일 (선택)
+  service_track text check (
+    service_track in (
+      'army_active',
+      'air_force_active',
+      'social_service',
+      'industrial_service_active',
+      'industrial_service_supplementary'
+    )
+  ),
+  acquaintance_name text,                  -- 일반인 회원이 등록한 지인 이름 (선택)
+  acquaintance_service_track text check (
+    acquaintance_service_track in (
+      'army_active',
+      'air_force_active'
+    )
+  ),
+  acquaintance_enlistment_date date,      -- 일반인 회원이 등록한 지인 입대일 (선택)
+  profile_completed boolean not null default false, -- 프로필 설정 완료 여부
   avatar_url  text,                        -- Supabase Storage 프로필 이미지 경로
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
@@ -52,6 +73,8 @@ create table if not exists public.community_posts (
   category    text not null default 'general'
                 check (category in ('general', 'question', 'info')),
   views       integer not null default 0,
+  upvotes     integer not null default 0,
+  downvotes   integer not null default 0,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -59,6 +82,8 @@ create table if not exists public.community_posts (
 comment on table public.community_posts is '커뮤니티 게시글';
 comment on column public.community_posts.post_number is '커뮤니티 게시판 고유 번호';
 comment on column public.community_posts.category is 'general=자유게시판, question=질문게시판, info=정보공유';
+comment on column public.community_posts.upvotes is '게시글 추천 수';
+comment on column public.community_posts.downvotes is '게시글 비추천 수';
 
 -- RLS 활성화
 alter table public.community_posts enable row level security;
@@ -136,7 +161,51 @@ create policy "comments: 본인만 삭제"
 
 
 -- ────────────────────────────────────────────────────────────
--- 4. 조회수 증가 헬퍼 함수
+-- 4. community_post_votes 테이블 (게시글 추천/비추천)
+-- ────────────────────────────────────────────────────────────
+create table if not exists public.community_post_votes (
+  post_id     uuid not null references public.community_posts(id) on delete cascade,
+  user_id     uuid not null references public.profiles(id) on delete cascade,
+  vote_type   text not null check (vote_type in ('up', 'down')),
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  primary key (post_id, user_id)
+);
+
+comment on table public.community_post_votes is '게시글 추천/비추천 기록';
+
+alter table public.community_post_votes enable row level security;
+
+create index if not exists community_post_votes_post_id_vote_type_idx
+  on public.community_post_votes (post_id, vote_type);
+
+create index if not exists community_post_votes_user_id_idx
+  on public.community_post_votes (user_id);
+
+create policy "post_votes: 본인 조회"
+  on public.community_post_votes for select
+  to authenticated
+  using ((select auth.uid()) = user_id);
+
+create policy "post_votes: 본인 생성"
+  on public.community_post_votes for insert
+  to authenticated
+  with check ((select auth.uid()) = user_id);
+
+create policy "post_votes: 본인 수정"
+  on public.community_post_votes for update
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+create policy "post_votes: 본인 삭제"
+  on public.community_post_votes for delete
+  to authenticated
+  using ((select auth.uid()) = user_id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 5. 조회수 증가/추천 토글 헬퍼 함수
 --    security definer: RLS를 우회하여 views 컬럼만 증가
 -- ────────────────────────────────────────────────────────────
 create or replace function public.increment_post_views(p_post_id uuid)
@@ -151,9 +220,92 @@ $$;
 
 comment on function public.increment_post_views is '게시글 조회수 1 증가 (RLS 우회, 인증 불필요)';
 
+create or replace function public.set_post_vote(p_post_id uuid, p_vote_type text)
+returns table (
+  upvotes integer,
+  downvotes integer,
+  viewer_vote text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_existing_vote text;
+begin
+  v_user_id := auth.uid();
+
+  if v_user_id is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if p_vote_type not in ('up', 'down') then
+    raise exception 'Invalid vote type: %', p_vote_type;
+  end if;
+
+  if not exists (
+    select 1
+    from public.community_posts
+    where id = p_post_id
+  ) then
+    raise exception 'Post not found';
+  end if;
+
+  select vote_type
+  into v_existing_vote
+  from public.community_post_votes
+  where post_id = p_post_id
+    and user_id = v_user_id;
+
+  if v_existing_vote = p_vote_type then
+    delete from public.community_post_votes
+    where post_id = p_post_id
+      and user_id = v_user_id;
+
+    viewer_vote := null;
+  elsif v_existing_vote is null then
+    insert into public.community_post_votes (post_id, user_id, vote_type)
+    values (p_post_id, v_user_id, p_vote_type);
+
+    viewer_vote := p_vote_type;
+  else
+    update public.community_post_votes
+    set vote_type = p_vote_type,
+        updated_at = now()
+    where post_id = p_post_id
+      and user_id = v_user_id;
+
+    viewer_vote := p_vote_type;
+  end if;
+
+  update public.community_posts
+  set
+    upvotes = (
+      select count(*)
+      from public.community_post_votes
+      where post_id = p_post_id
+        and vote_type = 'up'
+    ),
+    downvotes = (
+      select count(*)
+      from public.community_post_votes
+      where post_id = p_post_id
+        and vote_type = 'down'
+    )
+  where id = p_post_id
+  returning community_posts.upvotes, community_posts.downvotes
+  into upvotes, downvotes;
+
+  return next;
+end;
+$$;
+
+comment on function public.set_post_vote is '게시글 추천/비추천 설정 및 토글';
+
 
 -- ────────────────────────────────────────────────────────────
--- 5. updated_at 자동 갱신 트리거 (posts)
+-- 6. updated_at 자동 갱신 트리거 (posts, profiles, post_votes)
 -- ────────────────────────────────────────────────────────────
 create or replace function public.set_updated_at()
 returns trigger
@@ -175,9 +327,14 @@ create trigger trg_profiles_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
 
+drop trigger if exists trg_post_votes_updated_at on public.community_post_votes;
+create trigger trg_post_votes_updated_at
+  before update on public.community_post_votes
+  for each row execute function public.set_updated_at();
+
 
 -- ────────────────────────────────────────────────────────────
--- 6. 검색 성능 최적화 (ILIKE 대응)
+-- 7. 검색/투표 성능 최적화
 --    title/content 검색은 trigram 인덱스로 가속
 -- ────────────────────────────────────────────────────────────
 create extension if not exists pg_trgm;
@@ -190,7 +347,7 @@ create index if not exists community_posts_content_trgm_idx
 
 
 -- ────────────────────────────────────────────────────────────
--- 7. 완료 확인용 쿼리 (선택)
+-- 8. 완료 확인용 쿼리 (선택)
 -- ────────────────────────────────────────────────────────────
 -- select table_name from information_schema.tables
 -- where table_schema = 'public'

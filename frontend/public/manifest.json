@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Modern Sentinel",
+  "name": "Modern Sentinel — 군인을 위한 스마트 플랫폼",
+  "description": "예비군 훈련장 찾기, 급식 정보, 방산 뉴스, 커뮤니티까지. 군인의 일상을 한곳에서 관리하세요.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0061a5",
+  "background_color": "#fcf9f8",
+  "lang": "ko"
 }

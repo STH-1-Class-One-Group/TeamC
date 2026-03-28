@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { buildApiUrl } from '../../../api/apiBaseUrl';
 import { ProfileAvatar } from '../../../components/common/ProfileAvatar';
 import { Comment, formatRelativeTime } from '../types';
-import { Profile } from '../../../components/common/ProfileSetupModal';
+import { Profile } from '../../profile/types';
 import { supabase } from '../../../api/supabaseClient';
 
 interface CommentSectionProps {
@@ -17,11 +17,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, profile,
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch(buildApiUrl(`/api/v1/community/posts/${postId}/comments`));
@@ -32,7 +28,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, profile,
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [postId]);
+
+  useEffect(() => {
+    void fetchComments();
+  }, [fetchComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

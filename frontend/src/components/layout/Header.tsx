@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
 
+import { CartIcon } from '../../features/cart/components/CartIcon';
+import { useCart } from '../../features/cart/hooks/useCart';
+import { Profile } from '../../features/profile/types';
+import { getCadreCategoryLabel, getProfileDisplayRank, isCadreUser } from '../../utils/serviceDates';
 import { LoginModal } from '../common/LoginModal';
 import { MyCouponModal } from '../common/MyCouponModal';
 import { ProfileAvatar } from '../common/ProfileAvatar';
-import { Profile } from '../common/ProfileSetupModal';
-import { CartIcon } from '../../features/cart/components/CartIcon';
-import { useCart } from '../../features/cart/hooks/useCart';
 
 const brandLogoSrc = `${process.env.PUBLIC_URL}/logo.png`;
 
@@ -20,7 +21,7 @@ interface HeaderProps {
 const navItems = [
   { to: '/', label: '쇼핑' },
   { to: '/Dashboard', label: '대시보드' },
-  { to: '/armed-reseve', label: '예비군' },
+  { to: '/ArmedReserve', label: '예비군' },
   { to: '/recruitment', label: '모집정보' },
   { to: '/Community', label: '커뮤니티' },
 ];
@@ -42,15 +43,15 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
   const { openCart, totalCount } = useCart();
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      return (
-        savedTheme === 'dark' ||
-        (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      );
+    if (typeof window === 'undefined') {
+      return false;
     }
 
-    return false;
+    const savedTheme = localStorage.getItem('theme');
+    return (
+      savedTheme === 'dark' ||
+      (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
   });
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -65,10 +66,11 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      return;
     }
+
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
   }, [isDarkMode]);
 
   useEffect(() => {
@@ -121,6 +123,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
 
   const displayName =
     profile?.nickname || (user?.user_metadata?.full_name as string) || user?.email || 'Guest';
+  const displayRank = getProfileDisplayRank(profile);
 
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => !prev);
@@ -148,6 +151,18 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
     openCart();
     setIsActionsMenuOpen(false);
   };
+
+  const profileMeta = displayRank
+    ? [
+        displayRank,
+        isCadreUser(profile?.user_type) && profile?.cadre_category
+          ? getCadreCategoryLabel(profile.cadre_category)
+          : null,
+        profile?.unit ?? null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : null;
 
   return (
     <>
@@ -194,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
             <button
               onClick={toggleDarkMode}
               className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
-              aria-label="Toggle dark mode"
+              aria-label="테마 전환"
             >
               <span className="material-symbols-outlined cursor-pointer text-slate-500 transition-all hover:text-blue-600 dark:text-slate-400">
                 {isDarkMode ? 'light_mode' : 'dark_mode'}
@@ -226,26 +241,34 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                 >
                   <ProfileAvatar
                     nickname={displayName}
-                    rank={profile?.rank}
+                    rank={displayRank}
                     avatar_url={profile?.avatar_url}
+                    user_type={profile?.user_type}
+                    service_track={profile?.service_track}
+                    enlistment_date={profile?.enlistment_date}
                     containerClassName="h-9 w-9 overflow-hidden rounded-full"
                   />
                 </button>
 
                 {isDropdownOpen ? (
-                  <div className="absolute right-0 top-11 z-50 w-48 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                  <div className="absolute right-0 top-11 z-50 w-52 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                     <div className="border-b border-slate-100 px-4 py-2 dark:border-slate-700">
                       <p className="text-xs text-slate-500 dark:text-slate-400">로그인됨</p>
                       <p className="truncate text-sm font-semibold text-slate-800 dark:text-white">
                         {displayName}
                       </p>
-                      {profile?.rank ? (
-                        <p className="mt-0.5 text-xs text-primary">
-                          {profile.rank}
-                          {profile.unit ? ` 쨌 ${profile.unit}` : ''}
-                        </p>
+                      {profileMeta ? (
+                        <p className="mt-0.5 text-xs text-primary">{profileMeta}</p>
                       ) : null}
                     </div>
+                    <NavLink
+                      to="/MyPage"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700/60"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">badge</span>
+                      마이페이지
+                    </NavLink>
                     <button
                       onClick={() => void runSignOut()}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -326,10 +349,18 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
               <p className="mt-2 truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {user ? displayName : 'Guest'}
               </p>
+              {user ? (
+                <NavLink
+                  to="/MyPage"
+                  className="mt-4 inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  마이페이지
+                </NavLink>
+              ) : null}
               <button
                 type="button"
                 onClick={user ? () => void runSignOut() : openLoginModal}
-                className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="mt-3 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 {user ? '로그아웃' : '로그인'}
               </button>
@@ -369,7 +400,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                   <span className="material-symbols-outlined text-[20px]" translate="no">
                     {isDarkMode ? 'light_mode' : 'dark_mode'}
                   </span>
-                  Theme
+                  테마
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   {isDarkMode ? 'Light' : 'Dark'}
@@ -385,7 +416,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                   <span className="material-symbols-outlined text-[20px]" translate="no">
                     confirmation_number
                   </span>
-                  Coupons
+                  쿠폰
                 </span>
                 <span className="material-symbols-outlined text-base text-slate-400" translate="no">
                   chevron_right
@@ -401,24 +432,38 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                   <span className="material-symbols-outlined text-[20px]" translate="no">
                     shopping_cart
                   </span>
-                  Cart
+                  장바구니
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400">{totalCount}</span>
               </button>
 
               {user ? (
-                <button
-                  type="button"
-                  onClick={() => void runSignOut()}
-                  className="flex items-center justify-between rounded-2xl px-3 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[20px]" translate="no">
-                      logout
+                <>
+                  <NavLink
+                    to="/MyPage"
+                    onClick={() => setIsActionsMenuOpen(false)}
+                    className="flex items-center justify-between rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[20px]" translate="no">
+                        badge
+                      </span>
+                      마이페이지
                     </span>
-                    Logout
-                  </span>
-                </button>
+                  </NavLink>
+                  <button
+                    type="button"
+                    onClick={() => void runSignOut()}
+                    className="flex items-center justify-between rounded-2xl px-3 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[20px]" translate="no">
+                        logout
+                      </span>
+                      로그아웃
+                    </span>
+                  </button>
+                </>
               ) : (
                 <button
                   type="button"
@@ -429,7 +474,7 @@ export const Header: React.FC<HeaderProps> = ({ user, profile, onSignOut }) => {
                     <span className="material-symbols-outlined text-[20px]" translate="no">
                       account_circle
                     </span>
-                    Login
+                    로그인
                   </span>
                 </button>
               )}

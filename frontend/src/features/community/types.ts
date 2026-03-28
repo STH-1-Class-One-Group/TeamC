@@ -12,6 +12,9 @@ export interface Post {
   content: string;
   category: string;
   views: number;
+  upvotes: number;
+  downvotes: number;
+  viewer_vote: 'up' | 'down' | null;
   created_at: string;
   updated_at: string;
   author: AuthorInfo;

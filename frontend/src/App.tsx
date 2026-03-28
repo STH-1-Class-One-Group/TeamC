@@ -1,22 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
-import { Header } from './components/layout/Header';
-import { Footer } from './components/layout/Footer';
-import { DashboardPage } from './features/dashboard/DashboardPage';
-import { MealPage } from './features/meal/MealPage';
-import { NewsPage } from './features/news/NewsPage';
-import { ShopPage } from './features/shop/ShopPage';
-import { ArmedReservePage } from './features/armedReserve/ArmedReservePage';
-import { RecruitmentPage } from './features/recruitment/RecruitmentPage';
-import { CartProvider } from './features/cart/context/CartContext';
-import { CartModal } from './features/cart/components/CartModal';
+
 import { hasSupabaseConfig, supabase } from './api/supabaseClient';
-import { ProfileSetupModal, Profile } from './components/common/ProfileSetupModal';
+import { Footer } from './components/layout/Footer';
+import { Header } from './components/layout/Header';
+import { ProfileSetupModal } from './components/common/ProfileSetupModal';
+import { SignupCompletionModal } from './components/common/SignupCompletionModal';
+import { CartModal } from './features/cart/components/CartModal';
+import PaymentSuccess from './features/cart/components/PaymentSuccess';
+import { CartProvider } from './features/cart/context/CartContext';
 import { CommunityPage } from './features/community/CommunityPage';
 import { PostDetailPage } from './features/community/PostDetailPage';
 import { PostWritePage } from './features/community/PostWritePage';
-import PaymentSuccess from './features/cart/components/PaymentSuccess';
+import { DashboardPage } from './features/dashboard/DashboardPage';
+import { PrivacyPolicyPage } from './features/legal/PrivacyPolicyPage';
+import { SupportPage } from './features/legal/SupportPage';
+import { TermsOfServicePage } from './features/legal/TermsOfServicePage';
+import { MealPage } from './features/meal/MealPage';
+import { NewsPage } from './features/news/NewsPage';
+import { MyPage } from './features/profile/MyPage';
+import { isProfileSetupRequired } from './features/profile/profileModes';
+import { Profile } from './features/profile/types';
+import { RecruitmentPage } from './features/recruitment/RecruitmentPage';
+import { ArmedReservePage } from './features/reservation/ArmedReservePage';
+import { ShopPage } from './features/shop/ShopPage';
 
 type StorageEntry = {
   key: string;
@@ -73,6 +81,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [showSignupCompletion, setShowSignupCompletion] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -102,6 +111,7 @@ const App: React.FC = () => {
 
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+
       if (!currentUser) {
         setProfile(null);
         setShowProfileSetup(false);
@@ -161,7 +171,7 @@ const App: React.FC = () => {
       }
 
       setProfile(nextProfile);
-      setShowProfileSetup(!nextProfile);
+      setShowProfileSetup(isProfileSetupRequired(nextProfile));
     };
 
     void syncProfile();
@@ -217,31 +227,56 @@ const App: React.FC = () => {
           <main className="mx-auto w-full max-w-7xl flex-grow px-4 pb-14 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-32">
             <Routes>
               <Route path="/" element={<ShopPage />} />
-              <Route path="/Dashboard" element={<DashboardPage />} />
+              <Route path="/Dashboard" element={<DashboardPage profile={profile ?? null} />} />
+              <Route path="/ArmedReserve" element={<ArmedReservePage />} />
               <Route path="/armed-reseve" element={<ArmedReservePage />} />
               <Route path="/recruitment" element={<RecruitmentPage />} />
               <Route path="/Meal" element={<MealPage />} />
               <Route path="/News" element={<NewsPage />} />
+              <Route
+                path="/MyPage"
+                element={
+                  <MyPage
+                    user={user}
+                    profile={profile ?? null}
+                    isProfileLoading={profile === undefined}
+                    onProfileUpdated={setProfile}
+                    onAccountDeleted={handleSignOut}
+                  />
+                }
+              />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/Community" element={<CommunityPage user={user} profile={profile ?? null} />} />
               <Route path="/Community/write" element={<PostWritePage user={user} profile={profile ?? null} />} />
               <Route path="/Community/:postId" element={<PostDetailPage user={user} profile={profile ?? null} />} />
               <Route path="/Community/:postId/edit" element={<PostWritePage user={user} profile={profile ?? null} />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/support" element={<SupportPage />} />
             </Routes>
           </main>
           <Footer />
         </div>
         <CartModal />
-        {showProfileSetup && user && (
+        {showProfileSetup && user ? (
           <ProfileSetupModal
             user={user}
+            initialProfile={profile ?? null}
             onProfileCreated={(newProfile) => {
+              const shouldShowCompletionMessage = profile == null;
               setProfile(newProfile);
               setShowProfileSetup(false);
+              if (shouldShowCompletionMessage) {
+                setShowSignupCompletion(true);
+              }
             }}
             onSignOut={handleSignOut}
           />
-        )}
+        ) : null}
+        <SignupCompletionModal
+          isOpen={showSignupCompletion}
+          onClose={() => setShowSignupCompletion(false)}
+        />
       </BrowserRouter>
     </CartProvider>
   );

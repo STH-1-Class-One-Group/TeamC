@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { User } from '@supabase/supabase-js';
+import { Helmet } from 'react-helmet-async';
 
 import {
   getSupabaseConfigErrorMessage,
@@ -516,6 +517,12 @@ export const NewsPage: React.FC = () => {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>국방 뉴스 | Modern Sentinel</title>
+        <meta name="description" content="최신 국방 뉴스와 방산 이슈를 확인할 수 있습니다." />
+        <meta property="og:title" content="국방 뉴스 | Modern Sentinel" />
+        <meta property="og:description" content="최신 국방 뉴스와 방산 이슈를 확인할 수 있습니다." />
+      </Helmet>
       <header className="mb-10 flex flex-col items-center justify-center space-y-4 sm:mb-12">
         <h1 className="text-center text-3xl font-extrabold tracking-tighter text-on-surface dark:text-white lg:text-4xl">
           국방 뉴스 <span className="text-primary dark:text-blue-400">아카이브</span>

@@ -68,8 +68,6 @@ const parseNumber = (value: string) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-const padNumber = (value: number) => value.toString().padStart(2, '0');
-
 const addYearsToDateText = (value: string) => {
   if (!/^\d{8}$/.test(value)) {
     return '';

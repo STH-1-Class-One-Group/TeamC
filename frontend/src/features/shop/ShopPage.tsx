@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import { SearchBar } from '../../components/common/SearchBar';
 import { ProductCard } from './components/ProductCard';
@@ -30,6 +31,12 @@ export const ShopPage: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>스토어 | Modern Sentinel</title>
+        <meta name="description" content="군 생활에 필요한 상품과 보급품을 확인할 수 있습니다." />
+        <meta property="og:title" content="스토어 | Modern Sentinel" />
+        <meta property="og:description" content="군 생활에 필요한 상품과 보급품을 확인할 수 있습니다." />
+      </Helmet>
       <section className="mx-auto mb-10 max-w-2xl px-0 sm:mb-14">
         <SearchBar
           searchType="food"

@@ -2,7 +2,7 @@ from typing import Literal, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Query
 
-from app.schemas.community_schema import CommentCreate, PostCreate, PostUpdate
+from app.schemas.community_schema import CommentCreate, PostCreate, PostUpdate, PostVoteRequest
 from app.services import community_service
 
 router = APIRouter()
@@ -44,9 +44,13 @@ async def list_posts(
 
 
 @router.get("/community/posts/{post_id}")
-async def get_post(post_id: str, background_tasks: BackgroundTasks):
+async def get_post(
+    post_id: str,
+    background_tasks: BackgroundTasks,
+    authorization: Optional[str] = Header(None),
+):
     try:
-        post = await community_service.get_post_detail(post_id)
+        post = await community_service.get_post_detail(post_id, _extract_token(authorization))
         if not post:
             raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
         background_tasks.add_task(community_service.increment_views, post_id)
@@ -55,6 +59,29 @@ async def get_post(post_id: str, background_tasks: BackgroundTasks):
         raise
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error)) from error
+
+
+@router.post("/community/posts/{post_id}/views", status_code=204)
+async def increment_post_views(post_id: str):
+    post = await community_service.get_post_detail(post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
+    await community_service.increment_views(post_id)
+
+
+@router.post("/community/posts/{post_id}/vote")
+async def vote_post(
+    post_id: str,
+    body: PostVoteRequest,
+    authorization: Optional[str] = Header(None),
+):
+    token = _require_token(authorization)
+    try:
+        return await community_service.set_post_vote(post_id, body.vote_type, token)
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
 @router.post("/community/posts", status_code=201)

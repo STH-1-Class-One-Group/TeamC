@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import { buildApiUrl } from '../../api/apiBaseUrl';
 import { SearchBar } from '../../components/common/SearchBar';
@@ -468,6 +469,12 @@ export const MealPage: React.FC = () => {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>군 급식 정보 | Modern Sentinel</title>
+        <meta name="description" content="오늘과 전후 날짜의 군 급식 메뉴를 검색하고 확인할 수 있습니다." />
+        <meta property="og:title" content="군 급식 정보 | Modern Sentinel" />
+        <meta property="og:description" content="오늘과 전후 날짜의 군 급식 메뉴를 검색하고 확인할 수 있습니다." />
+      </Helmet>
       <div className="mx-auto mb-8 max-w-2xl sm:mb-10">
         <SearchBar
           searchType="food"

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import {
   getSupabaseConfigErrorMessage,
@@ -15,7 +16,9 @@ interface LoginModalProps {
 type OAuthProvider = 'google' | 'kakao' | 'naver';
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const getRedirectTo = () => {
     if (typeof window === 'undefined') {
@@ -98,15 +101,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="mt-8 text-center text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-          로그인하면 Modern Sentinel의
-          <button type="button" className="mx-1 underline hover:text-primary">
+          로그인하면 Modern Sentinel의{' '}
+          <Link to="/terms" onClick={onClose} className="underline hover:text-primary">
             이용약관
-          </button>
-          및
+          </Link>
+          {' '}및
           <br />
-          <button type="button" className="underline hover:text-primary">
+          <Link to="/privacy" onClick={onClose} className="underline hover:text-primary">
             개인정보처리방침
-          </button>
+          </Link>
           에 동의하게 됩니다.
         </div>
       </div>

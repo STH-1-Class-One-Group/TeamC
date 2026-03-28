@@ -18,6 +18,9 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   nickname,
   rank,
   avatar_url,
+  user_type,
+  service_track,
+  enlistment_date,
   containerClassName,
   imageClassName = 'w-full h-full object-cover',
   fallbackClassName = 'bg-blue-600 text-white text-sm font-bold',
@@ -26,12 +29,16 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const [usedDefaultFallback, setUsedDefaultFallback] = useState(false);
 
   useEffect(() => {
-    setImageSrc(getProfileAvatarUrl({ rank, avatar_url }));
+    setImageSrc(getProfileAvatarUrl({ rank, avatar_url, user_type, service_track, enlistment_date }));
     setUsedDefaultFallback(false);
-  }, [rank, avatar_url]);
+  }, [rank, avatar_url, user_type, service_track, enlistment_date]);
 
   const handleImageError = () => {
-    if (!usedDefaultFallback && getProfileAvatarPath({ rank, avatar_url }) !== DEFAULT_PROFILE_AVATAR_PATH) {
+    if (
+      !usedDefaultFallback &&
+      getProfileAvatarPath({ rank, avatar_url, user_type, service_track, enlistment_date }) !==
+        DEFAULT_PROFILE_AVATAR_PATH
+    ) {
       setImageSrc(getDefaultProfileAvatarUrl());
       setUsedDefaultFallback(true);
       return;

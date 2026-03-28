@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import {
   buildApiUrl,
   getApiResponseErrorMessage,
   getApiRuntimeErrorMessage,
   isNetworkFetchError,
 } from '../../api/apiBaseUrl';
-import { MealPopup, MealItem } from './components/MealPopup';
+import { calculateServiceTimeline } from '../../utils/serviceDates';
 import { fetchNewsBatch } from '../news/newsApi';
+import { Profile } from '../profile/types';
+import { MealPopup, MealItem } from './components/MealPopup';
 
 interface MealData {
   dates: string;
@@ -36,6 +39,10 @@ interface NewsItem {
   link: string;
   pubDate: string;
   thumbnail: string;
+}
+
+interface DashboardPageProps {
+  profile: Profile | null;
 }
 
 const getTodayString = () => {
@@ -71,9 +78,19 @@ const DEFAULT_MEAL_INFO = {
   dinner: '불러오는 중...',
 };
 
-export const DashboardPage: React.FC = () => {
+export const DashboardPage: React.FC<DashboardPageProps> = ({ profile }) => {
   const navigate = useNavigate();
   const didInitRef = useRef(false);
+  const performanceOriginRef = useRef<number | null>(null);
+  const servicePanelRef = useRef<HTMLDivElement | null>(null);
+
+  const [liveNowMs, setLiveNowMs] = useState(() => {
+    const initialOrigin = Date.now() - performance.now();
+    performanceOriginRef.current = initialOrigin;
+    return initialOrigin + performance.now();
+  });
+  const [visualProgressPercent, setVisualProgressPercent] = useState(0);
+  const [isServicePanelVisible, setIsServicePanelVisible] = useState(false);
 
   const [mealInfo, setMealInfo] = useState(DEFAULT_MEAL_INFO);
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
@@ -95,10 +112,59 @@ export const DashboardPage: React.FC = () => {
   });
 
   useEffect(() => {
+    const node = servicePanelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsServicePanelVisible(Boolean(entry?.isIntersecting));
+      },
+      { threshold: 0.15 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (performanceOriginRef.current == null) {
+      performanceOriginRef.current = Date.now() - performance.now();
+    }
+
+    if (!isServicePanelVisible) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      if (performanceOriginRef.current != null) {
+        setLiveNowMs(performanceOriginRef.current + performance.now());
+      }
+    }, 70);
+
+    return () => window.clearInterval(intervalId);
+  }, [isServicePanelVisible]);
+
+  const serviceTimeline = calculateServiceTimeline({
+    userType: profile?.user_type,
+    serviceTrack: profile?.service_track,
+    enlistmentDate: profile?.enlistment_date,
+    cadreCategory: profile?.cadre_category,
+    rank: profile?.rank,
+    acquaintanceName: profile?.acquaintance_name,
+    acquaintanceServiceTrack: profile?.acquaintance_service_track,
+    acquaintanceEnlistmentDate: profile?.acquaintance_enlistment_date,
+    now: new Date(liveNowMs),
+  });
+
+  useEffect(() => {
     if (didInitRef.current) {
       return;
     }
     didInitRef.current = true;
+
     const processMealData = async (data: MealData[]) => {
       const cleanString = (value?: string) => (value ? value.replace(/\([^)]*\)/g, '').trim() : '');
 
@@ -183,6 +249,7 @@ export const DashboardPage: React.FC = () => {
     const fetchMeals = async () => {
       setMealInfo(DEFAULT_MEAL_INFO);
       setMealError('');
+
       try {
         const todayDate = getTodayString();
         const response = await fetch(buildApiUrl(`/api/v1/meals/${todayDate}`));
@@ -201,7 +268,7 @@ export const DashboardPage: React.FC = () => {
         setMealError(
           isNetworkFetchError(error)
             ? getApiRuntimeErrorMessage('식단 데이터')
-            : '식단 데이터를 불러오지 못해 기본 메뉴를 표시합니다.'
+            : '식단 데이터를 불러오지 못해 기본 메뉴를 표시합니다.',
         );
         await processMealData(FALLBACK_MEALS(getTodayDisplayString()));
       }
@@ -225,7 +292,8 @@ export const DashboardPage: React.FC = () => {
 
         const data: NewsItem[] = await response.json();
         const uniqueNews = data.filter(
-          (item, index, array) => item.link && array.findIndex((candidate) => candidate.link === item.link) === index
+          (item, index, array) =>
+            item.link && array.findIndex((candidate) => candidate.link === item.link) === index,
         );
         setNewsList(uniqueNews);
       } catch (error) {
@@ -233,7 +301,7 @@ export const DashboardPage: React.FC = () => {
         setNewsError(
           isNetworkFetchError(error)
             ? getApiRuntimeErrorMessage('뉴스')
-            : '뉴스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+            : '뉴스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
         );
       } finally {
         window.clearTimeout(timeoutId);
@@ -241,9 +309,13 @@ export const DashboardPage: React.FC = () => {
       }
     };
 
-    fetchMeals();
-    fetchNews();
+    void fetchMeals();
+    void fetchNews();
   }, []);
+
+  useEffect(() => {
+    setVisualProgressPercent(serviceTimeline.progressPercent);
+  }, [serviceTimeline.progressPercent]);
 
   const handleMealClick = (mealType: string, items: MealItem[]) => {
     setSelectedMealType(mealType);
@@ -252,9 +324,10 @@ export const DashboardPage: React.FC = () => {
     setIsPopupOpen(true);
   };
 
+  const liveProgressLabel = serviceTimeline.progressPercent.toFixed(10);
+
   return (
     <div className="w-full space-y-10 sm:space-y-12 lg:space-y-16">
-      {/* Header Section */}
       <section className="relative">
         <div className="max-w-3xl">
           <h1 className="mb-5 text-4xl font-extrabold leading-tight tracking-tighter text-on-surface dark:text-white sm:text-5xl lg:mb-6 lg:text-[3.5rem]">
@@ -270,72 +343,139 @@ export const DashboardPage: React.FC = () => {
         <div className="absolute -right-6 top-0 -z-10 h-48 w-48 rounded-full signature-gradient opacity-10 blur-[72px] sm:-right-12 sm:-top-6 sm:h-72 sm:w-72 lg:-right-20 lg:-top-10 lg:h-96 lg:w-96 lg:blur-[100px]"></div>
       </section>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-12 lg:gap-8">
-        {/* Discharge Calculator */}
-        <div className="flex flex-col justify-between space-y-6 rounded-xl border border-transparent bg-surface-container-lowest p-5 shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all dark:border-slate-800 dark:bg-slate-900/50 sm:p-6 md:col-span-7 lg:col-span-8 lg:space-y-8 lg:p-8">
+        <div
+          ref={servicePanelRef}
+          className="flex flex-col justify-between space-y-6 rounded-xl border border-transparent bg-surface-container-lowest p-5 shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all dark:border-slate-800 dark:bg-slate-900/50 sm:p-6 md:col-span-7 lg:col-span-8 lg:space-y-8 lg:p-8"
+        >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase mb-2 block">인원 현황</span>
-              <h2 className="text-2xl font-bold text-on-surface dark:text-white">전역일 계산기</h2>
+              <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-primary dark:text-blue-400">
+                복무 현황
+              </span>
+              <h2 className="text-2xl font-bold text-on-surface dark:text-white">전역 계산기</h2>
+              <p className="mt-2 text-sm text-on-surface-variant dark:text-slate-400">
+                {serviceTimeline.subjectLabel}
+              </p>
             </div>
-            <div className="bg-surface-container-low dark:bg-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary dark:text-blue-400 text-sm" translate="no">timer</span>
-              <span className="text-sm font-semibold text-on-surface dark:text-white">D-184</span>
+            <div className="flex items-center gap-2 rounded-full bg-surface-container-low px-4 py-2 dark:bg-slate-800">
+              <span className="material-symbols-outlined text-sm text-primary dark:text-blue-400" translate="no">
+                timer
+              </span>
+              <span className="text-sm font-semibold text-on-surface dark:text-white">
+                {serviceTimeline.dDayLabel}
+              </span>
             </div>
           </div>
 
           <div className="space-y-5 sm:space-y-6">
+            <div className="rounded-2xl border border-outline-variant/15 bg-surface-container-low/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant dark:text-slate-400">
+                복무 구분
+              </p>
+              <div className="mt-1 flex items-end justify-between gap-3">
+                <p className="text-sm font-semibold text-on-surface dark:text-white">
+                  {serviceTimeline.serviceLabel}
+                </p>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary dark:bg-blue-500/10 dark:text-blue-300">
+                  {serviceTimeline.serviceDurationLabel}
+                </span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-outline-variant/15 bg-surface-container-low/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant dark:text-slate-400">
+                현재 계급/직급
+              </p>
+              <div className="mt-1 flex items-end justify-between gap-3">
+                <p className="text-sm font-semibold text-on-surface dark:text-white">
+                  {serviceTimeline.displayRankLabel}
+                </p>
+                {serviceTimeline.usesAcquaintance ? (
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-300">
+                    지인 기준
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
             <div className="flex flex-col gap-4 md:flex-row">
               <div className="flex-1 space-y-2">
-                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">입대일</label>
-                <input className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm" type="text" defaultValue="2023. 05. 08" readOnly />
+                <label className="ml-1 text-xs font-medium text-on-surface-variant dark:text-slate-400">
+                  입대일/임용일
+                </label>
+                <input
+                  className="w-full rounded-lg border-none bg-surface-container-low px-4 py-3 text-sm text-on-surface focus:ring-1 focus:ring-primary dark:bg-slate-800 dark:text-white"
+                  type="text"
+                  value={serviceTimeline.enlistmentLabel}
+                  readOnly
+                />
               </div>
               <div className="flex-1 space-y-2">
-                <label className="text-xs font-medium text-on-surface-variant dark:text-slate-400 ml-1">전역일</label>
-                <input className="w-full bg-surface-container-low dark:bg-slate-800 border-none rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary text-on-surface dark:text-white text-sm" type="text" defaultValue="2024. 11. 07" readOnly />
+                <label className="ml-1 text-xs font-medium text-on-surface-variant dark:text-slate-400">
+                  전역일
+                </label>
+                <input
+                  className="w-full rounded-lg border-none bg-surface-container-low px-4 py-3 text-sm text-on-surface focus:ring-1 focus:ring-primary dark:bg-slate-800 dark:text-white"
+                  type="text"
+                  value={serviceTimeline.dischargeLabel}
+                  readOnly
+                />
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-end justify-between gap-4">
-                <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">복무율</span>
-                <span className="text-3xl font-extrabold tracking-tighter text-primary dark:text-blue-400 sm:text-4xl">68.4<span className="text-lg sm:text-xl">%</span></span>
+                <span className="text-sm font-medium text-on-surface-variant dark:text-slate-400">
+                  복무율
+                </span>
+                <span className="inline-flex min-w-[14ch] justify-end font-mono text-3xl font-extrabold tracking-tighter text-primary tabular-nums dark:text-blue-400 sm:text-4xl">
+                  {liveProgressLabel}
+                  <span className="ml-1 text-lg sm:text-xl">%</span>
+                </span>
               </div>
-              <div className="w-full h-3 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full signature-gradient rounded-full" style={{ width: '68.4%' }}></div>
+              <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container-low dark:bg-slate-800">
+                <div
+                  className="h-full rounded-full signature-gradient transition-[width] duration-700 ease-out"
+                  style={{ width: `${visualProgressPercent}%` }}
+                ></div>
               </div>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400">
+                {serviceTimeline.helperText}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Reservist Status */}
         <div className="rounded-xl border border-transparent bg-surface-container-lowest p-5 shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all dark:border-slate-800 dark:bg-slate-900/50 sm:p-6 md:col-span-5 lg:col-span-4 lg:p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="material-symbols-outlined text-primary dark:text-blue-400 bg-primary-fixed dark:bg-blue-900/40 p-2 rounded-lg" translate="no">military_tech</span>
+          <div className="mb-8 flex items-center gap-3">
+            <span className="material-symbols-outlined rounded-lg bg-primary-fixed p-2 text-primary dark:bg-blue-900/40 dark:text-blue-400" translate="no">
+              military_tech
+            </span>
             <h2 className="text-xl font-bold text-on-surface dark:text-white">예비군 현황</h2>
           </div>
           <div className="space-y-6">
             <div>
-              <p className="text-xs text-on-surface-variant dark:text-slate-400 mb-1">현재 상태</p>
+              <p className="mb-1 text-xs text-on-surface-variant dark:text-slate-400">현재 상태</p>
               <p className="text-xl font-bold dark:text-white">예비군 1년차</p>
             </div>
-            <div className="p-4 bg-surface-container-low dark:bg-slate-800 rounded-lg space-y-4">
-              <div className="flex justify-between items-start">
+            <div className="space-y-4 rounded-lg bg-surface-container-low p-4 dark:bg-slate-800">
+              <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-bold dark:text-white">동원훈련</p>
                   <p className="text-xs text-on-surface-variant dark:text-slate-400">2024. 09. 12 - 09. 14</p>
                 </div>
-                <span className="bg-tertiary-container dark:bg-slate-700 text-on-tertiary-container dark:text-slate-200 px-2 py-1 rounded text-[10px] font-bold">대기 중</span>
+                <span className="rounded bg-tertiary-container px-2 py-1 text-[10px] font-bold text-on-tertiary-container dark:bg-slate-700 dark:text-slate-200">
+                  대기 중
+                </span>
               </div>
-              <div className="border-t border-outline-variant/15 dark:border-slate-700 pt-3">
+              <div className="border-t border-outline-variant/15 pt-3 dark:border-slate-700">
                 <p className="text-xs text-on-surface-variant dark:text-slate-400">장소: 파주 예비군 훈련장</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Today's Meals */}
         <div className="flex flex-col rounded-xl border border-transparent bg-surface-container-low p-5 transition-all dark:border-slate-800 dark:bg-slate-900/50 sm:p-6 md:col-span-5 lg:col-span-4 lg:p-8">
           <div className="mb-6 flex items-center justify-between sm:mb-8">
             <h2 className="text-xl font-bold text-on-surface dark:text-white">오늘의 식단</h2>
@@ -352,11 +492,11 @@ export const DashboardPage: React.FC = () => {
             >
               <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                 <span className="w-16 shrink-0 text-xs font-bold text-primary dark:text-blue-400">조식</span>
-                <p className="text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400 line-clamp-2">
+                <p className="line-clamp-2 text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400">
                   {mealInfo.breakfast}
                 </p>
               </div>
-              <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
+              <button className="flex text-on-surface-variant transition-colors group-hover:text-primary dark:text-slate-400 dark:group-hover:text-blue-400">
                 <span className="material-symbols-outlined text-lg" translate="no">chevron_right</span>
               </button>
             </div>
@@ -366,11 +506,11 @@ export const DashboardPage: React.FC = () => {
             >
               <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                 <span className="w-16 shrink-0 text-xs font-bold text-primary dark:text-blue-400">중식</span>
-                <p className="text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400 line-clamp-2">
+                <p className="line-clamp-2 text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400">
                   {mealInfo.lunch}
                 </p>
               </div>
-              <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
+              <button className="flex text-on-surface-variant transition-colors group-hover:text-primary dark:text-slate-400 dark:group-hover:text-blue-400">
                 <span className="material-symbols-outlined text-lg" translate="no">chevron_right</span>
               </button>
             </div>
@@ -380,28 +520,30 @@ export const DashboardPage: React.FC = () => {
             >
               <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                 <span className="w-16 shrink-0 text-xs font-bold text-primary dark:text-blue-400">석식</span>
-                <p className="text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400 line-clamp-2">
+                <p className="line-clamp-2 text-sm text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400">
                   {mealInfo.dinner}
                 </p>
               </div>
-              <button className="text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors flex">
+              <button className="flex text-on-surface-variant transition-colors group-hover:text-primary dark:text-slate-400 dark:group-hover:text-blue-400">
                 <span className="material-symbols-outlined text-lg" translate="no">chevron_right</span>
               </button>
             </div>
           </div>
           <button
             onClick={() => navigate('/Meal')}
-            className="mt-auto pt-6 text-sm font-bold text-primary dark:text-blue-400 flex items-center gap-1 hover:gap-2 transition-all"
+            className="mt-auto flex items-center gap-1 pt-6 text-sm font-bold text-primary transition-all hover:gap-2 dark:text-blue-400"
           >
             전체 식단 보기 <span className="material-symbols-outlined text-sm" translate="no">arrow_forward</span>
           </button>
         </div>
 
-        {/* Defense News */}
         <div className="rounded-xl border border-transparent bg-surface-container-lowest p-5 shadow-[0_12px_40px_rgba(27,28,28,0.06)] transition-all dark:border-slate-800 dark:bg-slate-900/50 sm:p-6 md:col-span-7 lg:col-span-8 lg:p-8">
           <div className="mb-6 flex items-center justify-between sm:mb-8">
             <h2 className="text-xl font-bold text-on-surface dark:text-white">국방 뉴스</h2>
-            <button onClick={() => navigate('/News')} className="text-xs font-bold text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-400">
+            <button
+              onClick={() => navigate('/News')}
+              className="text-xs font-bold text-on-surface-variant hover:text-primary dark:text-slate-400 dark:hover:text-blue-400"
+            >
               전체보기
             </button>
           </div>
@@ -412,43 +554,53 @@ export const DashboardPage: React.FC = () => {
           ) : null}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
             {isNewsLoading ? (
-              [1, 2, 3, 4].map((i) => (
-                <div key={i} className="animate-pulse flex items-center gap-4">
-                  <div className="w-16 h-16 bg-surface-container-low dark:bg-slate-800 rounded-lg"></div>
+              [1, 2, 3, 4].map((index) => (
+                <div key={index} className="flex animate-pulse items-center gap-4">
+                  <div className="h-16 w-16 rounded-lg bg-surface-container-low dark:bg-slate-800"></div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-surface-container-low dark:bg-slate-800 rounded w-3/4"></div>
-                    <div className="h-3 bg-surface-container-low dark:bg-slate-800 rounded w-1/2"></div>
+                    <div className="h-4 w-3/4 rounded bg-surface-container-low dark:bg-slate-800"></div>
+                    <div className="h-3 w-1/2 rounded bg-surface-container-low dark:bg-slate-800"></div>
                   </div>
                 </div>
               ))
             ) : newsList.length > 0 ? (
-              newsList.map((item, idx) => (
+              newsList.map((item, index) => (
                 <a
-                  key={idx}
+                  key={item.link || index}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-2 -m-2 rounded-lg hover:bg-surface-variant/30 transition-colors group"
+                  className="group -m-2 flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-surface-variant/30"
                 >
-                  <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-surface-container-low dark:bg-slate-800 border border-outline-variant/10">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-outline-variant/10 bg-surface-container-low dark:bg-slate-800">
                     {item.thumbnail ? (
-                      <img src={item.thumbnail} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <img
+                        src={item.thumbnail}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-outline-variant" translate="no">article</span>
+                      <div className="flex h-full w-full items-center justify-center">
+                        <span className="material-symbols-outlined text-outline-variant" translate="no">
+                          article
+                        </span>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold line-clamp-2 text-on-surface dark:text-slate-200 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="line-clamp-2 text-sm font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-slate-200 dark:group-hover:text-blue-400">
                       {item.title}
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant dark:text-slate-500 mt-1">{item.pubDate}</p>
+                    <p className="mt-1 text-[10px] text-on-surface-variant dark:text-slate-500">
+                      {item.pubDate}
+                    </p>
                   </div>
                 </a>
               ))
             ) : (
-              <p className="text-sm text-on-surface-variant dark:text-slate-500 col-span-2 py-4">표시할 뉴스가 없습니다.</p>
+              <p className="col-span-2 py-4 text-sm text-on-surface-variant dark:text-slate-500">
+                표시할 뉴스가 없습니다.
+              </p>
             )}
           </div>
         </div>

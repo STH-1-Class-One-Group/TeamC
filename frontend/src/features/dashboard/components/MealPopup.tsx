@@ -45,7 +45,7 @@ export const MealPopup: React.FC<MealPopupProps> = ({
           <div>
             <div className="inline-flex items-center gap-2 mb-1">
               <span className="material-symbols-outlined text-primary dark:text-blue-400 scale-75" translate="no">restaurant</span>
-              <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase">Meal Detail</span>
+              <span className="text-xs font-bold text-primary dark:text-blue-400 tracking-widest uppercase">식단 상세</span>
             </div>
             <h2 className="text-2xl font-black text-on-surface dark:text-white tracking-tight">
               {mealType} 상세 정보 <span className="text-lg opacity-70">({dateLabel})</span>
@@ -83,7 +83,7 @@ export const MealPopup: React.FC<MealPopupProps> = ({
           {/* Total Calorie Bar */}
           <div className="mt-8 pt-6 border-t border-surface-container-low dark:border-slate-800">
             <div className="flex justify-between items-end">
-              <span className="text-on-surface-variant dark:text-slate-400 font-bold text-sm uppercase">Daily Total Energy</span>
+              <span className="text-on-surface-variant dark:text-slate-400 font-bold text-sm uppercase">총 섭취 칼로리</span>
               <div className="text-right flex items-baseline gap-1">
                 <span className="text-3xl font-black text-primary dark:text-blue-400">
                   {totalCalories.toLocaleString()}

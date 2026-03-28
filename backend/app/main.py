@@ -5,6 +5,8 @@ import re
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+from app.api.v1.auth import router as auth_router
 from app.api.v1.community import router as community_router
 from app.api.v1.meal import router as meal_router
 from app.api.v1.news import router as news_router
@@ -19,7 +21,7 @@ logging.basicConfig(
 
 app = FastAPI(
     title="TeamC Backend API",
-    description="군대 소식 기반 웹사이트 백엔드 API",
+    description="국방 정보 기반 웹사이트 백엔드 API",
     version="1.0.0",
 )
 
@@ -47,6 +49,7 @@ async def normalize_request_path(request, call_next):
     return await call_next(request)
 
 
+app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
 app.include_router(meal_router, prefix="/api/v1", tags=["meals"])
 app.include_router(news_router, prefix="/api/v1", tags=["news"])
 app.include_router(community_router, prefix="/api/v1", tags=["community"])

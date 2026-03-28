@@ -39,9 +39,10 @@ def _base_headers(token: Optional[str] = None) -> dict[str, str]:
     headers = {"Content-Type": "application/json"}
 
     if token:
-        if not settings.supabase_anon_key:
-            raise HTTPException(status_code=500, detail="Supabase anon key is not configured.")
-        headers["apikey"] = settings.supabase_anon_key
+        api_key = settings.supabase_anon_key or settings.supabase_service_role_key
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Supabase credentials are not configured.")
+        headers["apikey"] = api_key
         headers["Authorization"] = f"Bearer {token}"
         return headers
 
@@ -205,7 +206,11 @@ async def _fetch_profiles_map(author_ids: list[str]) -> dict[str, dict[str, Any]
         return {author_id: {"id": author_id} for author_id in normalized_ids}
 
 
-def _map_db_post_row(row: dict[str, Any], include_content: bool) -> dict[str, Any]:
+def _map_db_post_row(
+    row: dict[str, Any],
+    include_content: bool,
+    viewer_vote: Optional[str] = None,
+) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
         "post_number": row.get("post_number", 0) or 0,
@@ -213,6 +218,9 @@ def _map_db_post_row(row: dict[str, Any], include_content: bool) -> dict[str, An
         "content": row.get("content", "") if include_content else "",
         "category": row.get("category", "general"),
         "views": row.get("views", 0) or 0,
+        "upvotes": row.get("upvotes", 0) or 0,
+        "downvotes": row.get("downvotes", 0) or 0,
+        "viewer_vote": viewer_vote,
         "created_at": row.get("created_at").isoformat() if row.get("created_at") else "",
         "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else "",
         "author": {
@@ -272,6 +280,8 @@ def _fetch_posts_from_db(
                     posts.title,
                     posts.category,
                     posts.views,
+                    posts.upvotes,
+                    posts.downvotes,
                     posts.created_at,
                     posts.updated_at,
                     profiles.id as author_id,
@@ -296,7 +306,7 @@ def _fetch_posts_from_db(
     }
 
 
-def _fetch_post_detail_from_db(post_id: str) -> Optional[dict[str, Any]]:
+def _fetch_post_detail_from_db(post_id: str, viewer_vote: Optional[str] = None) -> Optional[dict[str, Any]]:
     if not settings.database_url:
         raise HTTPException(status_code=502, detail="Community service upstream request failed.")
 
@@ -311,6 +321,8 @@ def _fetch_post_detail_from_db(post_id: str) -> Optional[dict[str, Any]]:
                     posts.content,
                     posts.category,
                     posts.views,
+                    posts.upvotes,
+                    posts.downvotes,
                     posts.created_at,
                     posts.updated_at,
                     profiles.id as author_id,
@@ -325,7 +337,7 @@ def _fetch_post_detail_from_db(post_id: str) -> Optional[dict[str, Any]]:
             )
             row = cursor.fetchone()
 
-    return _map_db_post_row(dict(row), include_content=True) if row else None
+    return _map_db_post_row(dict(row), include_content=True, viewer_vote=viewer_vote) if row else None
 
 
 def _fetch_comments_from_db(post_id: str) -> list[dict[str, Any]]:
@@ -382,7 +394,7 @@ async def get_posts(
     search_type: str,
 ) -> dict[str, Any]:
     params = {
-        "select": "id,post_number,title,category,views,created_at,updated_at,author_id",
+        "select": "id,post_number,title,category,views,upvotes,downvotes,created_at,updated_at,author_id",
         "order": "post_number.desc",
         "limit": str(per_page),
         "offset": str((page - 1) * per_page),
@@ -412,14 +424,43 @@ async def get_posts(
         return await asyncio.to_thread(_fetch_posts_from_db, page, per_page, category, query, search_type)
 
 
-async def get_post_detail(post_id: str) -> Optional[dict[str, Any]]:
+async def get_post_vote(post_id: str, token: str) -> Optional[str]:
+    user_id = await _get_user_id(token)
+    response = await _request(
+        "GET",
+        f"{_get_supabase_rest_url()}/community_post_votes",
+        headers=_base_headers(token),
+        params={
+            "select": "vote_type",
+            "post_id": f"eq.{post_id}",
+            "user_id": f"eq.{user_id}",
+            "limit": "1",
+        },
+    )
+    rows = response.json()
+    if not rows:
+        return None
+    return rows[0].get("vote_type")
+
+
+async def get_post_detail(
+    post_id: str,
+    token: Optional[str] = None,
+) -> Optional[dict[str, Any]]:
+    viewer_vote: Optional[str] = None
+    if token:
+        try:
+            viewer_vote = await get_post_vote(post_id, token)
+        except HTTPException as error:
+            logger.warning("Failed to load viewer vote for post %s: %s", post_id, error.detail)
+
     try:
         response = await _request(
             "GET",
             f"{_get_supabase_rest_url()}/community_posts",
             headers=_base_headers(),
             params={
-                "select": "id,post_number,title,content,category,views,created_at,updated_at,author_id",
+                "select": "id,post_number,title,content,category,views,upvotes,downvotes,created_at,updated_at,author_id",
                 "id": f"eq.{post_id}",
             },
         )
@@ -427,12 +468,12 @@ async def get_post_detail(post_id: str) -> Optional[dict[str, Any]]:
         if not rows:
             return None
         profiles_map = await _fetch_profiles_map([rows[0].get("author_id", "")])
-        return _format_post(rows[0], profiles_map)
+        return _format_post(rows[0], profiles_map, viewer_vote=viewer_vote)
     except HTTPException as error:
         if error.status_code != 502:
             raise
         logger.warning("Falling back to direct DB for community post detail.")
-        return await asyncio.to_thread(_fetch_post_detail_from_db, post_id)
+        return await asyncio.to_thread(_fetch_post_detail_from_db, post_id, viewer_vote)
 
 
 async def increment_views(post_id: str) -> None:
@@ -449,6 +490,28 @@ async def increment_views(post_id: str) -> None:
             return
         logger.warning("Falling back to direct DB for community view increment.")
         await asyncio.to_thread(_increment_views_in_db, post_id)
+
+
+async def set_post_vote(post_id: str, vote_type: str, token: str) -> dict[str, Any]:
+    response = await _request(
+        "POST",
+        f"{_get_supabase_rest_url()}/rpc/set_post_vote",
+        headers=_base_headers(token),
+        json={
+            "p_post_id": post_id,
+            "p_vote_type": vote_type,
+        },
+    )
+
+    payload = response.json()
+    if isinstance(payload, list):
+        payload = payload[0] if payload else {}
+
+    return {
+        "upvotes": payload.get("upvotes", 0),
+        "downvotes": payload.get("downvotes", 0),
+        "viewer_vote": payload.get("viewer_vote"),
+    }
 
 
 async def create_post(data: dict[str, Any], token: str) -> dict[str, Any]:
@@ -565,7 +628,7 @@ def _resolve_author_profile(
     row: dict[str, Any],
     profiles_map: Optional[dict[str, dict[str, Any]]] = None,
 ) -> Any:
-    embedded_profile = row.get("profiles")
+    embedded_profile = row.get("profiles") or row.get("author")
     if embedded_profile:
         return embedded_profile
 
@@ -588,6 +651,9 @@ def _format_post_summary(
         "content": "",
         "category": row.get("category", "general"),
         "views": row.get("views", 0) or 0,
+        "upvotes": row.get("upvotes", 0) or 0,
+        "downvotes": row.get("downvotes", 0) or 0,
+        "viewer_vote": None,
         "created_at": row.get("created_at", ""),
         "updated_at": row.get("updated_at", ""),
         "author": _author_payload(_resolve_author_profile(row, profiles_map)),
@@ -597,6 +663,7 @@ def _format_post_summary(
 def _format_post(
     row: dict[str, Any],
     profiles_map: Optional[dict[str, dict[str, Any]]] = None,
+    viewer_vote: Optional[str] = None,
 ) -> dict[str, Any]:
     return {
         "id": row.get("id", ""),
@@ -605,6 +672,9 @@ def _format_post(
         "content": row.get("content", ""),
         "category": row.get("category", "general"),
         "views": row.get("views", 0) or 0,
+        "upvotes": row.get("upvotes", 0) or 0,
+        "downvotes": row.get("downvotes", 0) or 0,
+        "viewer_vote": viewer_vote,
         "created_at": row.get("created_at", ""),
         "updated_at": row.get("updated_at", ""),
         "author": _author_payload(_resolve_author_profile(row, profiles_map)),
